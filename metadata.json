@@ -1,0 +1,6 @@
+{
+  "name": "Simulador Queda Livre - POE",
+  "description": "Simulador interativo de física focado na metodologia POE (Prever, Observar, Explicar) para demonstrar a queda livre e independência da massa.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
