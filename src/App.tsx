@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Square, RotateCcw, Activity, ArrowRight, Brain, Eye, BookOpen, Lightbulb } from 'lucide-react';
+import { Play, Square, RotateCcw, Activity, Settings2, LineChart as ChartIcon, Zap } from 'lucide-react';
 import { SimulationCanvas } from './components/SimulationCanvas';
 import { ChartsArea } from './components/ChartsArea';
 import { EnergyDisplay } from './components/EnergyDisplay';
 import { HistoryComparison } from './components/HistoryComparison';
 import { useEngine } from './hooks/useEngine';
-import { PoeStage, SimulationConfig, SimulationResult } from './types';
+import { SimulationConfig, SimulationResult } from './types';
 import { calculateFallTime } from './lib/utils';
 
 export default function App() {
-  const [stage, setStage] = useState<PoeStage>('prever');
-  const [prediction, setPrediction] = useState<string>('');
-  
   const [config, setConfig] = useState<SimulationConfig>({
     height: 50,
     massA: 2,
@@ -28,10 +25,9 @@ export default function App() {
 
   const engine = useEngine(config);
 
-  // Auto-advance to explanation when simulation finishes in "observar" stage
+  // Save to history when finished
   useEffect(() => {
-    if (stage === 'observar' && engine.isFinished) {
-      // Save to history
+    if (engine.isFinished) {
       const newRun: SimulationResult = {
         id: Math.random().toString(36).substring(7),
         config: { ...config },
@@ -42,61 +38,37 @@ export default function App() {
         maxU_B: Math.max(...engine.dataPoints.map(d => d.u_B), 0),
       };
       setHistory(prev => [...prev, newRun]);
-      
-      // Delay before showing explanation so they can see final results
-      setTimeout(() => {
-        setStage('explicar');
-      }, 1500);
     }
-  }, [engine.isFinished, stage, config]);
-
-  const handleStartObservation = () => {
-    if (!prediction) {
-      alert("Por favor, faça uma previsão antes de avançar!");
-      return;
-    }
-    setStage('observar');
-    engine.reset();
-  };
-
-  const resetMethodology = () => {
-    setStage('prever');
-    setPrediction('');
-    engine.reset();
-  };
+  }, [engine.isFinished, config]);
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-800 font-sans selection:bg-blue-200">
+    <div className="min-h-screen bg-[#09090b] text-[#f3f4f6] font-sans selection:bg-purple-500/30 pb-12 relative overflow-hidden">
       
+      {/* Abstract Background Decoration */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-purple-600/10 blur-[120px]"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-600/10 blur-[120px]"></div>
+      </div>
+
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-50">
+      <header className="bg-[#110e1b]/80 backdrop-blur-md border-b border-[#2d2844] sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Activity className="w-6 h-6 text-blue-600" />
-            <h1 className="font-bold text-lg tracking-tight">Física Lab: Queda Livre</h1>
+          <div className="flex items-center gap-3">
+            <div className="bg-purple-500/20 p-2 rounded-xl border border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.3)]">
+               <Zap className="w-5 h-5 text-purple-400" />
+            </div>
+            <h1 className="font-bold text-xl tracking-wider text-purple-50 uppercase drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]">Física Lab</h1>
           </div>
-          
-          {/* POE Progress Tracker */}
-          <div className="hidden md:flex items-center gap-4 text-sm font-medium text-slate-400">
-            <div className={`flex items-center gap-1 ${stage === 'prever' ? 'text-blue-600' : 'text-slate-600'}`}>
-              <Brain className="w-4 h-4" /> Prever
-            </div>
-            <ArrowRight className="w-4 h-4 opacity-30" />
-            <div className={`flex items-center gap-1 ${stage === 'observar' ? 'text-blue-600' : ''}`}>
-              <Eye className="w-4 h-4" /> Observar
-            </div>
-            <ArrowRight className="w-4 h-4 opacity-30" />
-            <div className={`flex items-center gap-1 ${stage === 'explicar' ? 'text-blue-600' : ''}`}>
-              <BookOpen className="w-4 h-4" /> Explicar
-            </div>
+          <div className="hidden md:flex items-center gap-2 text-xs font-semibold text-purple-300/60">
+             <span className="bg-[#161423] px-3 py-1.5 rounded-full border border-[#2d2844] tracking-widest uppercase shadow-inner">Simulador de Queda Livre</span>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <main className="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
         
         {/* Left Column: Canvas & Direct Controls */}
-        <div className="lg:col-span-5 space-y-4">
+        <div className="lg:col-span-5 space-y-6">
           <SimulationCanvas 
             y={engine.y} 
             height={config.height} 
@@ -107,184 +79,98 @@ export default function App() {
           />
           
           {/* Playback Controls */}
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 flex items-center justify-center gap-4">
+          <div className="bg-[#13111c] p-4 rounded-2xl border border-[#2d2844] shadow-lg flex items-center justify-center gap-4">
             <button 
               onClick={engine.start}
-              disabled={engine.isRunning || stage !== 'observar'}
-              className="flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-medium rounded-full transition-colors"
+              disabled={engine.isRunning}
+              className="flex items-center gap-2 px-6 py-2.5 bg-purple-600/20 hover:bg-purple-600/30 disabled:bg-[#1a1829] disabled:text-[#474066] disabled:border-[#2d2844] text-purple-300 font-bold rounded-xl border border-purple-500/50 shadow-[0_0_15px_rgba(168,85,247,0.2)] disabled:shadow-none transition-all"
             >
-              <Play className="w-4 h-4 fill-current" /> Iniciar
+              <Play className="w-4 h-4 fill-current" /> INICIAR
             </button>
             <button 
               onClick={engine.pause}
               disabled={!engine.isRunning}
-              className="flex items-center gap-2 px-6 py-2 bg-amber-500 hover:bg-amber-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-medium rounded-full transition-colors"
+              className="flex items-center gap-2 px-6 py-2.5 bg-cyan-500/10 hover:bg-cyan-500/20 disabled:bg-[#1a1829] disabled:text-[#474066] disabled:border-[#2d2844] text-cyan-400 font-bold rounded-xl border border-cyan-500/30 shadow-[0_0_10px_rgba(34,211,238,0.1)] disabled:shadow-none transition-all"
             >
-              <Square className="w-4 h-4 fill-current" /> Pausar
+              <Square className="w-4 h-4 fill-current" /> PAUSAR
             </button>
             <button 
               onClick={engine.reset}
-              disabled={stage !== 'observar'}
-              className="flex items-center gap-2 px-6 py-2 bg-slate-200 hover:bg-slate-300 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed text-slate-700 font-medium rounded-full transition-colors"
+              className="flex items-center gap-2 px-6 py-2.5 bg-[#1a1829] hover:bg-[#201d36] text-purple-300/80 font-bold rounded-xl border border-[#2d2844] transition-all"
             >
-              <RotateCcw className="w-4 h-4" /> Resetar
+              <RotateCcw className="w-4 h-4" /> RESET
             </button>
           </div>
         </div>
 
-        {/* Right Column: POE & Data Panels */}
+        {/* Right Column: Configuration & Data Panels */}
         <div className="lg:col-span-7 space-y-6">
           
-          {/* POE Panel */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-            {stage === 'prever' && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-blue-50 text-blue-600 rounded-full">
-                    <Brain className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-slate-800">Passo 1: Previsão</h2>
-                    <p className="text-slate-500 mt-1">Configure os objetos e responda a pergunta antes de simular.</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 bg-slate-50 p-4 rounded-lg border border-slate-100">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Altura Inicial (m)</label>
-                    <input type="range" min="10" max="100" step="5" value={config.height} onChange={e => setConfig({...config, height: Number(e.target.value)})} className="w-full" />
-                    <div className="text-right text-xs font-mono font-bold text-blue-600 mt-1">{config.height} m</div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Massa A (kg) - Azul</label>
-                    <input type="range" min="1" max="50" value={config.massA} onChange={e => setConfig({...config, massA: Number(e.target.value)})} className="w-full" />
-                    <div className="text-right text-xs font-mono font-bold text-blue-600 mt-1">{config.massA} kg</div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Massa B (kg) - Laranja</label>
-                    <input type="range" min="1" max="50" value={config.massB} onChange={e => setConfig({...config, massB: Number(e.target.value)})} className="w-full" />
-                    <div className="text-right text-xs font-mono font-bold text-orange-600 mt-1">{config.massB} kg</div>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <h3 className="font-semibold text-slate-800">Se abandonarmos ambos simultaneamente, qual chegará ao solo primeiro?</h3>
-                  <div className="flex flex-col gap-2">
-                    <label className="flex items-center gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors">
-                      <input type="radio" name="pred" value="A" onChange={e => setPrediction(e.target.value)} checked={prediction === 'A'} className="w-4 h-4 text-blue-600" />
-                      O objeto A chegará primeiro
-                    </label>
-                    <label className="flex items-center gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors">
-                      <input type="radio" name="pred" value="B" onChange={e => setPrediction(e.target.value)} checked={prediction === 'B'} className="w-4 h-4 text-blue-600" />
-                      O objeto B chegará primeiro
-                    </label>
-                    <label className="flex items-center gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors">
-                      <input type="radio" name="pred" value="Juntos" onChange={e => setPrediction(e.target.value)} checked={prediction === 'Juntos'} className="w-4 h-4 text-blue-600" />
-                      Ambos chegarão juntos
-                    </label>
-                  </div>
-                </div>
-
-                <div className="flex justify-end pt-4 border-t border-slate-100">
-                  <button onClick={handleStartObservation} className="flex items-center gap-2 px-6 py-2 bg-slate-900 hover:bg-black text-white font-medium rounded-full transition-colors">
-                    Avançar para Observação <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
+          {/* Configuration Panel */}
+          <div className="bg-[#13111c] p-6 rounded-2xl border border-[#2d2844] shadow-lg relative">
+            <div className="flex items-start gap-4 mb-6 border-b border-[#2d2844] pb-4">
+              <div className="p-3 bg-purple-500/10 text-purple-400 rounded-xl border border-purple-500/30 shadow-[0_0_10px_rgba(168,85,247,0.2)]">
+                <Settings2 className="w-6 h-6" />
               </div>
-            )}
-
-            {stage === 'observar' && (
-              <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-amber-50 text-amber-600 rounded-full">
-                      <Eye className="w-5 h-5" />
-                    </div>
-                    <h2 className="text-lg font-bold text-slate-800">Passo 2: Observação</h2>
-                  </div>
-                  <div className="text-sm font-mono bg-slate-100 px-3 py-1 rounded text-slate-600">
-                    Tempo: {engine.time.toFixed(2)}s
-                  </div>
-                </div>
-                <p className="text-slate-500 text-sm">Utilize os controles abaixo do simulador para iniciar. Analise os gráficos e energias ativando-os no painel.</p>
-                
-                {/* Visual Toggles */}
-                <div className="flex flex-wrap gap-4 pt-4 border-t border-slate-100">
-                  <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
-                    <div className={`w-10 h-6 flex items-center bg-slate-300 rounded-full p-1 cursor-pointer transition-colors ${toggles.vectors ? 'bg-blue-600' : ''}`} onClick={() => setToggles(t => ({...t, vectors: !t.vectors}))}>
-                      <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${toggles.vectors ? 'translate-x-4' : ''}`} />
-                    </div>
-                    Vetores (Força/Velocidade)
-                  </label>
-                  <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
-                    <div className={`w-10 h-6 flex items-center bg-slate-300 rounded-full p-1 cursor-pointer transition-colors ${toggles.graphs ? 'bg-blue-600' : ''}`} onClick={() => setToggles(t => ({...t, graphs: !t.graphs}))}>
-                      <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${toggles.graphs ? 'translate-x-4' : ''}`} />
-                    </div>
-                    Gráficos de Posição
-                  </label>
-                  <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
-                    <div className={`w-10 h-6 flex items-center bg-slate-300 rounded-full p-1 cursor-pointer transition-colors ${toggles.energies ? 'bg-blue-600' : ''}`} onClick={() => setToggles(t => ({...t, energies: !t.energies}))}>
-                      <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${toggles.energies ? 'translate-x-4' : ''}`} />
-                    </div>
-                    Monitor de Energia
-                  </label>
-                </div>
+              <div>
+                <h2 className="text-xl font-bold text-purple-50 uppercase tracking-wide">Configurações</h2>
+                <p className="text-purple-300/60 mt-1 text-sm">Ajuste os parâmetros iniciais para realizar seus testes.</p>
               </div>
-            )}
-
-            {stage === 'explicar' && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-left-4 duration-500">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 bg-emerald-50 text-emerald-600 rounded-full">
-                    <Lightbulb className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-slate-800">Passo 3: Explicação</h2>
-                    <p className="text-slate-500 mt-1">Confrontando suas previsões com a física.</p>
-                  </div>
-                </div>
-
-                <div className={`p-4 rounded-lg border ${prediction === 'Juntos' ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}`}>
-                  <h3 className={`font-bold ${prediction === 'Juntos' ? 'text-emerald-800' : 'text-amber-800'}`}>
-                    Sua previsão: {prediction === 'Juntos' ? 'Ambos chegam juntos.' : `Objeto ${prediction} chega primeiro.`}
-                  </h3>
-                  <p className="text-slate-700 text-sm mt-2">
-                    {prediction === 'Juntos' 
-                      ? 'Excelente! Como vimos na simulação, independentemente da diferença de massa, ambos caem ao mesmo tempo.' 
-                      : 'A intuição muitas vezes nos engana! Na simulação, vimos que independentemente da massa, ambos caíram exatamente ao mesmo tempo.'}
-                  </p>
-                </div>
-
-                <div className="prose prose-sm prose-slate">
-                  <p>
-                    <strong>Por que isso acontece?</strong> Pela Segunda Lei de Newton (F = m.a) e a Lei da Gravitação, a força peso é P = m.g. 
-                    Igualando as duas (m.a = m.g), a massa (m) cancela dos dois lados. Portanto, a aceleração (a) de qualquer objeto em queda livre 
-                    é igual à gravidade (g), <strong>independente da sua massa!</strong>
-                  </p>
-                  <p>
-                    Embora a aceleração e velocidade sejam iguais, note na tabela abaixo que as <strong>Energias Cinética e Potencial</strong> são diferentes.
-                    O objeto mais massivo acumula mais energia (J), mesmo caindo na mesma velocidade.
-                  </p>
-                </div>
-
-                <div className="flex justify-end pt-4 border-t border-slate-100">
-                  <button onClick={resetMethodology} className="flex items-center gap-2 px-6 py-2 bg-slate-900 hover:bg-black text-white font-medium rounded-full transition-colors">
-                    <RotateCcw className="w-4 h-4" /> Nova Simulação
-                  </button>
-                </div>
+              <div className="ml-auto text-sm font-mono font-bold bg-[#1a1829] px-4 py-2 border border-[#2d2844] rounded-lg text-purple-300 shadow-inner">
+                Tempo: {engine.time.toFixed(2)}s
               </div>
-            )}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 bg-[#0c0a13] p-5 rounded-xl border border-[#2d2844]">
+              <div>
+                <label className="block text-xs font-bold text-purple-300/80 mb-2 uppercase tracking-wider">Altura (m)</label>
+                <input type="range" min="10" max="100" step="5" value={config.height} onChange={e => setConfig({...config, height: Number(e.target.value)})} className="w-full accent-purple-500" disabled={engine.time > 0} />
+                <div className="text-right text-sm font-mono font-bold text-purple-400 mt-1">{config.height} m</div>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-cyan-300/80 mb-2 uppercase tracking-wider">Massa A (Cyan)</label>
+                <input type="range" min="1" max="50" value={config.massA} onChange={e => setConfig({...config, massA: Number(e.target.value)})} className="w-full accent-cyan-400" disabled={engine.time > 0} />
+                <div className="text-right text-sm font-mono font-bold text-cyan-400 mt-1">{config.massA} kg</div>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-fuchsia-300/80 mb-2 uppercase tracking-wider">Massa B (Fuchsia)</label>
+                <input type="range" min="1" max="50" value={config.massB} onChange={e => setConfig({...config, massB: Number(e.target.value)})} className="w-full accent-fuchsia-500" disabled={engine.time > 0} />
+                <div className="text-right text-sm font-mono font-bold text-fuchsia-400 mt-1">{config.massB} kg</div>
+              </div>
+            </div>
+
+            {/* Visual Toggles */}
+            <div className="flex flex-wrap gap-6 pt-6 mt-6 border-t border-[#2d2844]">
+              <label className="flex items-center gap-3 text-xs font-bold text-purple-300/80 uppercase tracking-wider cursor-pointer">
+                <div className={`w-12 h-6 flex items-center bg-[#1a1829] border border-[#2d2844] rounded-full p-1 cursor-pointer transition-colors ${toggles.vectors ? 'bg-purple-600/40 border-purple-500/50 shadow-[0_0_10px_rgba(168,85,247,0.3)]' : ''}`} onClick={() => setToggles(t => ({...t, vectors: !t.vectors}))}>
+                  <div className={`bg-purple-300/50 w-4 h-4 rounded-full transform transition-transform ${toggles.vectors ? 'translate-x-6 bg-purple-300' : ''}`} />
+                </div>
+                Vetores
+              </label>
+              <label className="flex items-center gap-3 text-xs font-bold text-purple-300/80 uppercase tracking-wider cursor-pointer">
+                <div className={`w-12 h-6 flex items-center bg-[#1a1829] border border-[#2d2844] rounded-full p-1 cursor-pointer transition-colors ${toggles.graphs ? 'bg-purple-600/40 border-purple-500/50 shadow-[0_0_10px_rgba(168,85,247,0.3)]' : ''}`} onClick={() => setToggles(t => ({...t, graphs: !t.graphs}))}>
+                  <div className={`bg-purple-300/50 w-4 h-4 rounded-full transform transition-transform ${toggles.graphs ? 'translate-x-6 bg-purple-300' : ''}`} />
+                </div>
+                Gráficos
+              </label>
+              <label className="flex items-center gap-3 text-xs font-bold text-purple-300/80 uppercase tracking-wider cursor-pointer">
+                <div className={`w-12 h-6 flex items-center bg-[#1a1829] border border-[#2d2844] rounded-full p-1 cursor-pointer transition-colors ${toggles.energies ? 'bg-purple-600/40 border-purple-500/50 shadow-[0_0_10px_rgba(168,85,247,0.3)]' : ''}`} onClick={() => setToggles(t => ({...t, energies: !t.energies}))}>
+                  <div className={`bg-purple-300/50 w-4 h-4 rounded-full transform transition-transform ${toggles.energies ? 'translate-x-6 bg-purple-300' : ''}`} />
+                </div>
+                Energia
+              </label>
+            </div>
           </div>
 
           {/* Dynamic Data Visualizations based on toggles */}
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            {(toggles.energies && stage !== 'prever') && (
+            {(toggles.energies) && (
               <div className="xl:col-span-1 animate-in fade-in duration-300">
                 <EnergyDisplay kA={engine.kA} uA={engine.uA} kB={engine.kB} uB={engine.uB} />
               </div>
             )}
             
-            {(toggles.graphs && stage !== 'prever') && (
+            {(toggles.graphs) && (
               <div className="xl:col-span-1 animate-in fade-in duration-300">
                 <ChartsArea data={engine.dataPoints} />
               </div>
