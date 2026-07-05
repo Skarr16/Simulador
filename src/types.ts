@@ -1,27 +1,47 @@
-export type PoeStage = 'prever' | 'observar' | 'explicar';
+export interface PhysicsObject {
+  id: string;
+  name: string;
+  mass: number; // kg
+  area: number; // m^2
+  cd: number; // drag coefficient
+  color: string;
+  radius: number; // visual relative size
+}
+
+export interface Environment {
+  id: string;
+  name: string;
+  g: number; // m/s^2
+  rho: number; // kg/m^3
+}
 
 export interface SimulationConfig {
   height: number;
-  massA: number;
-  massB: number;
+  structureId: string;
+  objectAId: string;
+  objectBId: string;
+  environmentId: string;
+  enableAirResistance: boolean;
+}
+
+export interface SimulationState {
+  t: number;
+  yA: number;
+  vA: number;
+  aA: number;
+  FdA: number;
+  yB: number;
+  vB: number;
+  aB: number;
+  FdB: number;
 }
 
 export interface SimulationResult {
   id: string;
   config: SimulationConfig;
-  timeToFall: number;
+  timeToFallA: number;
+  timeToFallB: number;
   maxK_A: number;
   maxK_B: number;
-  maxU_A: number;
-  maxU_B: number;
 }
 
-export interface DataPoint {
-  time: number;
-  y: number;
-  v: number;
-  k_A: number;
-  k_B: number;
-  u_A: number;
-  u_B: number;
-}

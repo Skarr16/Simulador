@@ -12,42 +12,41 @@ export function EnergyDisplay({ kA, uA, kB, uB }: EnergyDisplayProps) {
   const totalB = kB + uB;
 
   return (
-    <div className="bg-[#13111c] p-5 rounded-2xl border border-[#2d2844] shadow-lg font-mono text-sm h-full relative overflow-hidden">
-      <div className="absolute bottom-0 left-0 w-32 h-32 bg-cyan-600/10 rounded-full blur-[50px]"></div>
-      <h3 className="font-sans font-bold text-purple-200 mb-4 uppercase tracking-widest text-center drop-shadow-[0_0_5px_rgba(168,85,247,0.3)]">Monitor de Energia (J)</h3>
+    <div className="bg-white p-5 rounded-2xl shadow-[6px_6px_0px_0px_#0f172a] border-[3px] border-slate-900 font-mono text-sm h-full">
+      <h3 className="font-sans font-black text-slate-900 mb-4 uppercase tracking-widest text-center">Monitor de Energia (J)</h3>
       
-      <div className="grid grid-cols-2 gap-4 h-full relative z-10">
+      <div className="grid grid-cols-2 gap-4 h-full">
         {/* Objeto A */}
-        <div className="space-y-3 bg-[#0c0a13]/80 p-4 rounded-xl border border-cyan-500/20 flex flex-col justify-center shadow-[inset_0_0_15px_rgba(34,211,238,0.05)]">
-          <div className="text-cyan-300 bg-cyan-900/40 px-2 py-1 rounded border border-cyan-400/50 font-bold font-sans text-[10px] uppercase tracking-wider inline-block self-start shadow-[0_0_10px_rgba(34,211,238,0.2)] mb-1">Objeto A</div>
+        <div className="space-y-3 bg-[#fdf2f8] p-3 rounded-xl border-2 border-slate-900 flex flex-col justify-center">
+          <div className="text-white bg-[#FF3366] px-2 py-1 rounded border-2 border-slate-900 font-black font-sans text-xs inline-block self-start shadow-[2px_2px_0px_0px_#0f172a] mb-1">Objeto A</div>
           <div className="flex justify-between items-center text-xs">
-            <span className="text-purple-300/60 font-bold">K:</span>
-            <span className="font-bold text-cyan-100">{kA.toFixed(1)}</span>
+            <span className="text-slate-500 font-bold">K:</span>
+            <span className="font-black text-slate-900">{kA.toFixed(1)}</span>
           </div>
           <div className="flex justify-between items-center text-xs">
-            <span className="text-purple-300/60 font-bold">U:</span>
-            <span className="font-bold text-cyan-100">{uA.toFixed(1)}</span>
+            <span className="text-slate-500 font-bold">U:</span>
+            <span className="font-black text-slate-900">{uA.toFixed(1)}</span>
           </div>
-          <div className="flex justify-between items-center border-t border-[#2d2844] pt-3 mt-1 font-bold text-cyan-300">
+          <div className="flex justify-between items-center border-t-2 border-dashed border-slate-300 pt-2 mt-1 font-black text-slate-900">
             <span>Total:</span>
-            <span className="drop-shadow-[0_0_5px_rgba(34,211,238,0.5)]">{totalA.toFixed(1)}</span>
+            <span>{totalA.toFixed(1)}</span>
           </div>
         </div>
 
         {/* Objeto B */}
-        <div className="space-y-3 bg-[#0c0a13]/80 p-4 rounded-xl border border-fuchsia-500/20 flex flex-col justify-center shadow-[inset_0_0_15px_rgba(217,70,239,0.05)]">
-          <div className="text-fuchsia-300 bg-fuchsia-900/40 px-2 py-1 rounded border border-fuchsia-400/50 font-bold font-sans text-[10px] uppercase tracking-wider inline-block self-start shadow-[0_0_10px_rgba(217,70,239,0.2)] mb-1">Objeto B</div>
+        <div className="space-y-3 bg-[#eff6ff] p-3 rounded-xl border-2 border-slate-900 flex flex-col justify-center">
+          <div className="text-white bg-[#0055FF] px-2 py-1 rounded border-2 border-slate-900 font-black font-sans text-xs inline-block self-start shadow-[2px_2px_0px_0px_#0f172a] mb-1">Objeto B</div>
           <div className="flex justify-between items-center text-xs">
-            <span className="text-purple-300/60 font-bold">K:</span>
-            <span className="font-bold text-fuchsia-100">{kB.toFixed(1)}</span>
+            <span className="text-slate-500 font-bold">K:</span>
+            <span className="font-black text-slate-900">{kB.toFixed(1)}</span>
           </div>
           <div className="flex justify-between items-center text-xs">
-            <span className="text-purple-300/60 font-bold">U:</span>
-            <span className="font-bold text-fuchsia-100">{uB.toFixed(1)}</span>
+            <span className="text-slate-500 font-bold">U:</span>
+            <span className="font-black text-slate-900">{uB.toFixed(1)}</span>
           </div>
-          <div className="flex justify-between items-center border-t border-[#2d2844] pt-3 mt-1 font-bold text-fuchsia-300">
+          <div className="flex justify-between items-center border-t-2 border-dashed border-slate-300 pt-2 mt-1 font-black text-slate-900">
             <span>Total:</span>
-            <span className="drop-shadow-[0_0_5px_rgba(217,70,239,0.5)]">{totalB.toFixed(1)}</span>
+            <span>{totalB.toFixed(1)}</span>
           </div>
         </div>
       </div>

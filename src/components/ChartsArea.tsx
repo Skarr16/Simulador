@@ -1,46 +1,79 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { DataPoint } from '../types';
+import { SimulationState } from '../types';
 
 interface ChartsAreaProps {
-  data: DataPoint[];
+  data: SimulationState[];
 }
 
 export function ChartsArea({ data }: ChartsAreaProps) {
+  const [activeTab, setActiveTab] = useState<'position' | 'velocity'>('position');
+
   if (data.length === 0) {
-    return <div className="h-48 flex items-center justify-center font-bold text-purple-300/40 bg-[#13111c] rounded-2xl border border-[#2d2844] border-dashed">Aguardando simulação...</div>;
+    return <div className="h-48 flex items-center justify-center font-bold text-slate-400 bg-white rounded-2xl border-[3px] border-slate-900 border-dashed">Aguardando simulação...</div>;
   }
 
+  // Downsample data for Recharts to improve performance
+  const chartData = data.filter((_, i) => i % 10 === 0 || i === data.length - 1);
+
   return (
-    <div className="w-full h-64 bg-[#13111c] border border-[#2d2844] p-4 rounded-2xl shadow-lg relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-32 h-32 bg-purple-600/10 rounded-full blur-[50px]"></div>
-      <h3 className="text-xs font-bold text-purple-200 mb-2 text-center uppercase tracking-widest drop-shadow-[0_0_5px_rgba(168,85,247,0.3)]">Posição vs Tempo</h3>
-      <ResponsiveContainer width="100%" height="85%">
-        <LineChart data={data} margin={{ top: 5, right: 20, left: -20, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#2d2844" />
-          <XAxis 
-            dataKey="time" 
-            type="number" 
-            tickFormatter={(t) => `${t.toFixed(1)}s`} 
-            domain={['dataMin', 'dataMax']} 
-            className="text-[10px] font-bold fill-purple-300/50"
-            stroke="#2d2844"
-          />
-          <YAxis 
-            className="text-[10px] font-bold fill-purple-300/50"
-            label={{ value: 'Altura (m)', angle: -90, position: 'insideLeft', style: { fontSize: '10px', fontWeight: 'bold', fill: 'rgba(216, 180, 254, 0.5)' } }}
-            stroke="#2d2844"
-          />
-          <Tooltip 
-            formatter={(value: number) => [`${value.toFixed(2)}m`, 'Posição']}
-            labelFormatter={(label: number) => `Tempo: ${label.toFixed(2)}s`}
-            contentStyle={{ borderRadius: '12px', border: '1px solid #a855f7', backgroundColor: '#0c0a13', color: '#e9d5ff', fontWeight: 'bold', boxShadow: '0 0 15px rgba(168,85,247,0.3)' }}
-            itemStyle={{ color: '#e9d5ff' }}
-          />
-          <Line type="monotone" dataKey="y" name="Objeto A (Cyan)" stroke="#22d3ee" strokeWidth={4} dot={false} isAnimationActive={false} style={{ filter: 'drop-shadow(0 0 5px rgba(34,211,238,0.5))' }} />
-          <Line type="monotone" dataKey="y" name="Objeto B (Fuchsia)" stroke="#d946ef" strokeWidth={2} strokeDasharray="4 4" dot={false} isAnimationActive={false} style={{ filter: 'drop-shadow(0 0 5px rgba(217,70,239,0.5))' }} />
-        </LineChart>
-      </ResponsiveContainer>
+    <div className="w-full h-80 bg-white border-[3px] border-slate-900 p-4 rounded-2xl shadow-[6px_6px_0px_0px_#0f172a] flex flex-col">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">
+          {activeTab === 'position' ? 'Posição (m) vs Tempo (s)' : 'Velocidade (m/s) vs Tempo (s)'}
+        </h3>
+        <div className="flex bg-[#F4F1EB] rounded-lg p-1 border-[3px] border-slate-900">
+          <button 
+            onClick={() => setActiveTab('position')}
+            className={`px-3 py-1 text-xs font-black uppercase rounded ${activeTab === 'position' ? 'bg-[#00C48C] border-2 border-slate-900' : 'text-slate-500 hover:text-slate-900'}`}
+          >
+            Posição
+          </button>
+          <button 
+            onClick={() => setActiveTab('velocity')}
+            className={`px-3 py-1 text-xs font-black uppercase rounded ${activeTab === 'velocity' ? 'bg-[#FFB800] border-2 border-slate-900' : 'text-slate-500 hover:text-slate-900'}`}
+          >
+            Velocidade
+          </button>
+        </div>
+      </div>
+      
+      <div className="flex-1 min-h-0">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={chartData} margin={{ top: 5, right: 20, left: -20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#cbd5e1" />
+            <XAxis 
+              dataKey="t" 
+              type="number" 
+              tickFormatter={(t) => `${t.toFixed(1)}s`} 
+              domain={['dataMin', 'dataMax']} 
+              className="text-[10px] font-bold fill-slate-500"
+            />
+            <YAxis 
+              className="text-[10px] font-bold fill-slate-500"
+            />
+            <Tooltip 
+              formatter={(value: number) => [`${value.toFixed(2)} ${activeTab === 'position' ? 'm' : 'm/s'}`, '']}
+              labelFormatter={(label: number) => `Tempo: ${label.toFixed(2)}s`}
+              contentStyle={{ borderRadius: '8px', border: '3px solid #0f172a', fontWeight: 'bold' }}
+            />
+            <Legend wrapperStyle={{ fontSize: '12px', fontWeight: 'bold' }} />
+            
+            {activeTab === 'position' ? (
+              <>
+                <Line type="monotone" dataKey="yA" name="Objeto A" stroke="#FF3366" strokeWidth={4} dot={false} isAnimationActive={false} />
+                <Line type="monotone" dataKey="yB" name="Objeto B" stroke="#0055FF" strokeWidth={4} dot={false} isAnimationActive={false} />
+              </>
+            ) : (
+              <>
+                <Line type="monotone" dataKey="vA" name="Objeto A" stroke="#FF3366" strokeWidth={4} dot={false} isAnimationActive={false} />
+                <Line type="monotone" dataKey="vB" name="Objeto B" stroke="#0055FF" strokeWidth={4} dot={false} isAnimationActive={false} />
+              </>
+            )}
+            
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }
