@@ -91,7 +91,7 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                     <Wind className="w-4 h-4 text-slate-700" />
                     <span className="text-sm font-black uppercase text-slate-900">Resistência do Ar</span>
                   </div>
-                  <div className={`w-12 h-6 flex items-center bg-[#F4F1EB] border-2 border-slate-900 rounded-full p-0.5 transition-colors ${config.enableAirResistance ? 'bg-[#00C48C]' : ''}`}>
+                  <div className={`w-12 h-6 flex items-center border-2 border-slate-900 rounded-full p-0.5 transition-colors ${config.enableAirResistance ? 'bg-[#00C48C]' : 'bg-slate-200'}`}>
                     <input 
                       type="checkbox" 
                       className="hidden" 
@@ -99,7 +99,7 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                       onChange={(e) => setConfig({ ...config, enableAirResistance: e.target.checked })}
                       disabled={disabled || ENVIRONMENTS[config.environmentId].rho === 0}
                     />
-                    <div className={`bg-slate-900 w-4 h-4 rounded-full transform transition-transform ${config.enableAirResistance ? 'translate-x-6' : 'translate-x-0'}`} />
+                    <div className={`w-4 h-4 rounded-full shadow-sm transform transition-transform ${config.enableAirResistance ? 'translate-x-6 bg-white' : 'translate-x-0 bg-slate-500'}`} />
                   </div>
                 </label>
                 {ENVIRONMENTS[config.environmentId].rho === 0 && (
@@ -167,8 +167,8 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                 className="flex items-center justify-between w-full hover:bg-slate-50 p-2 rounded-lg transition-colors text-left"
               >
                 <span className="text-sm font-black uppercase text-slate-700">Vetores de Força</span>
-                <div className={`w-12 h-6 flex items-center bg-[#F4F1EB] border-2 border-slate-900 rounded-full p-0.5 transition-colors ${toggles.vectors ? 'bg-[#00C48C]' : ''}`}>
-                  <div className={`bg-slate-900 w-4 h-4 rounded-full transform transition-transform ${toggles.vectors ? 'translate-x-6' : 'translate-x-0'}`} />
+                <div className={`w-12 h-6 flex items-center border-2 border-slate-900 rounded-full p-0.5 transition-colors ${toggles.vectors ? 'bg-[#00C48C]' : 'bg-slate-200'}`}>
+                  <div className={`w-4 h-4 rounded-full shadow-sm transform transition-transform ${toggles.vectors ? 'translate-x-6 bg-white' : 'translate-x-0 bg-slate-500'}`} />
                 </div>
               </button>
               <button 
@@ -177,8 +177,8 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                 className="flex items-center justify-between w-full hover:bg-slate-50 p-2 rounded-lg transition-colors text-left"
               >
                 <span className="text-sm font-black uppercase text-slate-700">Gráficos de Queda</span>
-                <div className={`w-12 h-6 flex items-center bg-[#F4F1EB] border-2 border-slate-900 rounded-full p-0.5 transition-colors ${toggles.graphs ? 'bg-[#00C48C]' : ''}`}>
-                  <div className={`bg-slate-900 w-4 h-4 rounded-full transform transition-transform ${toggles.graphs ? 'translate-x-6' : 'translate-x-0'}`} />
+                <div className={`w-12 h-6 flex items-center border-2 border-slate-900 rounded-full p-0.5 transition-colors ${toggles.graphs ? 'bg-[#00C48C]' : 'bg-slate-200'}`}>
+                  <div className={`w-4 h-4 rounded-full shadow-sm transform transition-transform ${toggles.graphs ? 'translate-x-6 bg-white' : 'translate-x-0 bg-slate-500'}`} />
                 </div>
               </button>
               <button 
@@ -187,8 +187,8 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                 className="flex items-center justify-between w-full hover:bg-slate-50 p-2 rounded-lg transition-colors text-left"
               >
                 <span className="text-sm font-black uppercase text-slate-700">Medidor de Energia</span>
-                <div className={`w-12 h-6 flex items-center bg-[#F4F1EB] border-2 border-slate-900 rounded-full p-0.5 transition-colors ${toggles.energies ? 'bg-[#00C48C]' : ''}`}>
-                  <div className={`bg-slate-900 w-4 h-4 rounded-full transform transition-transform ${toggles.energies ? 'translate-x-6' : 'translate-x-0'}`} />
+                <div className={`w-12 h-6 flex items-center border-2 border-slate-900 rounded-full p-0.5 transition-colors ${toggles.energies ? 'bg-[#00C48C]' : 'bg-slate-200'}`}>
+                  <div className={`w-4 h-4 rounded-full shadow-sm transform transition-transform ${toggles.energies ? 'translate-x-6 bg-white' : 'translate-x-0 bg-slate-500'}`} />
                 </div>
               </button>
             </div>

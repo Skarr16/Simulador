@@ -133,7 +133,7 @@ export default function App() {
         setConfig={setConfig} 
         toggles={toggles} 
         setToggles={setToggles} 
-        disabled={engine.time > 0} 
+        disabled={engine.isRunning} 
       />
     </div>
   );
