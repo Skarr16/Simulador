@@ -15,23 +15,36 @@ interface SimulationCanvasProps {
   objectB: PhysicsObject;
   env: Environment;
   showVectors: boolean;
+  devMode?: boolean;
 }
 
 export function SimulationCanvas({ 
-  height, structureId, yA, yB, vA, vB, FdA, FdB, objectA, objectB, env, showVectors 
+  height, structureId, yA, yB, vA, vB, FdA, FdB, objectA, objectB, env, showVectors, devMode 
 }: SimulationCanvasProps) {
 
   const [scaleFactor, setScaleFactor] = useState(1);
-  const devOffsets: Record<string, {left: number, bottom: number, width: number, height: number}> = {
+  const [devOffsets, setDevOffsets] = useState<Record<string, {left: number, bottom: number, width: number, height: number}>>({
     pisa: { left: -3, bottom: -23, width: 88, height: 120 },
     eiffel: { left: 1, bottom: -20, width: 40, height: 108 },
     cristo: { left: 0, bottom: -21, width: 40, height: 112 },
-    gize: { left: -3, bottom: -25, width: 88, height: 125 }
-  };
+    gize: { left: -3, bottom: -25, width: 46, height: 125 }
+  });
 
   const currentOffset = structureId && structureId !== 'custom' && devOffsets[structureId] 
     ? devOffsets[structureId] 
     : { left: 20, bottom: 10, width: 40, height: 85 };
+
+  const updateOffset = (key: 'left' | 'bottom' | 'width' | 'height', value: number) => {
+    if (structureId && structureId !== 'custom') {
+      setDevOffsets(prev => ({
+        ...prev,
+        [structureId]: {
+          ...prev[structureId],
+          [key]: value
+        }
+      }));
+    }
+  };
 
   useEffect(() => {
     const updateScale = () => {
@@ -143,6 +156,17 @@ export function SimulationCanvas({
           </svg>
         )}
       </div>
+
+      {/* Dev Structure Offset Tweak Panel */}
+      {devMode && structureId && structureId !== 'custom' && (
+        <div className="absolute top-4 right-4 bg-white/90 p-4 border-2 border-slate-900 rounded-lg shadow-lg z-50 flex flex-col gap-2 w-64 pointer-events-auto text-xs font-mono font-black text-slate-900">
+          <div className="mb-2 text-sm text-center">Ajuste de Imagem ({structureId})</div>
+          <label className="flex flex-col gap-1">Left ({currentOffset.left}%)<input type="range" min="-50" max="100" value={currentOffset.left} onChange={(e) => updateOffset('left', Number(e.target.value))} /></label>
+          <label className="flex flex-col gap-1">Bottom ({currentOffset.bottom}%)<input type="range" min="-50" max="100" value={currentOffset.bottom} onChange={(e) => updateOffset('bottom', Number(e.target.value))} /></label>
+          <label className="flex flex-col gap-1">Max-Width ({currentOffset.width}%)<input type="range" min="10" max="200" value={currentOffset.width} onChange={(e) => updateOffset('width', Number(e.target.value))} /></label>
+          <label className="flex flex-col gap-1">Height ({currentOffset.height}%)<input type="range" min="10" max="200" value={currentOffset.height} onChange={(e) => updateOffset('height', Number(e.target.value))} /></label>
+        </div>
+      )}
 
       {/* Structures */}
       {structureId !== 'custom' && (

@@ -21,6 +21,7 @@ export default function App() {
     vectors: true,
     graphs: false,
     energies: false,
+    devMode: false,
   });
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -75,6 +76,7 @@ export default function App() {
                 objectB={engine.objectB}
                 env={engine.env}
                 showVectors={toggles.vectors}
+                devMode={toggles.devMode}
               />
             </div>
 
