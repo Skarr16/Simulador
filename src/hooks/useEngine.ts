@@ -1,15 +1,18 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { SimulationConfig, SimulationState } from '../types';
+import { SimulationConfig, SimulationState, PhysicsObject, Environment } from '../types';
 import { OBJECTS, ENVIRONMENTS } from '../lib/constants';
 
-export function useEngine(config: SimulationConfig) {
+export function useEngine(config: SimulationConfig, customObjects?: Record<string, PhysicsObject>, customEnvs?: Record<string, Environment>) {
   const [isRunning, setIsRunning] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   const [time, setTime] = useState(0);
   
-  const objectA = OBJECTS[config.objectAId];
-  const objectB = OBJECTS[config.objectBId];
-  const env = ENVIRONMENTS[config.environmentId];
+  const currentObjects = customObjects || OBJECTS;
+  const currentEnvs = customEnvs || ENVIRONMENTS;
+
+  const objectA = currentObjects[config.objectAId];
+  const objectB = currentObjects[config.objectBId];
+  const env = currentEnvs[config.environmentId];
 
   // Pre-compute the simulation trajectory
   const simulationData = useMemo(() => {

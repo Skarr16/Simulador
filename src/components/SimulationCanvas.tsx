@@ -286,7 +286,7 @@ export function SimulationCanvas({
           }
 
           return (
-             <div className="group relative w-full h-full cursor-help">
+             <div className="group relative w-full h-full cursor-help flex flex-col items-center justify-end">
                {content}
                {/* Tooltip */}
                <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-32 bg-slate-900 text-white text-xs p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
@@ -304,7 +304,7 @@ export function SimulationCanvas({
           <>
             {/* Falling Object A (Left) */}
             <div 
-              className="absolute flex flex-col items-center z-20"
+              className={`absolute flex flex-col items-center justify-end z-20 ${devMode ? 'border-2 border-dashed border-red-500 bg-red-500/20' : ''}`}
               style={{ bottom: `${yAPercent}%`, left: '60%', transform: 'translateX(-50%)', width: objectA.radius * scaleFactor, height: objectA.radius * scaleFactor }}
             >
               {renderObject(objectA, 'A', isFallingA)}
@@ -343,7 +343,7 @@ export function SimulationCanvas({
 
             {/* Falling Object B (Right) */}
             <div 
-              className="absolute flex flex-col items-center z-20"
+              className={`absolute flex flex-col items-center justify-end z-20 ${devMode ? 'border-2 border-dashed border-red-500 bg-red-500/20' : ''}`}
               style={{ bottom: `${yBPercent}%`, left: '85%', transform: 'translateX(-50%)', width: objectB.radius * scaleFactor, height: objectB.radius * scaleFactor }}
             >
               {renderObject(objectB, 'B', isFallingB)}

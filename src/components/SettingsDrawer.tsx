@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, Settings2, Wind, Globe2, Building2 } from 'lucide-react';
-import { SimulationConfig } from '../types';
-import { OBJECTS, ENVIRONMENTS, STRUCTURES } from '../lib/constants';
+import { SimulationConfig, PhysicsObject, Environment } from '../types';
+import { STRUCTURES } from '../lib/constants';
 
 interface SettingsDrawerProps {
   isOpen: boolean;
@@ -11,9 +11,11 @@ interface SettingsDrawerProps {
   toggles: { vectors: boolean; graphs: boolean; energies: boolean; devMode: boolean; };
   setToggles: (toggles: { vectors: boolean; graphs: boolean; energies: boolean; devMode: boolean; }) => void;
   disabled: boolean;
+  customObjects: Record<string, PhysicsObject>;
+  customEnvs: Record<string, Environment>;
 }
 
-export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, setToggles, disabled }: SettingsDrawerProps) {
+export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, setToggles, disabled, customObjects, customEnvs }: SettingsDrawerProps) {
   const handleStructureChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const structureId = e.target.value;
     const structure = STRUCTURES[structureId];
@@ -65,7 +67,7 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                   disabled={disabled}
                   className="w-full bg-[#F4F1EB] border-2 border-slate-900 rounded-lg p-2 font-bold outline-none focus:ring-2 focus:ring-[#0055FF] disabled:opacity-50"
                 >
-                  {Object.values(ENVIRONMENTS).map(env => (
+                  {Object.values(customEnvs).map(env => (
                     <option key={env.id} value={env.id}>{env.name} (g={env.g} m/s²)</option>
                   ))}
                 </select>
@@ -97,12 +99,12 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                       className="hidden" 
                       checked={config.enableAirResistance}
                       onChange={(e) => setConfig({ ...config, enableAirResistance: e.target.checked })}
-                      disabled={disabled || ENVIRONMENTS[config.environmentId].rho === 0}
+                      disabled={disabled || customEnvs[config.environmentId].rho === 0}
                     />
                     <div className={`w-4 h-4 rounded-full shadow-sm transform transition-transform ${config.enableAirResistance ? 'translate-x-6 bg-white' : 'translate-x-0 bg-slate-500'}`} />
                   </div>
                 </label>
-                {ENVIRONMENTS[config.environmentId].rho === 0 && (
+                {customEnvs[config.environmentId].rho === 0 && (
                   <p className="text-xs text-slate-500 mt-2 font-medium">Não há atmosfera neste local.</p>
                 )}
               </div>
@@ -122,7 +124,7 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                   disabled={disabled}
                   className="w-full bg-[#F4F1EB] border-2 border-slate-900 rounded-lg p-2 font-bold outline-none focus:ring-2 focus:ring-[#FF3366] disabled:opacity-50"
                 >
-                  {Object.values(OBJECTS).map(obj => (
+                  {Object.values(customObjects).map(obj => (
                     <option key={obj.id} value={obj.id}>{obj.name} ({obj.mass}kg)</option>
                   ))}
                 </select>
@@ -136,7 +138,7 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                   disabled={disabled}
                   className="w-full bg-[#F4F1EB] border-2 border-slate-900 rounded-lg p-2 font-bold outline-none focus:ring-2 focus:ring-[#0055FF] disabled:opacity-50"
                 >
-                  {Object.values(OBJECTS).map(obj => (
+                  {Object.values(customObjects).map(obj => (
                     <option key={obj.id} value={obj.id}>{obj.name} ({obj.mass}kg)</option>
                   ))}
                 </select>

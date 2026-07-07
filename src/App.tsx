@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Square, RotateCcw, Activity, Settings2, LineChart as ChartIcon, Zap } from 'lucide-react';
+import { Play, Square, RotateCcw, Activity, Settings2, LineChart as ChartIcon, Zap, ShieldAlert } from 'lucide-react';
 import { SimulationCanvas } from './components/SimulationCanvas';
 import { ChartsArea } from './components/ChartsArea';
 import { EnergyDisplay } from './components/EnergyDisplay';
 import { SettingsDrawer } from './components/SettingsDrawer';
+import { AdminModal } from './components/AdminModal';
 import { useEngine } from './hooks/useEngine';
 import { SimulationConfig } from './types';
+import { OBJECTS, ENVIRONMENTS } from './lib/constants';
 
 export default function App() {
   const [config, setConfig] = useState<SimulationConfig>({
@@ -25,8 +27,12 @@ export default function App() {
   });
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
+  
+  const [customObjects, setCustomObjects] = useState(OBJECTS);
+  const [customEnvs, setCustomEnvs] = useState(ENVIRONMENTS);
 
-  const engine = useEngine(config);
+  const engine = useEngine(config, customObjects, customEnvs);
 
   return (
     <div className="h-screen flex flex-col bg-[#F4F1EB] text-slate-900 font-sans selection:bg-blue-200 relative overflow-hidden">
@@ -46,8 +52,14 @@ export default function App() {
               Simulador de Queda Livre
             </span>
             <button 
+              onClick={() => setIsAdminOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-[#FF3366] text-white font-black uppercase rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
+            >
+              <ShieldAlert className="w-4 h-4" /> <span className="hidden sm:inline">Admin</span>
+            </button>
+            <button 
               onClick={() => setIsSettingsOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-[#FFB800] text-slate-900 font-black uppercase rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-1 hover:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
+              className="flex items-center gap-2 px-4 py-2 bg-[#FFB800] text-slate-900 font-black uppercase rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
             >
               <Settings2 className="w-4 h-4" /> <span className="hidden sm:inline">Configurar</span>
             </button>
@@ -136,6 +148,17 @@ export default function App() {
         toggles={toggles} 
         setToggles={setToggles} 
         disabled={engine.isRunning} 
+        customObjects={customObjects}
+        customEnvs={customEnvs}
+      />
+
+      <AdminModal
+        isOpen={isAdminOpen}
+        onClose={() => setIsAdminOpen(false)}
+        customObjects={customObjects}
+        setCustomObjects={setCustomObjects}
+        customEnvs={customEnvs}
+        setCustomEnvs={setCustomEnvs}
       />
     </div>
   );
