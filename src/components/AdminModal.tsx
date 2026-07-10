@@ -46,7 +46,10 @@ export function AdminModal({ isOpen, onClose, customObjects, setCustomObjects, c
         
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b-4 border-slate-900 bg-[#FF3366]">
-          <h2 className="text-xl font-black text-white uppercase tracking-tight">Painel Admin (Modelagem)</h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-xl font-black text-white uppercase tracking-tight">Painel Admin (Modelagem)</h2>
+            <span className="bg-white/20 text-white text-xs font-bold px-2 py-1 rounded-md">v1.1.0</span>
+          </div>
           <button onClick={onClose} className="p-1 hover:bg-white/20 rounded-lg transition-colors">
             <X className="w-6 h-6 text-white" />
           </button>
