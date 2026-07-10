@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Info, X } from 'lucide-react';
 import { PhysicsObject, Environment } from '../types';
 
 interface SimulationCanvasProps {
@@ -27,6 +28,7 @@ export function SimulationCanvas({
 }: SimulationCanvasProps) {
 
   const [scaleFactor, setScaleFactor] = useState(1);
+  const [showInfo, setShowInfo] = useState(false);
   const [devOffsets, setDevOffsets] = useState<Record<string, {left: number, bottom: number, width: number, height: number}>>({
     pisa: { left: -29, bottom: -18, width: 88, height: 107 },
     eiffel: { left: -6, bottom: -17, width: 40, height: 100 },
@@ -444,33 +446,43 @@ export function SimulationCanvas({
           </>
         );
       })()}      {simulationMode === 'paraquedas' && (
-        <div className="absolute top-4 right-4 bg-white/95 p-4 sm:p-6 rounded-xl border-[3px] border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] z-40 w-[calc(100%-2rem)] sm:w-[380px] max-h-[calc(90%-2rem)] overflow-y-auto">
-          <h3 className="font-black text-lg uppercase mb-4 border-b-2 border-slate-900 pb-2 flex items-center justify-between">
+        <>
+          {/* Mobile Info Toggle */}
+          <button 
+            onClick={() => setShowInfo(!showInfo)}
+            className="sm:hidden absolute top-4 right-4 z-50 bg-white p-2 rounded-full border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a]"
+          >
+            {showInfo ? <X className="w-5 h-5" /> : <Info className="w-5 h-5" />}
+          </button>
+          
+          <div className={`absolute top-16 left-4 right-4 sm:top-4 sm:left-auto sm:right-4 bg-white/90 sm:bg-white/95 backdrop-blur-sm p-4 sm:p-6 rounded-xl border-[2px] sm:border-[3px] border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] z-40 sm:w-[380px] max-h-[calc(90%-4rem)] sm:max-h-[calc(90%-2rem)] overflow-y-auto transition-opacity ${showInfo ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none sm:opacity-100 sm:pointer-events-auto'}`}>
+          <h3 className="font-black text-sm sm:text-lg uppercase mb-3 sm:mb-4 border-b-2 border-slate-900 pb-2 sm:pb-2 flex items-center justify-between">
             <span>Dados da Simulação</span>
-            {isFallingA && <span className="flex h-3 w-3 relative"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span></span>}
+            {isFallingA && <span className="flex h-2 w-2 sm:h-3 sm:w-3 relative"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 sm:h-3 sm:w-3 bg-red-500"></span></span>}
           </h3>
           
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-5">
-             <div className="bg-slate-100 p-2 sm:p-3 rounded-lg border border-slate-200 shadow-inner flex flex-col justify-center">
-               <div className="text-[10px] sm:text-xs uppercase font-bold text-slate-500 mb-1">Velocidade (v)</div>
-               <div className="font-black text-xl sm:text-2xl text-[#0055FF] tabular-nums tracking-tighter">{vA.toFixed(1)} m/s</div>
+          <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-4 sm:mb-5">
+             <div className="bg-slate-100 p-2 sm:p-3 rounded-lg border border-slate-200 shadow-inner flex flex-col justify-center items-center sm:items-start text-center sm:text-left">
+               <div className="text-[10px] sm:text-xs uppercase font-bold text-slate-500 mb-0.5 sm:mb-1">Velocidade (v)</div>
+               <div className="font-black text-sm sm:text-2xl text-[#0055FF] tabular-nums tracking-tighter">{vA.toFixed(1)} <span className="text-[10px] sm:text-base">m/s</span></div>
              </div>
-             <div className="bg-slate-100 p-2 sm:p-3 rounded-lg border border-slate-200 shadow-inner flex flex-col justify-center">
-               <div className="text-[10px] sm:text-xs uppercase font-bold text-slate-500 mb-1">Arrasto (Fa)</div>
-               <div className="font-black text-xl sm:text-2xl text-[#FF3366] tabular-nums tracking-tighter">{FdA.toFixed(1)} N</div>
+             <div className="bg-slate-100 p-2 sm:p-3 rounded-lg border border-slate-200 shadow-inner flex flex-col justify-center items-center sm:items-start text-center sm:text-left">
+               <div className="text-[10px] sm:text-xs uppercase font-bold text-slate-500 mb-0.5 sm:mb-1">Arrasto (Fa)</div>
+               <div className="font-black text-sm sm:text-2xl text-[#FF3366] tabular-nums tracking-tighter">{FdA.toFixed(1)} <span className="text-[10px] sm:text-base">N</span></div>
              </div>
-             <div className="bg-slate-100 p-2 sm:p-3 rounded-lg border border-slate-200 shadow-inner flex flex-col justify-center">
-               <div className="text-[10px] sm:text-xs uppercase font-bold text-slate-500 mb-1">Peso (P)</div>
-               <div className="font-black text-xl sm:text-2xl text-slate-900 tabular-nums tracking-tighter">{P_A.toFixed(1)} N</div>
+             <div className="bg-slate-100 p-2 sm:p-3 rounded-lg border border-slate-200 shadow-inner flex flex-col justify-center items-center sm:items-start text-center sm:text-left">
+               <div className="text-[10px] sm:text-xs uppercase font-bold text-slate-500 mb-0.5 sm:mb-1">Peso (P)</div>
+               <div className="font-black text-sm sm:text-2xl text-slate-900 tabular-nums tracking-tighter">{P_A.toFixed(1)} <span className="text-[10px] sm:text-base">N</span></div>
              </div>
-             <div className="bg-slate-100 p-2 sm:p-3 rounded-lg border border-slate-200 shadow-inner flex flex-col justify-center">
-               <div className="text-[10px] sm:text-xs uppercase font-bold text-slate-500 mb-1">Altura (y)</div>
-               <div className="font-black text-xl sm:text-2xl text-green-600 tabular-nums tracking-tighter">{yA.toFixed(1)} m</div>
+             <div className="bg-slate-100 p-2 sm:p-3 rounded-lg border border-slate-200 shadow-inner flex flex-col justify-center items-center sm:items-start text-center sm:text-left">
+               <div className="text-[10px] sm:text-xs uppercase font-bold text-slate-500 mb-0.5 sm:mb-1">Altura (y)</div>
+               <div className="font-black text-sm sm:text-2xl text-green-600 tabular-nums tracking-tighter">{yA.toFixed(1)} <span className="text-[10px] sm:text-base">m</span></div>
              </div>
           </div>
+
           <div className="border-t-2 border-slate-100 pt-4">
              <h4 className="font-bold text-sm uppercase mb-3 text-slate-700">Parâmetros</h4>
-             <div className="font-sans text-xl sm:text-2xl font-black tracking-wider mb-4 bg-slate-900 text-green-400 p-4 rounded-xl whitespace-nowrap overflow-x-auto text-center shadow-inner border border-slate-700">
+             <div className="font-sans text-sm sm:text-2xl font-black tracking-wider mb-4 bg-slate-900 text-green-400 p-3 sm:p-4 rounded-xl whitespace-nowrap overflow-x-auto text-center shadow-inner border border-slate-700">
                F<sub>a</sub> = &frac12; &middot; &rho; &middot; v&sup2; &middot; C<sub>d</sub> &middot; A
              </div>
              <ul className="text-xs space-y-2 text-slate-700 font-medium">
@@ -481,6 +493,7 @@ export function SimulationCanvas({
              </ul>
           </div>
         </div>
+        </>
       )}
 
       <style>{`
