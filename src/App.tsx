@@ -24,7 +24,7 @@ export default function App() {
     vectors: true,
     graphs: false,
     energies: false,
-    table: true,
+    table: false,
     devMode: false,
     showHeights: true,
   });
