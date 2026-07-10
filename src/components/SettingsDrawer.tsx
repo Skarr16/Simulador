@@ -8,8 +8,8 @@ interface SettingsDrawerProps {
   onClose: () => void;
   config: SimulationConfig;
   setConfig: (config: SimulationConfig) => void;
-  toggles: { vectors: boolean; graphs: boolean; energies: boolean; devMode: boolean; showHeights: boolean; };
-  setToggles: (toggles: { vectors: boolean; graphs: boolean; energies: boolean; devMode: boolean; showHeights: boolean; }) => void;
+  toggles: { vectors: boolean; graphs: boolean; energies: boolean; table: boolean; devMode: boolean; showHeights: boolean; };
+  setToggles: (toggles: { vectors: boolean; graphs: boolean; energies: boolean; table: boolean; devMode: boolean; showHeights: boolean; }) => void;
   disabled: boolean;
   customObjects: Record<string, PhysicsObject>;
   customEnvs: Record<string, Environment>;
@@ -203,22 +203,22 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
               </button>
               <button 
                 type="button"
+                onClick={() => setToggles({ ...toggles, table: !toggles.table })}
+                className="flex items-center justify-between w-full hover:bg-slate-50 p-2 rounded-lg transition-colors text-left"
+              >
+                <span className="text-sm font-black uppercase text-slate-700">Tabela de Dados</span>
+                <div className={`w-12 h-6 flex items-center border-2 border-slate-900 rounded-full p-0.5 transition-colors ${toggles.table ? 'bg-[#00C48C]' : 'bg-slate-200'}`}>
+                  <div className={`w-4 h-4 rounded-full shadow-sm transform transition-transform ${toggles.table ? 'translate-x-6 bg-white' : 'translate-x-0 bg-slate-500'}`} />
+                </div>
+              </button>
+              <button 
+                type="button"
                 onClick={() => setToggles({ ...toggles, showHeights: !toggles.showHeights })}
                 className="flex items-center justify-between w-full hover:bg-slate-50 p-2 rounded-lg transition-colors text-left"
               >
                 <span className="text-sm font-black uppercase text-slate-700">Mostrar Alturas</span>
                 <div className={`w-12 h-6 flex items-center border-2 border-slate-900 rounded-full p-0.5 transition-colors ${toggles.showHeights ? 'bg-[#00C48C]' : 'bg-slate-200'}`}>
                   <div className={`w-4 h-4 rounded-full shadow-sm transform transition-transform ${toggles.showHeights ? 'translate-x-6 bg-white' : 'translate-x-0 bg-slate-500'}`} />
-                </div>
-              </button>
-              <button 
-                type="button"
-                onClick={() => setToggles({ ...toggles, devMode: !toggles.devMode })}
-                className="flex items-center justify-between w-full hover:bg-slate-50 p-2 rounded-lg transition-colors text-left"
-              >
-                <span className="text-sm font-black uppercase text-slate-700">DevMode (Ajuste Img)</span>
-                <div className={`w-12 h-6 flex items-center border-2 border-slate-900 rounded-full p-0.5 transition-colors ${toggles.devMode ? 'bg-[#00C48C]' : 'bg-slate-200'}`}>
-                  <div className={`w-4 h-4 rounded-full shadow-sm transform transition-transform ${toggles.devMode ? 'translate-x-6 bg-white' : 'translate-x-0 bg-slate-500'}`} />
                 </div>
               </button>
             </div>

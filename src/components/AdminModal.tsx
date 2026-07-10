@@ -9,12 +9,14 @@ interface AdminModalProps {
   setCustomObjects: (objs: Record<string, PhysicsObject>) => void;
   customEnvs: Record<string, Environment>;
   setCustomEnvs: (envs: Record<string, Environment>) => void;
+  devMode: boolean;
+  setDevMode: (val: boolean) => void;
 }
 
-export function AdminModal({ isOpen, onClose, customObjects, setCustomObjects, customEnvs, setCustomEnvs }: AdminModalProps) {
+export function AdminModal({ isOpen, onClose, customObjects, setCustomObjects, customEnvs, setCustomEnvs, devMode, setDevMode }: AdminModalProps) {
   const [localObjects, setLocalObjects] = useState(customObjects);
   const [localEnvs, setLocalEnvs] = useState(customEnvs);
-  const [activeTab, setActiveTab] = useState<'objects' | 'envs'>('objects');
+  const [activeTab, setActiveTab] = useState<'objects' | 'envs' | 'general'>('objects');
   const [selectedObj, setSelectedObj] = useState<string>(Object.keys(localObjects)[0]);
   const [selectedEnv, setSelectedEnv] = useState<string>(Object.keys(localEnvs)[0]);
 
@@ -68,6 +70,12 @@ export function AdminModal({ isOpen, onClose, customObjects, setCustomObjects, c
             onClick={() => setActiveTab('envs')}
           >
             Ambientes
+          </button>
+          <button 
+            className={`flex-1 p-3 font-black uppercase text-sm border-l-4 border-slate-900 ${activeTab === 'general' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+            onClick={() => setActiveTab('general')}
+          >
+            Ajustes
           </button>
         </div>
 
@@ -150,6 +158,26 @@ export function AdminModal({ isOpen, onClose, customObjects, setCustomObjects, c
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {activeTab === 'general' && (
+            <div className="flex flex-col gap-6">
+              <div className="bg-white p-5 rounded-xl border-2 border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] flex items-center justify-between">
+                <div>
+                  <span className="block text-sm font-black uppercase text-slate-900">DEVMODE (AJUSTE IMG)</span>
+                  <span className="text-[11px] text-slate-500 font-bold leading-relaxed block mt-1">
+                    Ativa as ferramentas de posicionamento e calibragem manual de coordenadas das imagens dos cenários e objetos.
+                  </span>
+                </div>
+                <button 
+                  type="button"
+                  onClick={() => setDevMode(!devMode)}
+                  className={`w-12 h-6 flex items-center border-2 border-slate-900 rounded-full p-0.5 transition-colors shrink-0 ${devMode ? 'bg-[#00C48C]' : 'bg-slate-200'}`}
+                >
+                  <div className={`w-4 h-4 rounded-full shadow-sm transform transition-transform ${devMode ? 'translate-x-6 bg-white' : 'translate-x-0 bg-slate-500'}`} />
+                </button>
+              </div>
             </div>
           )}
         </div>

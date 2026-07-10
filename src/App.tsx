@@ -3,6 +3,7 @@ import { Play, Square, RotateCcw, Activity, Settings2, LineChart as ChartIcon, Z
 import { SimulationCanvas } from './components/SimulationCanvas';
 import { ChartsArea } from './components/ChartsArea';
 import { EnergyDisplay } from './components/EnergyDisplay';
+import { DataTable } from './components/DataTable';
 import { SettingsDrawer } from './components/SettingsDrawer';
 import { AdminModal } from './components/AdminModal';
 import { useEngine } from './hooks/useEngine';
@@ -23,6 +24,7 @@ export default function App() {
     vectors: true,
     graphs: false,
     energies: false,
+    table: true,
     devMode: false,
     showHeights: true,
   });
@@ -137,7 +139,7 @@ export default function App() {
         </div>
 
         {/* Dynamic Data Panels (Optional Sidebar) */}
-        {(toggles.energies || toggles.graphs) && (
+        {(toggles.energies || toggles.graphs || toggles.table) && (
           <div className="w-full lg:w-[450px] p-4 flex flex-col gap-6 overflow-visible lg:overflow-y-auto shrink-0 border-t-[3px] lg:border-t-0 lg:border-l-[3px] border-slate-900 bg-[#F4F1EB] z-20">
             {toggles.energies && (
               <div className="animate-in fade-in slide-in-from-right-4 duration-300">
@@ -148,6 +150,18 @@ export default function App() {
             {toggles.graphs && (
               <div className="animate-in fade-in slide-in-from-right-4 duration-300 flex-1 min-h-[300px]">
                 <ChartsArea data={engine.dataPoints} />
+              </div>
+            )}
+
+            {toggles.table && (
+              <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+                <DataTable 
+                  dataPoints={engine.dataPoints} 
+                  initialHeight={config.height} 
+                  objectA={engine.objectA} 
+                  objectB={engine.objectB}
+                  simulationMode={config.simulationMode}
+                />
               </div>
             )}
           </div>
@@ -173,6 +187,8 @@ export default function App() {
         setCustomObjects={setCustomObjects}
         customEnvs={customEnvs}
         setCustomEnvs={setCustomEnvs}
+        devMode={toggles.devMode}
+        setDevMode={(val) => setToggles(prev => ({ ...prev, devMode: val }))}
       />
     </div>
   );
