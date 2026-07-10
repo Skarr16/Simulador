@@ -37,43 +37,89 @@ export default function App() {
 
   const engine = useEngine(config, customObjects, customEnvs);
 
+  const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
+  const [tooltipTimer, setTooltipTimer] = useState<any>(null);
+
+  const showTooltip = (text: string, isTouch: boolean = false) => {
+    setActiveTooltip(text);
+    if (tooltipTimer) {
+      window.clearTimeout(tooltipTimer);
+    }
+    if (isTouch) {
+      const timer = window.setTimeout(() => {
+        setActiveTooltip(null);
+      }, 2000);
+      setTooltipTimer(timer);
+    }
+  };
+
+  const hideTooltip = () => {
+    if (tooltipTimer) {
+      window.clearTimeout(tooltipTimer);
+      setTooltipTimer(null);
+    }
+    setActiveTooltip(null);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (tooltipTimer) window.clearTimeout(tooltipTimer);
+    };
+  }, [tooltipTimer]);
+
   return (
     <div className="h-screen flex flex-col bg-[#F4F1EB] text-slate-900 font-sans selection:bg-blue-200 relative overflow-hidden">
       
       {/* Header */}
-      <header className="bg-white border-b-[3px] border-slate-900 shadow-sm z-50 flex-shrink-0">
-        <div className="px-4 h-16 flex items-center justify-center">
-          <div className="flex items-center gap-2 sm:gap-4 overflow-x-auto py-2 px-2 max-w-full justify-start md:justify-center">
+      <header className="bg-white border-b-[3px] border-slate-900 shadow-sm z-50 flex-shrink-0 overflow-visible">
+        <div className="px-4 py-2.5 flex items-center justify-center min-h-16 h-auto overflow-visible">
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 max-w-full overflow-visible">
+            
+            {/* Button 1: Queda Livre */}
             <button
               onClick={() => setConfig({ ...config, simulationMode: 'livre', height: 56, structureId: 'pisa', objectAId: 'bowling', objectBId: 'feather' })}
-              className={`flex shrink-0 items-center gap-2 px-4 py-2 ${(!config.simulationMode || config.simulationMode === 'livre') ? 'bg-[#00C48C] text-white' : 'bg-white text-slate-900'} font-black uppercase rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
+              className={`flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 ${(!config.simulationMode || config.simulationMode === 'livre') ? 'bg-[#00C48C] text-white' : 'bg-white text-slate-900'} rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
             >
-              <Activity className="w-4 h-4" /> <span className="hidden sm:inline">Queda Livre</span>
+              <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
+              <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Queda Livre</span>
             </button>
+
+            {/* Button 2: Paraquedas */}
             <button 
               onClick={() => setConfig({ ...config, simulationMode: 'paraquedas', objectAId: 'skydiver', objectBId: 'skydiver', height: 4000, structureId: 'custom', enableAirResistance: true })}
-              className={`flex shrink-0 items-center gap-2 px-4 py-2 ${config.simulationMode === 'paraquedas' ? 'bg-[#00C48C] text-white' : 'bg-white text-slate-900'} font-black uppercase rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
+              className={`flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 ${config.simulationMode === 'paraquedas' ? 'bg-[#00C48C] text-white' : 'bg-white text-slate-900'} rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
             >
-              <Wind className="w-4 h-4" /> <span className="hidden sm:inline">Paraquedas</span>
+              <Wind className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
+              <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Paraquedas</span>
             </button>
+
+            {/* Button 3: Em Breve */}
             <button 
               onClick={() => setConfig({ ...config, simulationMode: 'lancamento' })}
-              className={`flex shrink-0 items-center gap-2 px-4 py-2 ${config.simulationMode === 'lancamento' ? 'bg-[#0055FF] text-white' : 'bg-white text-slate-900'} font-black uppercase rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
+              className={`flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 ${config.simulationMode === 'lancamento' ? 'bg-[#0055FF] text-white' : 'bg-white text-slate-900'} rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
             >
-              <Activity className="w-4 h-4" /> <span className="hidden sm:inline">Em Breve</span>
+              <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
+              <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Em Breve</span>
             </button>
+
+            {/* Button 4: Admin */}
             <button 
               onClick={() => setIsAdminOpen(true)}
-              className="flex shrink-0 items-center gap-2 px-4 py-2 bg-[#FF3366] text-white font-black uppercase rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
+              className="flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-[#FF3366] text-white rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
             >
-              <ShieldAlert className="w-4 h-4" /> <span className="hidden sm:inline">Admin</span>
+              <ShieldAlert className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
+              <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Admin</span>
             </button>
+
+            {/* Button 5: Configurar */}
             <button 
               onClick={() => setIsSettingsOpen(true)}
-              className="flex shrink-0 items-center gap-2 px-4 py-2 bg-[#FFB800] text-slate-900 font-black uppercase rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
+              className="flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-[#FFB800] text-slate-900 rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
             >
-              <Settings2 className="w-4 h-4" /> <span className="hidden sm:inline">Configurar</span>
+              <Settings2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
+              <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Configurar</span>
             </button>
+
           </div>
         </div>
       </header>

@@ -337,16 +337,25 @@ export function SimulationCanvas({
              );
           }
 
+          const isObjA = letter === 'A';
           return (
              <div className="group relative w-full h-full cursor-help flex flex-col items-center justify-end">
                {content}
                {/* Tooltip */}
-               <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-32 bg-slate-900 text-white text-xs p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+               <div className={`absolute ${
+                 isObjA 
+                   ? 'left-full top-1/2 -translate-y-1/2 ml-3' 
+                   : 'right-full top-1/2 -translate-y-1/2 mr-3'
+               } w-36 bg-slate-900 text-white text-xs p-2.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-lg border border-slate-700`}>
                  <div className="font-black border-b border-slate-700 pb-1 mb-1">{obj.name}</div>
                  <div>Massa: {obj.mass} kg</div>
                  <div>Área: {obj.area} m²</div>
                  <div>Cd: {obj.cd}</div>
-                 <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></div>
+                 <div className={`absolute ${
+                   isObjA 
+                     ? 'right-full top-1/2 -translate-y-1/2 border-r-slate-900' 
+                     : 'left-full top-1/2 -translate-y-1/2 border-l-slate-900'
+                 } border-4 border-transparent`}></div>
                </div>
              </div>
           );
@@ -371,53 +380,58 @@ export function SimulationCanvas({
                    <div className="h-1 w-20 bg-white/80 rounded-full animate-pulse" style={{ animationDelay: '100ms' }}></div>
                    <div className="h-1 w-8 bg-white/80 rounded-full animate-pulse" style={{ animationDelay: '300ms' }}></div>
                 </div>
-                <img src="/paraquedas/aviao.png" alt="Avião" className="w-full h-full object-contain drop-shadow-xl z-10" />
+                <img src="/paraquedas/aviao(1).png" alt="Avião" className="w-full h-full object-contain drop-shadow-xl z-10" />
               </div>
             )}
 
             {/* Falling Object A (Left) */}
-            <div 
-              className={`absolute flex flex-col items-center justify-end z-20 ${devMode ? 'border-2 border-dashed border-red-500 bg-red-500/20' : ''} ${yA >= height && simulationMode === 'paraquedas' && !planeArrived ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}
-              style={{ bottom: `${yAPercent}%`, left: simulationMode === 'paraquedas' ? '50%' : '45%', transform: 'translateX(-50%)', width: objectA.radius * scaleFactor, height: objectA.radius * scaleFactor }}
-            >
-              {showHeights && (
-                <div className="absolute right-full mr-2 sm:mr-4 top-1/2 -translate-y-1/2 bg-white/90 px-2 py-1 rounded-md border-[3px] border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] whitespace-nowrap z-50">
-                  <span className="text-xs sm:text-sm font-black text-slate-900">{yA.toFixed(1)} m</span>
-                </div>
-              )}
-              {renderObject(objectA, 'A', isFallingA, parachuteDeployedA)}
-              {/* Vectors */}
-              {showVectors && (
-                <>
-                  {/* Top Vectors (Drag) */}
-                  {FdA > 0 && (
-                    <div className="absolute bottom-[100%] left-1/2 -translate-x-1/2 mb-1 flex flex-col items-center pointer-events-none z-30">
-                       <span className="text-[10px] font-black bg-white/80 px-1 rounded mb-1 shadow-sm border border-slate-200 text-center whitespace-nowrap">Fa: {FdA.toFixed(1)} N</span>
-                       <div className="w-1.5 bg-[#FF3366] relative" style={{ height: 15 + Math.min(FdA, 50) }}>
-                         <div className="absolute -top-2 -left-[5px] border-l-[8px] border-r-[8px] border-b-[10px] border-x-transparent border-b-[#FF3366]"></div>
-                       </div>
+            {(() => {
+              const multiplierA = (simulationMode === 'paraquedas' && isMobile) ? 1.35 : 1.0;
+              return (
+                <div 
+                  className={`absolute flex flex-col items-center justify-end z-20 ${devMode ? 'border-2 border-dashed border-red-500 bg-red-500/20' : ''} ${yA >= height && simulationMode === 'paraquedas' && !planeArrived ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}
+                  style={{ bottom: `${yAPercent}%`, left: simulationMode === 'paraquedas' ? '50%' : '45%', transform: 'translateX(-50%)', width: objectA.radius * scaleFactor * multiplierA, height: objectA.radius * scaleFactor * multiplierA }}
+                >
+                  {showHeights && (
+                    <div className="absolute right-full mr-2 sm:mr-4 top-1/2 -translate-y-1/2 bg-white/90 px-2 py-1 rounded-md border-[3px] border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] whitespace-nowrap z-50">
+                      <span className="text-xs sm:text-sm font-black text-slate-900">{yA.toFixed(1)} m</span>
                     </div>
                   )}
-                  {/* Bottom Vectors (Velocity & Weight) */}
-                  <div className="absolute top-[100%] left-1/2 -translate-x-1/2 mt-1 flex flex-row gap-3 pointer-events-none z-30">
-                    {vA > 0 && (
-                        <div className="flex flex-col items-center text-[#0055FF]">
-                            <div className="w-1.5 bg-[#0055FF] relative" style={{ height: 15 + getVelScale(vA) }}>
-                                <div className="absolute -bottom-2 -left-[5px] border-l-[8px] border-r-[8px] border-t-[10px] border-x-transparent border-t-[#0055FF]"></div>
-                            </div>
-                            <span className="text-[10px] font-black bg-white/80 px-1 rounded mt-3 shadow-sm border border-slate-200 text-center whitespace-nowrap">v: {vA.toFixed(1)} m/s</span>
+                  {renderObject(objectA, 'A', isFallingA, parachuteDeployedA)}
+                  {/* Vectors */}
+                  {showVectors && (
+                    <>
+                      {/* Top Vectors (Drag) */}
+                      {FdA > 0 && (
+                        <div className="absolute bottom-[100%] left-1/2 -translate-x-1/2 mb-1 flex flex-col items-center pointer-events-none z-30">
+                           <span className="text-[10px] font-black bg-white/80 px-1 rounded mb-1 shadow-sm border border-slate-200 text-center whitespace-nowrap">Fa: {FdA.toFixed(1)} N</span>
+                           <div className="w-1 sm:w-1.5 bg-[#FF3366] relative" style={{ height: 15 + Math.min(FdA, 50) }}>
+                             <div className="absolute -top-[7px] sm:-top-2 left-1/2 -translate-x-1/2 border-l-[5px] sm:border-l-[8px] border-r-[5px] sm:border-r-[8px] border-b-[7px] sm:border-b-[10px] border-x-transparent border-b-[#FF3366]"></div>
+                           </div>
                         </div>
-                    )}
-                    <div className="flex flex-col items-center text-slate-900">
-                       <div className="w-1.5 bg-slate-900 relative" style={{ height: 15 + Math.min(P_A, 50) }}>
-                         <div className="absolute -bottom-2 -left-[5px] border-l-[8px] border-r-[8px] border-t-[10px] border-x-transparent border-t-slate-900"></div>
-                       </div>
-                       <span className="text-[10px] font-black bg-white/80 px-1 rounded mt-3 shadow-sm border border-slate-200 text-center whitespace-nowrap">P: {P_A.toFixed(1)} N</span>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
+                      )}
+                      {/* Bottom Vectors (Velocity & Weight) */}
+                      <div className="absolute top-[100%] left-1/2 -translate-x-1/2 mt-1 flex flex-row gap-3 pointer-events-none z-30">
+                        {vA > 0 && (
+                            <div className="flex flex-col items-center text-[#0055FF]">
+                                <div className="w-1 sm:w-1.5 bg-[#0055FF] relative" style={{ height: 15 + getVelScale(vA) }}>
+                                    <div className="absolute -bottom-[7px] sm:-bottom-2 left-1/2 -translate-x-1/2 border-l-[5px] sm:border-l-[8px] border-r-[5px] sm:border-r-[8px] border-t-[7px] sm:border-t-[10px] border-x-transparent border-t-[#0055FF]"></div>
+                                </div>
+                                <span className="text-[10px] font-black bg-white/80 px-1 rounded mt-3 shadow-sm border border-slate-200 text-center whitespace-nowrap">v: {vA.toFixed(1)} m/s</span>
+                            </div>
+                        )}
+                        <div className="flex flex-col items-center text-slate-900">
+                           <div className="w-1 sm:w-1.5 bg-slate-900 relative" style={{ height: 15 + Math.min(P_A, 50) }}>
+                             <div className="absolute -bottom-[7px] sm:-bottom-2 left-1/2 -translate-x-1/2 border-l-[5px] sm:border-l-[8px] border-r-[5px] sm:border-r-[8px] border-t-[7px] sm:border-t-[10px] border-x-transparent border-t-slate-900"></div>
+                           </div>
+                           <span className="text-[10px] font-black bg-white/80 px-1 rounded mt-3 shadow-sm border border-slate-200 text-center whitespace-nowrap">P: {P_A.toFixed(1)} N</span>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              );
+            })()}
 
             {/* Falling Object B (Right) */}
             {simulationMode !== 'paraquedas' && (
@@ -438,8 +452,8 @@ export function SimulationCanvas({
                   {FdB > 0 && (
                     <div className="absolute bottom-[100%] left-1/2 -translate-x-1/2 mb-1 flex flex-col items-center pointer-events-none z-30">
                        <span className="text-[10px] font-black bg-white/80 px-1 rounded mb-1 shadow-sm border border-slate-200 text-center whitespace-nowrap">Fa: {FdB.toFixed(1)} N</span>
-                       <div className="w-1.5 bg-[#FF3366] relative" style={{ height: 15 + Math.min(FdB, 50) }}>
-                         <div className="absolute -top-2 -left-[5px] border-l-[8px] border-r-[8px] border-b-[10px] border-x-transparent border-b-[#FF3366]"></div>
+                       <div className="w-1 sm:w-1.5 bg-[#FF3366] relative" style={{ height: 15 + Math.min(FdB, 50) }}>
+                         <div className="absolute -top-[7px] sm:-top-2 left-1/2 -translate-x-1/2 border-l-[5px] sm:border-l-[8px] border-r-[5px] sm:border-r-[8px] border-b-[7px] sm:border-b-[10px] border-x-transparent border-b-[#FF3366]"></div>
                        </div>
                     </div>
                   )}
@@ -447,15 +461,15 @@ export function SimulationCanvas({
                   <div className="absolute top-[100%] left-1/2 -translate-x-1/2 mt-1 flex flex-row gap-3 pointer-events-none z-30">
                     {vB > 0 && (
                         <div className="flex flex-col items-center text-[#0055FF]">
-                            <div className="w-1.5 bg-[#0055FF] relative" style={{ height: 15 + getVelScale(vB) }}>
-                                <div className="absolute -bottom-2 -left-[5px] border-l-[8px] border-r-[8px] border-t-[10px] border-x-transparent border-t-[#0055FF]"></div>
+                            <div className="w-1 sm:w-1.5 bg-[#0055FF] relative" style={{ height: 15 + getVelScale(vB) }}>
+                                <div className="absolute -bottom-[7px] sm:-bottom-2 left-1/2 -translate-x-1/2 border-l-[5px] sm:border-l-[8px] border-r-[5px] sm:border-r-[8px] border-t-[7px] sm:border-t-[10px] border-x-transparent border-t-[#0055FF]"></div>
                             </div>
                             <span className="text-[10px] font-black bg-white/80 px-1 rounded mt-3 shadow-sm border border-slate-200 text-center whitespace-nowrap">v: {vB.toFixed(1)} m/s</span>
                         </div>
                     )}
                     <div className="flex flex-col items-center text-slate-900">
-                       <div className="w-1.5 bg-slate-900 relative" style={{ height: 15 + Math.min(P_B, 50) }}>
-                         <div className="absolute -bottom-2 -left-[5px] border-l-[8px] border-r-[8px] border-t-[10px] border-x-transparent border-t-slate-900"></div>
+                       <div className="w-1 sm:w-1.5 bg-slate-900 relative" style={{ height: 15 + Math.min(P_B, 50) }}>
+                         <div className="absolute -bottom-[7px] sm:-bottom-2 left-1/2 -translate-x-1/2 border-l-[5px] sm:border-l-[8px] border-r-[5px] sm:border-r-[8px] border-t-[7px] sm:border-t-[10px] border-x-transparent border-t-slate-900"></div>
                        </div>
                        <span className="text-[10px] font-black bg-white/80 px-1 rounded mt-3 shadow-sm border border-slate-200 text-center whitespace-nowrap">P: {P_B.toFixed(1)} N</span>
                     </div>
