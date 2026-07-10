@@ -40,45 +40,35 @@ export default function App() {
       
       {/* Header */}
       <header className="bg-white border-b-[3px] border-slate-900 shadow-sm z-50 flex-shrink-0">
-        <div className="px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="bg-[#0055FF] p-1.5 rounded-lg border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a]">
-               <Activity className="w-5 h-5 text-white" />
-            </div>
-            <h1 className="font-black text-xl tracking-tight uppercase">Simulador</h1>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <span className="hidden md:inline-block bg-[#F4F1EB] px-3 py-1 rounded-full border-2 border-slate-300 text-slate-500 uppercase tracking-widest text-xs font-black">
-              {config.simulationMode === 'paraquedas' ? 'Queda com Paraquedas' : config.simulationMode === 'lancamento' ? 'Lançamento (Em Breve)' : 'Simulador de Queda Livre'}
-            </span>
+        <div className="px-4 h-16 flex items-center justify-center">
+          <div className="flex items-center gap-2 sm:gap-4 overflow-x-auto py-2 px-2 max-w-full justify-start md:justify-center">
             <button
               onClick={() => setConfig({ ...config, simulationMode: 'livre', height: 56, structureId: 'pisa', objectAId: 'bowling', objectBId: 'feather' })}
-              className={`flex items-center gap-2 px-4 py-2 ${(!config.simulationMode || config.simulationMode === 'livre') ? 'bg-[#00C48C] text-white' : 'bg-white text-slate-900'} font-black uppercase rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
+              className={`flex shrink-0 items-center gap-2 px-4 py-2 ${(!config.simulationMode || config.simulationMode === 'livre') ? 'bg-[#00C48C] text-white' : 'bg-white text-slate-900'} font-black uppercase rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
             >
               <Activity className="w-4 h-4" /> <span className="hidden sm:inline">Queda Livre</span>
             </button>
             <button 
               onClick={() => setConfig({ ...config, simulationMode: 'paraquedas', objectAId: 'skydiver', objectBId: 'skydiver', height: 4000, structureId: 'custom', enableAirResistance: true })}
-              className={`flex items-center gap-2 px-4 py-2 ${config.simulationMode === 'paraquedas' ? 'bg-[#00C48C] text-white' : 'bg-white text-slate-900'} font-black uppercase rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
+              className={`flex shrink-0 items-center gap-2 px-4 py-2 ${config.simulationMode === 'paraquedas' ? 'bg-[#00C48C] text-white' : 'bg-white text-slate-900'} font-black uppercase rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
             >
               <Wind className="w-4 h-4" /> <span className="hidden sm:inline">Paraquedas</span>
             </button>
             <button 
               onClick={() => setConfig({ ...config, simulationMode: 'lancamento' })}
-              className={`flex items-center gap-2 px-4 py-2 ${config.simulationMode === 'lancamento' ? 'bg-[#0055FF] text-white' : 'bg-white text-slate-900'} font-black uppercase rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
+              className={`flex shrink-0 items-center gap-2 px-4 py-2 ${config.simulationMode === 'lancamento' ? 'bg-[#0055FF] text-white' : 'bg-white text-slate-900'} font-black uppercase rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
             >
               <Activity className="w-4 h-4" /> <span className="hidden sm:inline">Em Breve</span>
             </button>
             <button 
               onClick={() => setIsAdminOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-[#FF3366] text-white font-black uppercase rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
+              className="flex shrink-0 items-center gap-2 px-4 py-2 bg-[#FF3366] text-white font-black uppercase rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
             >
               <ShieldAlert className="w-4 h-4" /> <span className="hidden sm:inline">Admin</span>
             </button>
             <button 
               onClick={() => setIsSettingsOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-[#FFB800] text-slate-900 font-black uppercase rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
+              className="flex shrink-0 items-center gap-2 px-4 py-2 bg-[#FFB800] text-slate-900 font-black uppercase rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
             >
               <Settings2 className="w-4 h-4" /> <span className="hidden sm:inline">Configurar</span>
             </button>
@@ -87,10 +77,10 @@ export default function App() {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col lg:flex-row relative z-10 overflow-hidden">
+      <main className="flex-1 flex flex-col lg:flex-row relative z-10 overflow-y-auto lg:overflow-hidden">
         
         {/* Canvas Area (Takes max space) */}
-        <div className="flex-1 flex flex-col relative min-h-0">
+        <div className="w-full h-[580px] sm:h-[620px] lg:h-auto lg:flex-1 flex flex-col relative shrink-0 lg:shrink">
           <div className="absolute inset-4 flex flex-col pointer-events-none">
             {/* We make SimulationCanvas accept full width/height of this wrapper */}
             <div className="flex-1 pointer-events-auto flex rounded-2xl shadow-[6px_6px_0px_0px_#0f172a] border-[3px] border-slate-900 overflow-hidden bg-white">
@@ -148,7 +138,7 @@ export default function App() {
 
         {/* Dynamic Data Panels (Optional Sidebar) */}
         {(toggles.energies || toggles.graphs) && (
-          <div className="w-full lg:w-[450px] p-4 flex flex-col gap-6 overflow-y-auto shrink-0 border-t-[3px] lg:border-t-0 lg:border-l-[3px] border-slate-900 bg-[#F4F1EB] z-20">
+          <div className="w-full lg:w-[450px] p-4 flex flex-col gap-6 overflow-visible lg:overflow-y-auto shrink-0 border-t-[3px] lg:border-t-0 lg:border-l-[3px] border-slate-900 bg-[#F4F1EB] z-20">
             {toggles.energies && (
               <div className="animate-in fade-in slide-in-from-right-4 duration-300">
                 <EnergyDisplay kA={engine.kA} uA={engine.uA} kB={engine.kB} uB={engine.uB} />

@@ -165,6 +165,16 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
   const kB = 0.5 * objectB.mass * currentState.vB * currentState.vB;
   const uB = objectB.mass * env.g * currentState.yB;
 
+  // Filter data points dynamically to generate graphs progressively during the fall
+  const currentDataPoints = useMemo(() => {
+    if (isFinished) return simulationData;
+    const filtered = simulationData.filter((d) => d.t <= time);
+    if (filtered.length === 0 && simulationData.length > 0) {
+      return [simulationData[0]];
+    }
+    return filtered;
+  }, [simulationData, time, isFinished]);
+
   return {
     start,
     pause,
@@ -174,7 +184,7 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
     resetCount,
     time,
     currentState,
-    dataPoints: simulationData, // For charts
+    dataPoints: currentDataPoints, // For charts
     objectA,
     objectB,
     env,

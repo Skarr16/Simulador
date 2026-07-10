@@ -29,13 +29,33 @@ export function SimulationCanvas({
 
   const [scaleFactor, setScaleFactor] = useState(1);
   const [showInfo, setShowInfo] = useState(false);
-  const [devOffsets, setDevOffsets] = useState<Record<string, {left: number, bottom: number, width: number, height: number}>>({
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const [devOffsets, setDevOffsets] = useState<Record<string, {left: number, bottom: number, width: number, height: number}>>({});
+  
+  const mobileOffsets: Record<string, {left: number, bottom: number, width: number, height: number}> = {
+    pisa: { left: -12, bottom: -15, width: 75, height: 95 },
+    eiffel: { left: 4, bottom: -15, width: 35, height: 95 },
+    cristo: { left: 8, bottom: -15, width: 35, height: 95 },
+    gize: { left: 10, bottom: -18, width: 40, height: 95 }
+  };
+
+  const desktopOffsets: Record<string, {left: number, bottom: number, width: number, height: number}> = {
     pisa: { left: -29, bottom: -18, width: 88, height: 107 },
     eiffel: { left: -6, bottom: -17, width: 40, height: 100 },
     cristo: { left: -2, bottom: -19, width: 40, height: 107 },
     gize: { left: -1, bottom: -25, width: 46, height: 108 }
-  });
-  
+  };
+
   const groundOffset = 10; 
   const canvasHeightPercent = 55; 
   
@@ -59,16 +79,17 @@ export function SimulationCanvas({
     }
   }, [simulationMode, yA, height, resetCount]);
 
-  const currentOffset = structureId && structureId !== 'custom' && devOffsets[structureId] 
-    ? devOffsets[structureId] 
+  const currentOffset = structureId && structureId !== 'custom'
+    ? (devOffsets[structureId] || (isMobile ? mobileOffsets[structureId] : desktopOffsets[structureId]) || { left: 20, bottom: 10, width: 40, height: 85 })
     : { left: 20, bottom: 10, width: 40, height: 85 };
 
   const updateOffset = (key: 'left' | 'bottom' | 'width' | 'height', value: number) => {
     if (structureId && structureId !== 'custom') {
+      const base = isMobile ? mobileOffsets[structureId] : desktopOffsets[structureId];
       setDevOffsets(prev => ({
         ...prev,
         [structureId]: {
-          ...prev[structureId],
+          ...(prev[structureId] || base),
           [key]: value
         }
       }));
@@ -106,7 +127,7 @@ export function SimulationCanvas({
   const P_B = objectB.mass * env.g;
 
   return (
-    <div className={`relative w-full flex-1 h-full min-h-[500px] overflow-hidden font-sans ${env.id === 'moon' ? 'bg-[#1a1a2e]' : 'bg-[#F4F1EB]'}`}>
+    <div className={`relative w-full flex-1 h-full min-h-0 overflow-hidden font-sans ${env.id === 'moon' ? 'bg-[#1a1a2e]' : 'bg-[#F4F1EB]'}`}>
       
       {/* Decorative Vector Elements */}
       {env.id === 'earth' && (
@@ -201,19 +222,19 @@ export function SimulationCanvas({
         >
           
           {structureId === 'pisa' && (
-             <img src="/queda livre/pisa.png" alt="Torre de Pisa" className={`w-full h-full object-contain ${env.id === 'moon' ? 'invert opacity-80 mix-blend-screen' : 'mix-blend-multiply'}`} />
+             <img src="/queda livre/torre de pisa.png" alt="Torre de Pisa" className={`w-full h-full object-contain ${env.id === 'moon' ? 'invert opacity-80 mix-blend-screen' : 'mix-blend-multiply'}`} />
           )}
 
           {structureId === 'eiffel' && (
-             <img src="/queda livre/eiffel.png" alt="Torre Eiffel" className={`w-full h-full object-contain ${env.id === 'moon' ? 'invert opacity-80 mix-blend-screen' : 'mix-blend-multiply'}`} />
+             <img src="/queda livre/torre effel.png" alt="Torre Eiffel" className={`w-full h-full object-contain ${env.id === 'moon' ? 'invert opacity-80 mix-blend-screen' : 'mix-blend-multiply'}`} />
           )}
 
           {structureId === 'cristo' && (
-             <img src="/queda livre/cristo.png" alt="Cristo Redentor" className={`w-full h-full object-contain ${env.id === 'moon' ? 'invert opacity-80 mix-blend-screen' : 'mix-blend-multiply'}`} />
+             <img src="/queda livre/cristo redentor.png" alt="Cristo Redentor" className={`w-full h-full object-contain ${env.id === 'moon' ? 'invert opacity-80 mix-blend-screen' : 'mix-blend-multiply'}`} />
           )}
 
           {structureId === 'gize' && (
-             <img src="/queda livre/gize.png" alt="Pirâmide de Gizé" className={`w-full h-full object-contain ${env.id === 'moon' ? 'invert opacity-80 mix-blend-screen' : 'mix-blend-multiply'}`} />
+             <img src="/queda livre/piramide de gize.png" alt="Pirâmide de Gizé" className={`w-full h-full object-contain ${env.id === 'moon' ? 'invert opacity-80 mix-blend-screen' : 'mix-blend-multiply'}`} />
           )}
 
           <div className="bg-white/90 px-3 py-1 rounded-full border-2 border-slate-900 mt-2 font-black text-xs text-slate-900 shadow-[2px_2px_0px_0px_#0f172a] whitespace-nowrap">
@@ -350,7 +371,7 @@ export function SimulationCanvas({
                    <div className="h-1 w-20 bg-white/80 rounded-full animate-pulse" style={{ animationDelay: '100ms' }}></div>
                    <div className="h-1 w-8 bg-white/80 rounded-full animate-pulse" style={{ animationDelay: '300ms' }}></div>
                 </div>
-                <img src="/paraquedas/avião.png" alt="Avião" className="w-full h-full object-contain drop-shadow-xl z-10" />
+                <img src="/paraquedas/aviao.png" alt="Avião" className="w-full h-full object-contain drop-shadow-xl z-10" />
               </div>
             )}
 
