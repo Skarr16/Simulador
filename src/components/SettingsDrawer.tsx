@@ -73,19 +73,21 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                 </select>
               </div>
 
-              <div>
-                <label className="block text-xs font-black text-slate-500 mb-2 uppercase">Local / Estrutura</label>
-                <select 
-                  value={config.structureId}
-                  onChange={handleStructureChange}
-                  disabled={disabled}
-                  className="w-full bg-[#F4F1EB] border-2 border-slate-900 rounded-lg p-2 font-bold outline-none focus:ring-2 focus:ring-[#0055FF] disabled:opacity-50"
-                >
-                  {Object.values(STRUCTURES).map(struct => (
-                    <option key={struct.id} value={struct.id}>{struct.name} ({struct.height}m)</option>
-                  ))}
-                </select>
-              </div>
+              {config.simulationMode !== 'paraquedas' && (
+                <div>
+                  <label className="block text-xs font-black text-slate-500 mb-2 uppercase">Local / Estrutura</label>
+                  <select 
+                    value={config.structureId}
+                    onChange={handleStructureChange}
+                    disabled={disabled}
+                    className="w-full bg-[#F4F1EB] border-2 border-slate-900 rounded-lg p-2 font-bold outline-none focus:ring-2 focus:ring-[#0055FF] disabled:opacity-50"
+                  >
+                    {Object.values(STRUCTURES).map(struct => (
+                      <option key={struct.id} value={struct.id}>{struct.name} ({struct.height}m)</option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               <div>
                 <label className="flex items-center justify-between cursor-pointer group">
@@ -117,7 +119,9 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
             
             <div className="bg-white p-4 rounded-xl border-[3px] border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] space-y-4">
               <div>
-                <label className="block text-xs font-black text-[#FF3366] mb-2 uppercase">Objeto A (Esquerda)</label>
+                <label className="block text-xs font-black text-[#FF3366] mb-2 uppercase">
+                  {config.simulationMode === 'paraquedas' ? 'Objeto em Queda' : 'Objeto A (Esquerda)'}
+                </label>
                 <select 
                   value={config.objectAId}
                   onChange={(e) => setConfig({ ...config, objectAId: e.target.value })}
@@ -130,25 +134,29 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                 </select>
               </div>
 
-              <div>
-                <label className="block text-xs font-black text-[#0055FF] mb-2 uppercase">Objeto B (Direita)</label>
-                <select 
-                  value={config.objectBId}
-                  onChange={(e) => setConfig({ ...config, objectBId: e.target.value })}
-                  disabled={disabled}
-                  className="w-full bg-[#F4F1EB] border-2 border-slate-900 rounded-lg p-2 font-bold outline-none focus:ring-2 focus:ring-[#0055FF] disabled:opacity-50"
-                >
-                  {Object.values(customObjects).map(obj => (
-                    <option key={obj.id} value={obj.id}>{obj.name} ({obj.mass}kg)</option>
-                  ))}
-                </select>
-              </div>
+              {config.simulationMode !== 'paraquedas' && (
+                <div>
+                  <label className="block text-xs font-black text-[#0055FF] mb-2 uppercase">Objeto B (Direita)</label>
+                  <select 
+                    value={config.objectBId}
+                    onChange={(e) => setConfig({ ...config, objectBId: e.target.value })}
+                    disabled={disabled}
+                    className="w-full bg-[#F4F1EB] border-2 border-slate-900 rounded-lg p-2 font-bold outline-none focus:ring-2 focus:ring-[#0055FF] disabled:opacity-50"
+                  >
+                    {Object.values(customObjects).map(obj => (
+                      <option key={obj.id} value={obj.id}>{obj.name} ({obj.mass}kg)</option>
+                    ))}
+                  </select>
+                </div>
+              )}
               
               <div>
                 <label className="block text-xs font-black text-slate-900 mb-2 uppercase">Altura Inicial Manual</label>
                 <input 
                   type="range" 
-                  min="10" max="200" step="1" 
+                  min={config.simulationMode === 'paraquedas' ? "1000" : "10"} 
+                  max={config.simulationMode === 'paraquedas' ? "10000" : "200"} 
+                  step={config.simulationMode === 'paraquedas' ? "500" : "1"} 
                   value={config.height} 
                   onChange={handleHeightChange} 
                   className="w-full accent-slate-900" 

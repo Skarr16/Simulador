@@ -97,6 +97,7 @@ export default function App() {
               <SimulationCanvas 
                 height={config.height} 
                 structureId={config.structureId}
+                resetCount={engine.resetCount}
                 yA={engine.currentState.yA}
                 yB={engine.currentState.yB}
                 vA={engine.currentState.vA}

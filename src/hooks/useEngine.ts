@@ -5,6 +5,7 @@ import { OBJECTS, ENVIRONMENTS } from '../lib/constants';
 export function useEngine(config: SimulationConfig, customObjects?: Record<string, PhysicsObject>, customEnvs?: Record<string, Environment>) {
   const [isRunning, setIsRunning] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
+  const [resetCount, setResetCount] = useState(0);
   const [time, setTime] = useState(0);
   
   const currentObjects = customObjects || OBJECTS;
@@ -148,6 +149,7 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
     setIsRunning(false);
     setIsFinished(false);
     setTime(0);
+    setResetCount(c => c + 1);
     startTimeRef.current = null;
     setCurrentState(simulationData[0]);
   };
@@ -169,6 +171,7 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
     reset,
     isRunning,
     isFinished,
+    resetCount,
     time,
     currentState,
     dataPoints: simulationData, // For charts
