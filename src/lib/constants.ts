@@ -8,7 +8,7 @@ export const OBJECTS: Record<string, PhysicsObject> = {
   paper_crumpled: { id: 'paper_crumpled', name: 'Papel Amassado', mass: 0.005, area: 0.0028, cd: 0.8, color: '#cbd5e1', radius: 90 },
   paper_flat: { id: 'paper_flat', name: 'Folha de Papel', mass: 0.005, area: 0.06, cd: 1.28, color: '#ffffff', radius: 120 },
   book: { id: 'book', name: 'Livro', mass: 1.0, area: 0.06, cd: 1.05, color: '#b91c1c', radius: 140 },
-  feather: { id: 'feather', name: 'Pena', mass: 0.001, area: 0.005, cd: 1.5, color: '#fcd34d', radius: 110 },
+  feather: { id: 'feather', name: 'Pena', mass: 0.001, area: 0.005, cd: 1.5, color: '#fcd34d', radius: 80 },
 };
 
 export const ENVIRONMENTS: Record<string, Environment> = {

@@ -24,10 +24,10 @@ export function SimulationCanvas({
 
   const [scaleFactor, setScaleFactor] = useState(1);
   const [devOffsets, setDevOffsets] = useState<Record<string, {left: number, bottom: number, width: number, height: number}>>({
-    pisa: { left: -3, bottom: -23, width: 88, height: 120 },
-    eiffel: { left: 1, bottom: -20, width: 40, height: 108 },
-    cristo: { left: 0, bottom: -21, width: 40, height: 112 },
-    gize: { left: -3, bottom: -25, width: 46, height: 125 }
+    pisa: { left: -29, bottom: -18, width: 88, height: 107 },
+    eiffel: { left: -6, bottom: -17, width: 40, height: 100 },
+    cristo: { left: -2, bottom: -19, width: 40, height: 107 },
+    gize: { left: -1, bottom: -25, width: 46, height: 108 }
   });
 
   const currentOffset = structureId && structureId !== 'custom' && devOffsets[structureId] 
@@ -49,7 +49,10 @@ export function SimulationCanvas({
   useEffect(() => {
     const updateScale = () => {
        const width = window.innerWidth;
-       const newScale = Math.max(0.8, Math.min(1.8, width / 600));
+       const height = window.innerHeight;
+       // Limit scale factor so objects don't overflow the top of the container
+       const baseScale = Math.min(width / 800, height / 800);
+       const newScale = Math.max(0.4, Math.min(1.0, baseScale));
        setScaleFactor(newScale);
     };
     window.addEventListener('resize', updateScale);
@@ -68,7 +71,7 @@ export function SimulationCanvas({
   }
 
   const groundOffset = 10; 
-  const canvasHeightPercent = 80; 
+  const canvasHeightPercent = 55; 
   
   const yAPercent = groundOffset + (yA / Math.max(height, 1)) * canvasHeightPercent;
   const yBPercent = groundOffset + (yB / Math.max(height, 1)) * canvasHeightPercent;
@@ -125,16 +128,18 @@ export function SimulationCanvas({
       )}
 
       {/* Height Indicator */}
-      <div className={`absolute left-2 sm:left-4 top-8 bottom-[10%] flex flex-col justify-between items-start text-sm font-black border-l-[3px] pl-3 py-4 z-10 ${env.id === 'moon' ? 'text-white border-white' : 'text-slate-900 border-slate-900'}`}>
-        {Array.from({ length: 41 }).map((_, i) => {
-          const val = (height * (40 - i) / 40).toFixed(1);
-          const isMajor = i % 4 === 0;
-          const isMid = i % 2 === 0;
+      <div className={`absolute left-0 top-0 bottom-0 w-24 z-10 ${env.id === 'moon' ? 'text-white' : 'text-slate-900'}`}>
+        <div className={`absolute left-4 sm:left-6 top-[10%] bottom-[10%] border-l-[3px] ${env.id === 'moon' ? 'border-white' : 'border-slate-900'}`}></div>
+        {Array.from({ length: 11 }).map((_, i) => {
+          const percent = i * 10;
+          const val = (height * percent / 100).toFixed(1);
+          const bottomPercent = 10 + percent * 0.55;
+          const isMajor = i % 2 === 0;
           return (
-            <div key={i} className="flex items-center">
-              <div className={`absolute left-0 h-[3px] ${env.id === 'moon' ? 'bg-white' : 'bg-slate-900'} ${isMajor ? 'w-4' : isMid ? 'w-2' : 'w-1'}`}></div>
+            <div key={i} className="absolute flex items-center left-4 sm:left-6 -translate-y-1/2" style={{ bottom: `${bottomPercent}%` }}>
+              <div className={`h-[3px] ${env.id === 'moon' ? 'bg-white' : 'bg-slate-900'} ${isMajor ? 'w-4 sm:w-6' : 'w-2 sm:w-3'}`}></div>
               {isMajor && (
-                <span className={`px-1 ml-1 border-[3px] rounded-md text-[9px] sm:text-[10px] ${env.id === 'moon' ? 'bg-[#1a1a2e] border-white' : 'bg-[#F4F1EB] border-slate-900'}`}>
+                <span className={`px-1.5 py-0.5 ml-1 sm:ml-2 border-[3px] rounded-md text-xs sm:text-sm font-black shadow-sm ${env.id === 'moon' ? 'bg-[#1a1a2e] border-white' : 'bg-[#F4F1EB] border-slate-900'}`}>
                   {val}m
                 </span>
               )}
@@ -267,13 +272,13 @@ export function SimulationCanvas({
              );
           } else if (obj.id === 'feather') {
              content = (
-               <div className={`w-[200%] h-[60%] relative flex items-center justify-center ${isFalling ? 'animate-[float_2s_ease-in-out_infinite]' : ''}`}>
-                  <svg viewBox="0 0 100 200" className="w-full h-full drop-shadow-md -rotate-90">
-                     <path d="M 50 180 Q 50 100 50 20" fill="none" stroke="#0f172a" strokeWidth="4" />
-                     <path d="M 50 20 C 70 40 80 80 50 160 C 20 80 30 40 50 20" fill="#fcd34d" stroke="#0f172a" strokeWidth="3" />
-                     <path d="M 50 40 L 65 30 M 50 60 L 70 50 M 50 80 L 65 70 M 50 100 L 60 95 M 50 50 L 35 40 M 50 70 L 30 60 M 50 90 L 35 85" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" />
+               <div className={`w-full h-full relative flex items-center justify-center ${isFalling ? 'animate-[float_2s_ease-in-out_infinite]' : ''}`}>
+                  <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md">
+                     <path d="M 50 90 Q 50 50 50 10" fill="none" stroke="#0f172a" strokeWidth="4" />
+                     <path d="M 50 10 C 70 20 80 40 50 80 C 20 40 30 20 50 10" fill="#fcd34d" stroke="#0f172a" strokeWidth="3" />
+                     <path d="M 50 20 L 65 15 M 50 30 L 70 25 M 50 40 L 65 35 M 50 50 L 60 47.5 M 50 25 L 35 20 M 50 35 L 30 30 M 50 45 L 35 42.5" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" />
                   </svg>
-                  <span className="text-slate-900 font-black text-[10px] z-10 absolute -mt-4">{letter}</span>
+                  <span className="text-slate-900 font-black text-[10px] z-10 absolute mt-4">{letter}</span>
                </div>
              );
           } else {
@@ -305,7 +310,7 @@ export function SimulationCanvas({
             {/* Falling Object A (Left) */}
             <div 
               className={`absolute flex flex-col items-center justify-end z-20 ${devMode ? 'border-2 border-dashed border-red-500 bg-red-500/20' : ''}`}
-              style={{ bottom: `${yAPercent}%`, left: '60%', transform: 'translateX(-50%)', width: objectA.radius * scaleFactor, height: objectA.radius * scaleFactor }}
+              style={{ bottom: `${yAPercent}%`, left: '45%', transform: 'translateX(-50%)', width: objectA.radius * scaleFactor, height: objectA.radius * scaleFactor }}
             >
               {renderObject(objectA, 'A', isFallingA)}
               {/* Vectors */}
@@ -344,7 +349,7 @@ export function SimulationCanvas({
             {/* Falling Object B (Right) */}
             <div 
               className={`absolute flex flex-col items-center justify-end z-20 ${devMode ? 'border-2 border-dashed border-red-500 bg-red-500/20' : ''}`}
-              style={{ bottom: `${yBPercent}%`, left: '85%', transform: 'translateX(-50%)', width: objectB.radius * scaleFactor, height: objectB.radius * scaleFactor }}
+              style={{ bottom: `${yBPercent}%`, left: '65%', transform: 'translateX(-50%)', width: objectB.radius * scaleFactor, height: objectB.radius * scaleFactor }}
             >
               {renderObject(objectB, 'B', isFallingB)}
               {/* Vectors */}
