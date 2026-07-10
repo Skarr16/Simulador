@@ -22,6 +22,7 @@ export interface SimulationConfig {
   objectBId: string;
   environmentId: string;
   enableAirResistance: boolean;
+  simulationMode?: 'livre' | 'paraquedas' | 'lancamento';
 }
 
 export interface SimulationState {
@@ -34,6 +35,8 @@ export interface SimulationState {
   vB: number;
   aB: number;
   FdB: number;
+  parachuteDeployedA?: boolean;
+  parachuteDeployedB?: boolean;
 }
 
 export interface SimulationResult {

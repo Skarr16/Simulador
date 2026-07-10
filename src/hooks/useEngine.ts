@@ -17,7 +17,7 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
   // Pre-compute the simulation trajectory
   const simulationData = useMemo(() => {
     let t = 0;
-    const dt = 0.01; // 10ms step for physics integration
+    const dt = 0.02; // 20ms step for physics integration
     let yA = config.height;
     let vA = 0;
     let yB = config.height;
@@ -25,11 +25,33 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
     
     const data: SimulationState[] = [];
     
-    // Safety break at 120s
-    while ((yA > 0 || yB > 0) && t < 120) {
+    // Safety break at 1200s
+    while ((yA > 0 || yB > 0) && t < 1200) {
+      let currentAreaA = objectA.area;
+      let currentCdA = objectA.cd;
+      let currentAreaB = objectB.area;
+      let currentCdB = objectB.cd;
+
+      let parachuteDeployedA = false;
+      let parachuteDeployedB = false;
+
+      if (config.simulationMode === 'paraquedas') {
+        // Deploy parachute at 60% of the height
+        if (yA < config.height * 0.6) {
+          currentAreaA = objectA.area + 5; // Parachute area
+          currentCdA = 1.75; // Parachute drag coefficient
+          parachuteDeployedA = true;
+        }
+        if (yB < config.height * 0.6) {
+          currentAreaB = objectB.area + 5;
+          currentCdB = 1.75;
+          parachuteDeployedB = true;
+        }
+      }
+
       let FdA = 0;
       if (config.enableAirResistance && yA > 0) {
-        FdA = 0.5 * env.rho * vA * vA * objectA.cd * objectA.area;
+        FdA = 0.5 * env.rho * vA * vA * currentCdA * currentAreaA;
       }
       let aA = env.g - (FdA / objectA.mass);
       if (yA <= 0) {
@@ -38,7 +60,7 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
       
       let FdB = 0;
       if (config.enableAirResistance && yB > 0) {
-        FdB = 0.5 * env.rho * vB * vB * objectB.cd * objectB.area;
+        FdB = 0.5 * env.rho * vB * vB * currentCdB * currentAreaB;
       }
       let aB = env.g - (FdB / objectB.mass);
       if (yB <= 0) {
@@ -46,7 +68,7 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
       }
       
       data.push({
-        t, yA, vA, aA, FdA, yB, vB, aB, FdB
+        t, yA, vA, aA, FdA, yB, vB, aB, FdB, parachuteDeployedA, parachuteDeployedB
       });
       
       if (yA > 0) {
@@ -62,7 +84,7 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
     
     // push final state exactly at 0
     data.push({
-      t, yA: 0, vA: 0, aA: 0, FdA: 0, yB: 0, vB: 0, aB: 0, FdB: 0
+      t, yA: 0, vA: 0, aA: 0, FdA: 0, yB: 0, vB: 0, aB: 0, FdB: 0, parachuteDeployedA: config.simulationMode === 'paraquedas', parachuteDeployedB: config.simulationMode === 'paraquedas'
     });
     
     return data;
@@ -74,12 +96,13 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
   const startTimeRef = useRef<number | null>(null);
 
   const animate = useCallback((timestamp: number) => {
-    if (!startTimeRef.current) startTimeRef.current = timestamp - (time * 1000);
-    const elapsed = (timestamp - startTimeRef.current) / 1000;
+    const timeScale = config.simulationMode === 'paraquedas' ? 10 : 1;
+    if (!startTimeRef.current) startTimeRef.current = timestamp - ((time * 1000) / timeScale);
+    const elapsed = ((timestamp - startTimeRef.current) / 1000) * timeScale;
     
     setTime(elapsed);
     
-    let frameIndex = Math.floor(elapsed / 0.01);
+    let frameIndex = Math.floor(elapsed / 0.02);
     
     if (frameIndex >= simulationData.length - 1) {
       frameIndex = simulationData.length - 1;

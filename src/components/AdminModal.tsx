@@ -82,7 +82,7 @@ export function AdminModal({ isOpen, onClose, customObjects, setCustomObjects, c
                   onChange={(e) => setSelectedObj(e.target.value)}
                   className="w-full bg-white border-2 border-slate-900 rounded-lg p-2 font-bold"
                 >
-                  {Object.values(localObjects).map(obj => (
+                  {Object.values(localObjects).map((obj: any) => (
                     <option key={obj.id} value={obj.id}>{obj.name}</option>
                   ))}
                 </select>
@@ -107,8 +107,8 @@ export function AdminModal({ isOpen, onClose, customObjects, setCustomObjects, c
                     <input type="number" step="0.01" value={localObjects[selectedObj].cd} onChange={e => updateObject(selectedObj, 'cd', Number(e.target.value))} className="border-2 border-slate-900 rounded p-1 font-bold" />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <label className="text-xs font-black uppercase text-slate-700">Tamanho Relativo (px)</label>
-                    <input type="number" value={localObjects[selectedObj].radius} onChange={e => updateObject(selectedObj, 'radius', Number(e.target.value))} className="border-2 border-slate-900 rounded p-1 font-bold" />
+                    <label className="text-xs font-black uppercase text-slate-700">Tamanho da Imagem (px)</label>
+                    <input type="number" step="10" value={localObjects[selectedObj].radius} onChange={e => updateObject(selectedObj, 'radius', Number(e.target.value))} className="border-2 border-slate-900 rounded p-1 font-bold" />
                   </div>
                   <div className="flex flex-col gap-1">
                     <label className="text-xs font-black uppercase text-slate-700">Cor</label>
@@ -128,7 +128,7 @@ export function AdminModal({ isOpen, onClose, customObjects, setCustomObjects, c
                   onChange={(e) => setSelectedEnv(e.target.value)}
                   className="w-full bg-white border-2 border-slate-900 rounded-lg p-2 font-bold"
                 >
-                  {Object.values(localEnvs).map(env => (
+                  {Object.values(localEnvs).map((env: any) => (
                     <option key={env.id} value={env.id}>{env.name}</option>
                   ))}
                 </select>

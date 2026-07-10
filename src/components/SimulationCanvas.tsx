@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { engine } from '../lib/physicsEngine';
 import { PhysicsObject, Environment } from '../types';
 
 interface SimulationCanvasProps {
@@ -15,11 +14,15 @@ interface SimulationCanvasProps {
   objectB: PhysicsObject;
   env: Environment;
   showVectors: boolean;
+  showHeights?: boolean;
   devMode?: boolean;
+  parachuteDeployedA?: boolean;
+  parachuteDeployedB?: boolean;
+  simulationMode?: string;
 }
 
 export function SimulationCanvas({ 
-  height, structureId, yA, yB, vA, vB, FdA, FdB, objectA, objectB, env, showVectors, devMode 
+  height, structureId, yA, yB, vA, vB, FdA, FdB, objectA, objectB, env, showVectors, showHeights, devMode, parachuteDeployedA, parachuteDeployedB, simulationMode 
 }: SimulationCanvasProps) {
 
   const [scaleFactor, setScaleFactor] = useState(1);
@@ -29,6 +32,29 @@ export function SimulationCanvas({
     cristo: { left: -2, bottom: -19, width: 40, height: 107 },
     gize: { left: -1, bottom: -25, width: 46, height: 108 }
   });
+  
+  const groundOffset = 10; 
+  const canvasHeightPercent = 55; 
+  
+  const yAPercent = groundOffset + (yA / Math.max(height, 1)) * canvasHeightPercent;
+  const yBPercent = groundOffset + (yB / Math.max(height, 1)) * canvasHeightPercent;
+  const isFallingA = yA < height;
+  const isFallingB = yB < height;
+  const isFalling = isFallingA || isFallingB;
+
+  const [planeArrived, setPlaneArrived] = useState(false);
+
+  useEffect(() => {
+    if (simulationMode === 'paraquedas') {
+      if (!isFallingA) {
+        setPlaneArrived(false);
+        const timer = setTimeout(() => setPlaneArrived(true), 1800);
+        return () => clearTimeout(timer);
+      }
+    } else {
+      setPlaneArrived(true);
+    }
+  }, [simulationMode, isFallingA]);
 
   const currentOffset = structureId && structureId !== 'custom' && devOffsets[structureId] 
     ? devOffsets[structureId] 
@@ -69,15 +95,6 @@ export function SimulationCanvas({
       default: return '';
     }
   }
-
-  const groundOffset = 10; 
-  const canvasHeightPercent = 55; 
-  
-  const yAPercent = groundOffset + (yA / Math.max(height, 1)) * canvasHeightPercent;
-  const yBPercent = groundOffset + (yB / Math.max(height, 1)) * canvasHeightPercent;
-  const isFallingA = yA < height;
-  const isFallingB = yB < height;
-  const isFalling = isFallingA || isFallingB;
 
   const maxVelAllowed = Math.sqrt(2 * 9.81 * 100); 
   const getVelScale = (v: number) => (v / maxVelAllowed) * 60; 
@@ -181,19 +198,19 @@ export function SimulationCanvas({
         >
           
           {structureId === 'pisa' && (
-             <img src="/pisa.png" alt="Torre de Pisa" className={`w-full h-full object-contain ${env.id === 'moon' ? 'invert opacity-80 mix-blend-screen' : 'mix-blend-multiply'}`} />
+             <img src="/queda livre/pisa.png" alt="Torre de Pisa" className={`w-full h-full object-contain ${env.id === 'moon' ? 'invert opacity-80 mix-blend-screen' : 'mix-blend-multiply'}`} />
           )}
 
           {structureId === 'eiffel' && (
-             <img src="/eiffel.png" alt="Torre Eiffel" className={`w-full h-full object-contain ${env.id === 'moon' ? 'invert opacity-80 mix-blend-screen' : 'mix-blend-multiply'}`} />
+             <img src="/queda livre/eiffel.png" alt="Torre Eiffel" className={`w-full h-full object-contain ${env.id === 'moon' ? 'invert opacity-80 mix-blend-screen' : 'mix-blend-multiply'}`} />
           )}
 
           {structureId === 'cristo' && (
-             <img src="/cristo.png" alt="Cristo Redentor" className={`w-full h-full object-contain ${env.id === 'moon' ? 'invert opacity-80 mix-blend-screen' : 'mix-blend-multiply'}`} />
+             <img src="/queda livre/cristo.png" alt="Cristo Redentor" className={`w-full h-full object-contain ${env.id === 'moon' ? 'invert opacity-80 mix-blend-screen' : 'mix-blend-multiply'}`} />
           )}
 
           {structureId === 'gize' && (
-             <img src="/gize.png" alt="Pirâmide de Gizé" className={`w-full h-full object-contain ${env.id === 'moon' ? 'invert opacity-80 mix-blend-screen' : 'mix-blend-multiply'}`} />
+             <img src="/queda livre/gize.png" alt="Pirâmide de Gizé" className={`w-full h-full object-contain ${env.id === 'moon' ? 'invert opacity-80 mix-blend-screen' : 'mix-blend-multiply'}`} />
           )}
 
           <div className="bg-white/90 px-3 py-1 rounded-full border-2 border-slate-900 mt-2 font-black text-xs text-slate-900 shadow-[2px_2px_0px_0px_#0f172a] whitespace-nowrap">
@@ -204,7 +221,7 @@ export function SimulationCanvas({
 
       {/* Object Visual Renderer */}
       {(() => {
-        const renderObject = (obj: PhysicsObject, letter: string, isFalling: boolean) => {
+        const renderObject = (obj: PhysicsObject, letter: string, isFalling: boolean, parachuteDeployed?: boolean) => {
           let content = null;
           if (obj.id === 'bowling') {
              content = (
@@ -281,6 +298,12 @@ export function SimulationCanvas({
                   <span className="text-slate-900 font-black text-[10px] z-10 absolute mt-4">{letter}</span>
                </div>
              );
+          } else if (obj.id === 'skydiver') {
+             content = (
+               <div className={`w-full h-full relative flex items-center justify-center drop-shadow-md ${parachuteDeployed ? 'animate-[float_2s_ease-in-out_infinite]' : ''}`}>
+                  <img src={parachuteDeployed ? "/paraquedas/boneco caindo com paraquedas (1).png" : "/paraquedas/boneco caindo (1).png"} className="w-full h-full object-contain" />
+               </div>
+             );
           } else {
              // Fallback
              content = (
@@ -307,12 +330,33 @@ export function SimulationCanvas({
 
         return (
           <>
+            {/* Airplane for Parachute Mode */}
+            {simulationMode === 'paraquedas' && (
+              <div 
+                className={`absolute z-30 flex items-center justify-center transition-all ${isFallingA ? 'animate-[flyAway_3s_ease-in_forwards]' : 'animate-[flyIn_2s_ease-out_forwards]'}`}
+                style={{ bottom: `${groundOffset + canvasHeightPercent + 15}%`, left: '50%', width: 350, height: 140 }}
+              >
+                {/* Wind trail */}
+                <div className="absolute -left-20 top-1/2 flex space-x-2 opacity-80">
+                   <div className="h-1 w-12 bg-white/80 rounded-full animate-pulse"></div>
+                   <div className="h-1 w-20 bg-white/80 rounded-full animate-pulse" style={{ animationDelay: '100ms' }}></div>
+                   <div className="h-1 w-8 bg-white/80 rounded-full animate-pulse" style={{ animationDelay: '300ms' }}></div>
+                </div>
+                <img src="/paraquedas/avião.png" alt="Avião" className="w-full h-full object-contain drop-shadow-xl z-10" />
+              </div>
+            )}
+
             {/* Falling Object A (Left) */}
             <div 
-              className={`absolute flex flex-col items-center justify-end z-20 ${devMode ? 'border-2 border-dashed border-red-500 bg-red-500/20' : ''}`}
-              style={{ bottom: `${yAPercent}%`, left: '45%', transform: 'translateX(-50%)', width: objectA.radius * scaleFactor, height: objectA.radius * scaleFactor }}
+              className={`absolute flex flex-col items-center justify-end z-20 ${devMode ? 'border-2 border-dashed border-red-500 bg-red-500/20' : ''} ${!isFallingA && simulationMode === 'paraquedas' && !planeArrived ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}
+              style={{ bottom: `${yAPercent}%`, left: simulationMode === 'paraquedas' ? '50%' : '45%', transform: 'translateX(-50%)', width: objectA.radius * scaleFactor, height: objectA.radius * scaleFactor }}
             >
-              {renderObject(objectA, 'A', isFallingA)}
+              {showHeights && (
+                <div className="absolute right-full mr-2 sm:mr-4 top-1/2 -translate-y-1/2 bg-white/90 px-2 py-1 rounded-md border-[3px] border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] whitespace-nowrap z-50">
+                  <span className="text-xs sm:text-sm font-black text-slate-900">{yA.toFixed(1)} m</span>
+                </div>
+              )}
+              {renderObject(objectA, 'A', isFallingA, parachuteDeployedA)}
               {/* Vectors */}
               {showVectors && (
                 <>
@@ -347,11 +391,17 @@ export function SimulationCanvas({
             </div>
 
             {/* Falling Object B (Right) */}
+            {simulationMode !== 'paraquedas' && (
             <div 
               className={`absolute flex flex-col items-center justify-end z-20 ${devMode ? 'border-2 border-dashed border-red-500 bg-red-500/20' : ''}`}
               style={{ bottom: `${yBPercent}%`, left: '65%', transform: 'translateX(-50%)', width: objectB.radius * scaleFactor, height: objectB.radius * scaleFactor }}
             >
-              {renderObject(objectB, 'B', isFallingB)}
+              {showHeights && (
+                <div className="absolute left-full ml-2 sm:ml-4 top-1/2 -translate-y-1/2 bg-white/90 px-2 py-1 rounded-md border-[3px] border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] whitespace-nowrap z-50">
+                  <span className="text-xs sm:text-sm font-black text-slate-900">{yB.toFixed(1)} m</span>
+                </div>
+              )}
+              {renderObject(objectB, 'B', isFallingB, parachuteDeployedB)}
               {/* Vectors */}
               {showVectors && (
                 <>
@@ -384,11 +434,66 @@ export function SimulationCanvas({
                 </>
               )}
             </div>
+            )}
           </>
         );
       })()}
       
+      {simulationMode === 'paraquedas' && (
+        <div className="absolute top-4 right-4 bg-white/95 p-6 rounded-xl border-[3px] border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] z-40 min-w-[340px]">
+          <h3 className="font-black text-lg uppercase mb-4 border-b-2 border-slate-900 pb-2 flex items-center justify-between">
+            <span>Dados da Simulação</span>
+            {isFallingA && <span className="flex h-3 w-3 relative"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span></span>}
+          </h3>
+          
+          <div className="grid grid-cols-2 gap-4 mb-5">
+             <div className="bg-slate-100 p-3 rounded-lg border border-slate-200 shadow-inner">
+               <div className="text-xs uppercase font-bold text-slate-500 mb-1">Velocidade (v)</div>
+               <div className="font-black text-2xl text-[#0055FF]">{vA.toFixed(1)} m/s</div>
+             </div>
+             <div className="bg-slate-100 p-3 rounded-lg border border-slate-200 shadow-inner">
+               <div className="text-xs uppercase font-bold text-slate-500 mb-1">Arrasto (Fa)</div>
+               <div className="font-black text-2xl text-[#FF3366]">{FdA.toFixed(1)} N</div>
+             </div>
+             <div className="bg-slate-100 p-3 rounded-lg border border-slate-200 shadow-inner">
+               <div className="text-xs uppercase font-bold text-slate-500 mb-1">Peso (P)</div>
+               <div className="font-black text-2xl text-slate-900">{P_A.toFixed(1)} N</div>
+             </div>
+             <div className="bg-slate-100 p-3 rounded-lg border border-slate-200 shadow-inner">
+               <div className="text-xs uppercase font-bold text-slate-500 mb-1">Altura (y)</div>
+               <div className="font-black text-2xl text-green-600">{yA.toFixed(1)} m</div>
+             </div>
+          </div>
+
+          <div className="border-t-2 border-slate-100 pt-4">
+             <h4 className="font-bold text-sm uppercase mb-2 text-slate-700">Parâmetros</h4>
+             <div className="font-mono text-xs mb-3 bg-slate-800 text-green-400 p-3 rounded-lg whitespace-nowrap overflow-x-hidden text-center shadow-inner">
+               F<sub>a</sub> = &frac12; &rho; v&sup2; C<sub>d</sub> A
+             </div>
+             <ul className="text-xs space-y-2 text-slate-700 font-medium">
+               <li className="flex justify-between items-center border-b border-slate-100 pb-1"><span><strong className="text-slate-900 text-sm">&rho;</strong> (Densidade do ar)</span> <span>{env.rho} kg/m&sup3;</span></li>
+               <li className="flex justify-between items-center border-b border-slate-100 pb-1"><span><strong className="text-slate-900 text-sm">C<sub>d</sub></strong> (Coef. de arrasto)</span> <span>{parachuteDeployedA ? '1.75' : objectA.cd}</span></li>
+               <li className="flex justify-between items-center border-b border-slate-100 pb-1"><span><strong className="text-slate-900 text-sm">A</strong> (Área de seção)</span> <span>{parachuteDeployedA ? (objectA.area + 5).toFixed(2) : objectA.area} m&sup2;</span></li>
+               <li className="flex justify-between items-center"><span><strong className="text-slate-900 text-sm">m</strong> (Massa)</span> <span>{objectA.mass} kg</span></li>
+             </ul>
+          </div>
+        </div>
+      )}
+
       <style>{`
+        @keyframes flyIn {
+          0% { transform: translateX(-150vw); opacity: 0; }
+          10% { opacity: 1; }
+          100% { transform: translateX(-50%); opacity: 1; }
+        }
+        @keyframes flyAway {
+          0% { transform: translateX(-50%); opacity: 1; }
+          100% { transform: translateX(100vw); opacity: 0; }
+        }
+        @keyframes hoverPlane {
+          0%, 100% { transform: translateX(-50%) translateY(0); }
+          50% { transform: translateX(-50%) translateY(-10px); }
+        }
         @keyframes wiggle {
           0%, 100% { transform: rotate(-10deg) translateX(-5px); }
           50% { transform: rotate(10deg) translateX(5px); }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Square, RotateCcw, Activity, Settings2, LineChart as ChartIcon, Zap, ShieldAlert } from 'lucide-react';
+import { Play, Square, RotateCcw, Activity, Settings2, LineChart as ChartIcon, Zap, ShieldAlert, Wind } from 'lucide-react';
 import { SimulationCanvas } from './components/SimulationCanvas';
 import { ChartsArea } from './components/ChartsArea';
 import { EnergyDisplay } from './components/EnergyDisplay';
@@ -24,6 +24,7 @@ export default function App() {
     graphs: false,
     energies: false,
     devMode: false,
+    showHeights: true,
   });
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -49,8 +50,26 @@ export default function App() {
           
           <div className="flex items-center gap-4">
             <span className="hidden md:inline-block bg-[#F4F1EB] px-3 py-1 rounded-full border-2 border-slate-300 text-slate-500 uppercase tracking-widest text-xs font-black">
-              Simulador de Queda Livre
+              {config.simulationMode === 'paraquedas' ? 'Queda com Paraquedas' : config.simulationMode === 'lancamento' ? 'Lançamento (Em Breve)' : 'Simulador de Queda Livre'}
             </span>
+            <button
+              onClick={() => setConfig({ ...config, simulationMode: 'livre', height: 56, structureId: 'pisa', objectAId: 'bowling', objectBId: 'feather' })}
+              className={`flex items-center gap-2 px-4 py-2 ${(!config.simulationMode || config.simulationMode === 'livre') ? 'bg-[#00C48C] text-white' : 'bg-white text-slate-900'} font-black uppercase rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
+            >
+              <Activity className="w-4 h-4" /> <span className="hidden sm:inline">Queda Livre</span>
+            </button>
+            <button 
+              onClick={() => setConfig({ ...config, simulationMode: 'paraquedas', objectAId: 'skydiver', objectBId: 'skydiver', height: 4000, structureId: 'custom', enableAirResistance: true })}
+              className={`flex items-center gap-2 px-4 py-2 ${config.simulationMode === 'paraquedas' ? 'bg-[#00C48C] text-white' : 'bg-white text-slate-900'} font-black uppercase rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
+            >
+              <Wind className="w-4 h-4" /> <span className="hidden sm:inline">Paraquedas</span>
+            </button>
+            <button 
+              onClick={() => setConfig({ ...config, simulationMode: 'lancamento' })}
+              className={`flex items-center gap-2 px-4 py-2 ${config.simulationMode === 'lancamento' ? 'bg-[#0055FF] text-white' : 'bg-white text-slate-900'} font-black uppercase rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
+            >
+              <Activity className="w-4 h-4" /> <span className="hidden sm:inline">Em Breve</span>
+            </button>
             <button 
               onClick={() => setIsAdminOpen(true)}
               className="flex items-center gap-2 px-4 py-2 bg-[#FF3366] text-white font-black uppercase rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-1 hover:translate-x-1 hover:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
@@ -88,7 +107,11 @@ export default function App() {
                 objectB={engine.objectB}
                 env={engine.env}
                 showVectors={toggles.vectors}
+                showHeights={toggles.showHeights}
                 devMode={toggles.devMode}
+                parachuteDeployedA={engine.currentState.parachuteDeployedA}
+                parachuteDeployedB={engine.currentState.parachuteDeployedB}
+                simulationMode={config.simulationMode}
               />
             </div>
 
