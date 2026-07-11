@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Save } from 'lucide-react';
+import { X, Save, ArrowDown, Cpu, Layers, Play, Settings2, Database, Eye } from 'lucide-react';
 import { PhysicsObject, Environment } from '../types';
 
 interface AdminModalProps {
@@ -16,7 +16,7 @@ interface AdminModalProps {
 export function AdminModal({ isOpen, onClose, customObjects, setCustomObjects, customEnvs, setCustomEnvs, devMode, setDevMode }: AdminModalProps) {
   const [localObjects, setLocalObjects] = useState(customObjects);
   const [localEnvs, setLocalEnvs] = useState(customEnvs);
-  const [activeTab, setActiveTab] = useState<'objects' | 'envs' | 'formulas' | 'general'>('objects');
+  const [activeTab, setActiveTab] = useState<'objects' | 'envs' | 'formulas' | 'architecture' | 'general'>('objects');
   const [selectedObj, setSelectedObj] = useState<string>(Object.keys(localObjects)[0]);
   const [selectedEnv, setSelectedEnv] = useState<string>(Object.keys(localEnvs)[0]);
 
@@ -76,6 +76,12 @@ export function AdminModal({ isOpen, onClose, customObjects, setCustomObjects, c
             onClick={() => setActiveTab('formulas')}
           >
             Fórmulas
+          </button>
+          <button 
+            className={`flex-1 min-w-[80px] p-2.5 sm:p-3 font-black uppercase text-xs sm:text-sm border-l-2 sm:border-l-4 border-slate-900 ${activeTab === 'architecture' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+            onClick={() => setActiveTab('architecture')}
+          >
+            Fluxograma
           </button>
           <button 
             className={`flex-1 min-w-[80px] p-2.5 sm:p-3 font-black uppercase text-xs sm:text-sm border-l-2 sm:border-l-4 border-slate-900 ${activeTab === 'general' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
@@ -259,6 +265,137 @@ export function AdminModal({ isOpen, onClose, customObjects, setCustomObjects, c
                 <p className="text-[11px] text-slate-600 font-bold mt-2">
                   Isso cria uma força de arrasto superior ao peso, gerando uma forte desaceleração vertical até o estabelecimento de uma velocidade terminal lenta e confortável para o pouso.
                 </p>
+              </div>
+
+            </div>
+          )}
+
+          {activeTab === 'architecture' && (
+            <div className="flex flex-col items-center text-slate-800">
+              
+              <div className="w-full text-center bg-white p-4 rounded-xl border-2 border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] mb-6">
+                <h3 className="text-sm font-black uppercase text-slate-900 mb-1">
+                  Arquitetura de Fluxo do Simulador
+                </h3>
+                <p className="text-[11px] text-slate-600 font-bold max-w-md mx-auto leading-relaxed">
+                  Veja como os dados, estados do React e cálculos da física clássica se interconectam em tempo real durante a simulação.
+                </p>
+              </div>
+
+              {/* Step 1 */}
+              <div className="w-full bg-white p-4 rounded-xl border-2 border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] relative">
+                <div className="absolute -top-3 left-4 bg-[#FFB800] text-slate-900 border-2 border-slate-900 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md">
+                  1. Entrada de Dados
+                </div>
+                <div className="flex gap-3 items-start mt-1.5">
+                  <div className="p-2 bg-amber-50 rounded-lg border-2 border-slate-900 shrink-0">
+                    <Settings2 className="w-5 h-5 text-[#FFB800]" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-black uppercase text-slate-900">Configuração Inicial</span>
+                      <span className="bg-slate-100 text-slate-500 font-mono text-[9px] px-1.5 py-0.5 rounded border border-slate-200">SettingsDrawer.tsx</span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 font-bold leading-relaxed mt-1">
+                      O usuário define os parâmetros iniciais na interface: altura (<code className="font-mono text-slate-900">h₀</code>), gravidade (<code className="font-mono text-slate-900">g</code>), massa (<code className="font-mono text-slate-900">m</code>), coeficiente de arrasto (<code className="font-mono text-slate-900">Cd</code>) e área transversal (<code className="font-mono text-slate-900">A</code>).
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Connector 1 */}
+              <div className="flex flex-col items-center my-3">
+                <div className="w-1 h-6 bg-slate-900"></div>
+                <ArrowDown className="w-4 h-4 text-slate-900 -mt-1.5" />
+              </div>
+
+              {/* Step 2 */}
+              <div className="w-full bg-white p-4 rounded-xl border-2 border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] relative">
+                <div className="absolute -top-3 left-4 bg-[#0055FF] text-white border-2 border-slate-900 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md">
+                  2. Hub de Estado Reativo
+                </div>
+                <div className="flex gap-3 items-start mt-1.5">
+                  <div className="p-2 bg-blue-50 rounded-lg border-2 border-slate-900 shrink-0">
+                    <Database className="w-5 h-5 text-[#0055FF]" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-black uppercase text-slate-900">Propagação e Controle</span>
+                      <span className="bg-slate-100 text-slate-500 font-mono text-[9px] px-1.5 py-0.5 rounded border border-slate-200">App.tsx</span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 font-bold leading-relaxed mt-1">
+                      Concentra os estados reativos da aplicação (<code className="font-mono text-slate-900">config</code>, <code className="font-mono text-slate-900">customObjects</code>) e repassa os parâmetros atualizados para os demais hooks e subcomponentes visuais.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Connector 2 */}
+              <div className="flex flex-col items-center my-3">
+                <div className="w-1 h-6 bg-slate-900"></div>
+                <ArrowDown className="w-4 h-4 text-slate-900 -mt-1.5" />
+              </div>
+
+              {/* Step 3 */}
+              <div className="w-full bg-white p-4 rounded-xl border-2 border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] relative">
+                <div className="absolute -top-3 left-4 bg-[#00C48C] text-white border-2 border-slate-900 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md">
+                  3. Motor de Cálculo Numérico
+                </div>
+                <div className="flex gap-3 items-start mt-1.5">
+                  <div className="p-2 bg-emerald-50 rounded-lg border-2 border-slate-900 shrink-0">
+                    <Cpu className="w-5 h-5 text-[#00C48C]" />
+                  </div>
+                  <div className="w-full">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-black uppercase text-slate-900">Loop de Física (Euler)</span>
+                      <span className="bg-slate-100 text-slate-500 font-mono text-[9px] px-1.5 py-0.5 rounded border border-slate-200">useEngine.ts</span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 font-bold leading-relaxed mt-1 mb-2">
+                      Ao iniciar a queda, executa um ciclo contínuo em passos de <code className="font-mono text-slate-900">dt = 0.02s</code> recalculando instantaneamente:
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px] font-mono font-bold text-slate-700 bg-slate-50 p-2 rounded-lg border border-slate-200">
+                      <div>
+                        <span className="text-[#0055FF]">Peso:</span> P = m · g
+                      </div>
+                      <div>
+                        <span className="text-[#FF3366]">Arrasto:</span> Fa = 0.5 · ρ · v² · Cd · A
+                      </div>
+                      <div>
+                        <span className="text-purple-600">Aceleração:</span> a = g - (Fa / m)
+                      </div>
+                      <div>
+                        <span className="text-[#00C48C]">Altura/Velocidade:</span> v += a·dt, y -= v·dt
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Connector 3 */}
+              <div className="flex flex-col items-center my-3">
+                <div className="w-1 h-6 bg-slate-900"></div>
+                <ArrowDown className="w-4 h-4 text-slate-900 -mt-1.5" />
+              </div>
+
+              {/* Step 4 */}
+              <div className="w-full bg-white p-4 rounded-xl border-2 border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] relative">
+                <div className="absolute -top-3 left-4 bg-[#FF3366] text-white border-2 border-slate-900 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md">
+                  4. Renderização Visual
+                </div>
+                <div className="flex gap-3 items-start mt-1.5">
+                  <div className="p-2 bg-rose-50 rounded-lg border-2 border-slate-900 shrink-0">
+                    <Eye className="w-5 h-5 text-[#FF3366]" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-black uppercase text-slate-900">Canvas Vetorial Dinâmico</span>
+                      <span className="bg-slate-100 text-slate-500 font-mono text-[9px] px-1.5 py-0.5 rounded border border-slate-200">SimulationCanvas.tsx</span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 font-bold leading-relaxed mt-1">
+                      Lê os estados de altura e velocidade calculados no motor de física e atualiza o posicionamento gráfico dos objetos na tela, desenhando vetores de força proporcionais.
+                    </p>
+                  </div>
+                </div>
               </div>
 
             </div>

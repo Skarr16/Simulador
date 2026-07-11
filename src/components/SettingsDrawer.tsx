@@ -151,18 +151,39 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
               )}
               
               <div>
-                <label className="block text-xs font-black text-slate-900 mb-2 uppercase">Altura Inicial Manual</label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-xs font-black text-slate-900 uppercase">Altura Inicial Manual</label>
+                  <div className="flex items-center gap-1">
+                    <input 
+                      type="number" 
+                      min={config.simulationMode === 'paraquedas' ? "1000" : "10"} 
+                      max={config.simulationMode === 'paraquedas' ? "10000" : "10000"} 
+                      value={config.height || ''} 
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value, 10);
+                        if (!isNaN(val)) {
+                          setConfig({ ...config, height: val, structureId: 'custom' });
+                        } else {
+                          setConfig({ ...config, height: 0, structureId: 'custom' });
+                        }
+                      }}
+                      className="w-20 bg-[#F4F1EB] border-2 border-slate-900 rounded-lg px-2 py-1 text-right font-mono font-black text-xs outline-none focus:ring-2 focus:ring-[#0055FF] disabled:opacity-50"
+                      disabled={disabled} 
+                    />
+                    <span className="text-xs font-black text-slate-900">m</span>
+                  </div>
+                </div>
                 <input 
                   type="range" 
                   min={config.simulationMode === 'paraquedas' ? "1000" : "10"} 
                   max={config.simulationMode === 'paraquedas' ? "10000" : "200"} 
                   step={config.simulationMode === 'paraquedas' ? "500" : "1"} 
-                  value={config.height} 
+                  value={config.height || 0} 
                   onChange={handleHeightChange} 
                   className="w-full accent-slate-900" 
                   disabled={disabled} 
                 />
-                <div className="text-right text-sm font-mono font-black text-slate-900 mt-1">{config.height} m</div>
+                <div className="text-right text-xs font-mono font-bold text-slate-500 mt-1">Valor atual: {config.height} m</div>
               </div>
             </div>
           </section>

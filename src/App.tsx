@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Square, RotateCcw, Activity, Settings2, LineChart as ChartIcon, Zap, ShieldAlert, Wind } from 'lucide-react';
+import { Play, Square, RotateCcw, Activity, Settings2, LineChart as ChartIcon, Zap, ShieldAlert, Wind, QrCode } from 'lucide-react';
 import { SimulationCanvas } from './components/SimulationCanvas';
 import { ChartsArea } from './components/ChartsArea';
 import { EnergyDisplay } from './components/EnergyDisplay';
 import { DataTable } from './components/DataTable';
 import { SettingsDrawer } from './components/SettingsDrawer';
 import { AdminModal } from './components/AdminModal';
+import { QrCodeModal } from './components/QrCodeModal';
 import { useEngine } from './hooks/useEngine';
 import { SimulationConfig } from './types';
 import { OBJECTS, ENVIRONMENTS } from './lib/constants';
@@ -31,6 +32,7 @@ export default function App() {
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [isQrCodeOpen, setIsQrCodeOpen] = useState(false);
   
   const [customObjects, setCustomObjects] = useState(OBJECTS);
   const [customEnvs, setCustomEnvs] = useState(ENVIRONMENTS);
@@ -118,6 +120,15 @@ export default function App() {
             >
               <Settings2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
               <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Configurar</span>
+            </button>
+
+            {/* Button 6: QR Code */}
+            <button 
+              onClick={() => setIsQrCodeOpen(true)}
+              className="flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-[#A855F7] text-white rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
+            >
+              <QrCode className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
+              <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">QR Code</span>
             </button>
 
           </div>
@@ -235,6 +246,11 @@ export default function App() {
         setCustomEnvs={setCustomEnvs}
         devMode={toggles.devMode}
         setDevMode={(val) => setToggles(prev => ({ ...prev, devMode: val }))}
+      />
+
+      <QrCodeModal 
+        isOpen={isQrCodeOpen}
+        onClose={() => setIsQrCodeOpen(false)}
       />
     </div>
   );
