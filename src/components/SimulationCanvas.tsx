@@ -347,7 +347,7 @@ export function SimulationCanvas({
              const currentY = letter === 'A' ? yA : yB;
              content = (
                <div className={`w-full h-full relative flex items-center justify-center drop-shadow-md`}>
-                  <img src={(currentY <= 0) ? "/imagens/astronalta/astronalta no chão.png" : "/imagens/astronalta/astronalta caindo.png"} className="w-full h-full object-contain object-bottom" />
+                  <img src={(currentY <= 0) ? "/astronalta/astronalta no chão.png" : "/astronalta/astronalta caindo.png"} className="w-full h-full object-contain object-bottom" />
                </div>
              );
           } else {
@@ -398,8 +398,8 @@ export function SimulationCanvas({
               >
                 {objectA.id === 'astronaut' ? (
                   <>
-                    <img src="/imagens/astronalta/chama da nave.png" alt="Chama" className="absolute -left-24 top-1/2 -translate-y-1/2 w-36 h-24 object-contain drop-shadow-xl z-0 animate-pulse" />
-                    <img src="/imagens/astronalta/nave.png" alt="Nave" className="w-full h-full object-contain drop-shadow-xl z-10" />
+                    <img src="/astronalta/chama da nave.png" alt="Chama" className="absolute -left-24 top-1/2 -translate-y-1/2 w-36 h-24 object-contain drop-shadow-xl z-0 animate-pulse" />
+                    <img src="/astronalta/nave.png" alt="Nave" className="w-full h-full object-contain drop-shadow-xl z-10" />
                   </>
                 ) : (
                   <>
