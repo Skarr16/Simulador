@@ -77,6 +77,15 @@ export default function App() {
         <div className="px-4 py-2.5 flex items-center justify-center min-h-16 h-auto overflow-visible">
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 max-w-full overflow-visible">
             
+            {/* Button 6: QR Code */}
+            <button 
+              onClick={() => setIsQrCodeOpen(true)}
+              className="flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-[#A855F7] text-white rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
+            >
+              <QrCode className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
+              <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">QR Code</span>
+            </button>
+
             {/* Button 1: Queda Livre */}
             <button
               onClick={() => setConfig({ ...config, simulationMode: 'livre', height: 56, structureId: 'pisa', objectAId: 'bowling', objectBId: 'feather' })}
@@ -95,23 +104,39 @@ export default function App() {
               <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Paraquedas</span>
             </button>
 
-            {/* Button 3: Em Breve */}
-            <button 
-              onClick={() => setConfig({ ...config, simulationMode: 'lancamento' })}
-              className={`flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 ${config.simulationMode === 'lancamento' ? 'bg-[#0055FF] text-white' : 'bg-white text-slate-900'} rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
-            >
-              <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
-              <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Em Breve</span>
-            </button>
+            {/* Botão de Alternar Personagem (Só no Paraquedas) */}
+            {config.simulationMode === 'paraquedas' && (
+              <button 
+                onClick={() => {
+                  if (config.objectAId === 'astronaut') {
+                    setConfig({ ...config, objectAId: 'skydiver', objectBId: 'skydiver' });
+                  } else {
+                    if (config.environmentId !== 'moon') {
+                      alert("O astronauta só pode ser usado na Lua! Mude o local primeiro.");
+                    } else {
+                      setConfig({ ...config, objectAId: 'astronaut', objectBId: 'astronaut' });
+                    }
+                  }
+                }}
+                className={`flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-white text-slate-900 rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
+              >
+                <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
+                <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">
+                  {config.objectAId === 'astronaut' ? 'Usar Paraquedista' : 'Usar Astronauta'}
+                </span>
+              </button>
+            )}
 
-            {/* Button 4: Admin */}
-            <button 
-              onClick={() => setIsAdminOpen(true)}
-              className="flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-[#FF3366] text-white rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
-            >
-              <ShieldAlert className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
-              <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Admin</span>
-            </button>
+            {/* Button 4: Avançado (Antigo Admin) */}
+            {toggles.devMode && (
+              <button 
+                onClick={() => setIsAdminOpen(true)}
+                className="flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-[#FF3366] text-white rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
+              >
+                <ShieldAlert className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
+                <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Avançado</span>
+              </button>
+            )}
 
             {/* Button 5: Configurar */}
             <button 
@@ -120,15 +145,6 @@ export default function App() {
             >
               <Settings2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
               <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Configurar</span>
-            </button>
-
-            {/* Button 6: QR Code */}
-            <button 
-              onClick={() => setIsQrCodeOpen(true)}
-              className="flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-[#A855F7] text-white rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
-            >
-              <QrCode className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
-              <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">QR Code</span>
             </button>
 
           </div>
@@ -162,6 +178,31 @@ export default function App() {
                 parachuteDeployedA={engine.currentState.parachuteDeployedA}
                 parachuteDeployedB={engine.currentState.parachuteDeployedB}
                 simulationMode={config.simulationMode}
+                onToggleEnv={() => {
+                  const keys = Object.keys(customEnvs);
+                  const currentIndex = keys.indexOf(config.environmentId);
+                  const nextIndex = (currentIndex + 1) % keys.length;
+                  const nextEnvId = keys[nextIndex];
+                  
+                  let nextObjectA = config.objectAId;
+                  let nextObjectB = config.objectBId;
+
+                  if (nextEnvId !== 'moon') {
+                    if (nextObjectA === 'astronaut') nextObjectA = config.simulationMode === 'paraquedas' ? 'skydiver' : 'bowling';
+                    if (nextObjectB === 'astronaut') nextObjectB = config.simulationMode === 'paraquedas' ? 'skydiver' : 'bowling';
+                  }
+
+                  let nextEnableAirResistance = config.enableAirResistance;
+                  if (nextEnvId === 'moon') nextEnableAirResistance = false;
+
+                  setConfig({ 
+                    ...config, 
+                    environmentId: nextEnvId,
+                    objectAId: nextObjectA,
+                    objectBId: nextObjectB,
+                    enableAirResistance: nextEnableAirResistance
+                  });
+                }}
               />
             </div>
 

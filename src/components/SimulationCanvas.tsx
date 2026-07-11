@@ -21,10 +21,11 @@ interface SimulationCanvasProps {
   parachuteDeployedA?: boolean;
   parachuteDeployedB?: boolean;
   simulationMode?: string;
+  onToggleEnv?: () => void;
 }
 
 export function SimulationCanvas({ 
-  height, structureId, resetCount, yA, yB, vA, vB, FdA, FdB, objectA, objectB, env, showVectors, showHeights, devMode, parachuteDeployedA, parachuteDeployedB, simulationMode 
+  height, structureId, resetCount, yA, yB, vA, vB, FdA, FdB, objectA, objectB, env, showVectors, showHeights, devMode, parachuteDeployedA, parachuteDeployedB, simulationMode, onToggleEnv 
 }: SimulationCanvasProps) {
 
   const [scaleFactor, setScaleFactor] = useState(1);
@@ -43,17 +44,17 @@ export function SimulationCanvas({
   const [devOffsets, setDevOffsets] = useState<Record<string, {left: number, bottom: number, width: number, height: number}>>({});
   
   const mobileOffsets: Record<string, {left: number, bottom: number, width: number, height: number}> = {
-    pisa: { left: -12, bottom: -15, width: 75, height: 95 },
-    eiffel: { left: 4, bottom: -15, width: 35, height: 95 },
-    cristo: { left: 8, bottom: -15, width: 35, height: 95 },
-    gize: { left: 10, bottom: -18, width: 40, height: 95 }
+    pisa: { left: -12, bottom: -18, width: 75, height: 95 },
+    eiffel: { left: 4, bottom: -18, width: 35, height: 95 },
+    cristo: { left: 8, bottom: -18, width: 35, height: 95 },
+    gize: { left: 10, bottom: -21, width: 40, height: 95 }
   };
 
   const desktopOffsets: Record<string, {left: number, bottom: number, width: number, height: number}> = {
-    pisa: { left: -29, bottom: -18, width: 88, height: 107 },
-    eiffel: { left: -6, bottom: -17, width: 40, height: 100 },
-    cristo: { left: -2, bottom: -19, width: 40, height: 107 },
-    gize: { left: -1, bottom: -25, width: 46, height: 108 }
+    pisa: { left: -29, bottom: -21, width: 88, height: 107 },
+    eiffel: { left: -6, bottom: -20, width: 40, height: 100 },
+    cristo: { left: -2, bottom: -22, width: 40, height: 107 },
+    gize: { left: -1, bottom: -28, width: 46, height: 108 }
   };
 
   const groundOffset = 10; 
@@ -190,16 +191,21 @@ export function SimulationCanvas({
       </div>
 
       {/* Ground */}
-      <div className={`absolute bottom-0 left-0 right-0 h-[10%] border-t-[3px] border-slate-900 z-30 flex items-center justify-center ${env.id === 'moon' ? 'bg-[#475569]' : 'bg-[#00C48C]'}`}>
-        <div className="text-slate-900 font-black text-sm uppercase tracking-widest bg-white/80 px-4 py-1 rounded-full border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a]">
+      <div className={`absolute bottom-0 left-0 right-0 h-[10%] border-t-[3px] border-slate-900 z-30 flex items-center justify-center ${env.id === 'moon' ? 'bg-[#64748b]' : 'bg-[#00C48C]'}`}>
+        <button 
+          onClick={onToggleEnv}
+          className="text-slate-900 font-black text-sm uppercase tracking-widest bg-white/80 px-4 py-1 rounded-full border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a] hover:bg-white active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_#0f172a] transition-all z-10"
+        >
           {env.id === 'earth' ? 'Terra' : env.name}
-        </div>
+        </button>
         {env.id === 'moon' && (
-          <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20">
-            <ellipse cx="20%" cy="50%" rx="30" ry="10" stroke="#0f172a" strokeWidth="2" fill="none" />
-            <ellipse cx="80%" cy="60%" rx="40" ry="12" stroke="#0f172a" strokeWidth="2" fill="none" />
-            <ellipse cx="50%" cy="40%" rx="20" ry="8" stroke="#0f172a" strokeWidth="2" fill="none" />
-          </svg>
+          <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden">
+            <div className="absolute top-[30%] left-[15%] w-16 h-6 rounded-[50%] bg-[#475569] shadow-[inset_0_4px_6px_rgba(0,0,0,0.6),0_1px_2px_rgba(255,255,255,0.2)]"></div>
+            <div className="absolute top-[60%] left-[75%] w-20 h-8 rounded-[50%] bg-[#475569] shadow-[inset_0_4px_6px_rgba(0,0,0,0.6),0_1px_2px_rgba(255,255,255,0.2)]"></div>
+            <div className="absolute top-[40%] left-[45%] w-12 h-5 rounded-[50%] bg-[#475569] shadow-[inset_0_3px_5px_rgba(0,0,0,0.6),0_1px_2px_rgba(255,255,255,0.2)]"></div>
+            <div className="absolute top-[20%] left-[85%] w-10 h-4 rounded-[50%] bg-[#475569] shadow-[inset_0_2px_4px_rgba(0,0,0,0.6),0_1px_2px_rgba(255,255,255,0.2)]"></div>
+            <div className="absolute top-[70%] left-[5%] w-14 h-5 rounded-[50%] bg-[#475569] shadow-[inset_0_3px_5px_rgba(0,0,0,0.6),0_1px_2px_rgba(255,255,255,0.2)]"></div>
+          </div>
         )}
       </div>
 
@@ -222,19 +228,19 @@ export function SimulationCanvas({
         >
           
           {structureId === 'pisa' && (
-             <img src="/queda livre/torre de pisa.png" alt="Torre de Pisa" className={`w-full h-full object-contain ${env.id === 'moon' ? 'invert opacity-80 mix-blend-screen' : 'mix-blend-multiply'}`} />
+             <img src="/queda livre/torre de pisa.png" alt="Torre de Pisa" className="w-full h-full object-contain mix-blend-multiply" />
           )}
 
           {structureId === 'eiffel' && (
-             <img src="/queda livre/torre effel.png" alt="Torre Eiffel" className={`w-full h-full object-contain ${env.id === 'moon' ? 'invert opacity-80 mix-blend-screen' : 'mix-blend-multiply'}`} />
+             <img src="/queda livre/torre effel.png" alt="Torre Eiffel" className="w-full h-full object-contain mix-blend-multiply" />
           )}
 
           {structureId === 'cristo' && (
-             <img src="/queda livre/cristo redentor.png" alt="Cristo Redentor" className={`w-full h-full object-contain ${env.id === 'moon' ? 'invert opacity-80 mix-blend-screen' : 'mix-blend-multiply'}`} />
+             <img src="/queda livre/cristo redentor.png" alt="Cristo Redentor" className="w-full h-full object-contain mix-blend-multiply" />
           )}
 
           {structureId === 'gize' && (
-             <img src="/queda livre/piramide de gize.png" alt="Pirâmide de Gizé" className={`w-full h-full object-contain ${env.id === 'moon' ? 'invert opacity-80 mix-blend-screen' : 'mix-blend-multiply'}`} />
+             <img src="/queda livre/piramide de gize.png" alt="Pirâmide de Gizé" className="w-full h-full object-contain mix-blend-multiply" />
           )}
 
           <div className="bg-white/90 px-3 py-1 rounded-full border-2 border-slate-900 mt-2 font-black text-xs text-slate-900 shadow-[2px_2px_0px_0px_#0f172a] whitespace-nowrap">
@@ -323,9 +329,25 @@ export function SimulationCanvas({
                </div>
              );
           } else if (obj.id === 'skydiver') {
+             const currentY = letter === 'A' ? yA : yB;
+             let imgSrc = "/paraquedas/boneco caindo (1).png";
+             let transformClass = "";
+             if (currentY <= 0) {
+                imgSrc = "/paraquedas/boneco no chao.png";
+                transformClass = "translate-y-[24%] scale-[1.3]";
+             } else if (parachuteDeployed) {
+                imgSrc = "/paraquedas/boneco caindo com paraquedas (1).png";
+             }
              content = (
-               <div className={`w-full h-full relative flex items-center justify-center drop-shadow-md ${parachuteDeployed && isFalling ? 'animate-[float_2s_ease-in-out_infinite]' : ''}`}>
-                  <img src={parachuteDeployed ? "/paraquedas/boneco caindo com paraquedas (1).png" : "/paraquedas/boneco caindo (1).png"} className="w-full h-full object-contain" />
+               <div className={`w-full h-full relative flex items-center justify-center drop-shadow-md ${parachuteDeployed && isFalling ? 'animate-[float_2s_ease-in-out_infinite]' : ''} ${transformClass}`}>
+                  <img src={imgSrc} className="w-full h-full object-contain object-bottom" />
+               </div>
+             );
+          } else if (obj.id === 'astronaut') {
+             const currentY = letter === 'A' ? yA : yB;
+             content = (
+               <div className={`w-full h-full relative flex items-center justify-center drop-shadow-md`}>
+                  <img src={(currentY <= 0) ? "/imagens/astronalta/astronalta no chão.png" : "/imagens/astronalta/astronalta caindo.png"} className="w-full h-full object-contain object-bottom" />
                </div>
              );
           } else {
@@ -363,24 +385,33 @@ export function SimulationCanvas({
 
         return (
           <>
-            {/* Airplane for Parachute Mode */}
+            {/* Airplane/Spaceship for Parachute Mode */}
             {simulationMode === 'paraquedas' && (
               <div 
                 key={`${resetCount}-${yA >= height ? 'reset' : 'flying'}`}
-                className={`absolute z-30 flex items-center justify-center transition-all ${
+                className={`absolute z-10 flex items-center justify-center transition-all ${
                   yA >= height ? 'animate-[flyIn_2s_ease-out_forwards]' : 
                   yA <= 0 ? 'hidden' : 
                   'animate-[flyAway_3s_ease-in_forwards]'
                 }`}
-                style={{ bottom: `${groundOffset + canvasHeightPercent + 15}%`, left: '50%', width: 350, height: 140 }}
+                style={{ bottom: `${groundOffset + canvasHeightPercent + 15}%`, left: '50%', width: objectA.id === 'astronaut' ? 220 : 350, height: objectA.id === 'astronaut' ? 90 : 140 }}
               >
-                {/* Wind trail */}
-                <div className="absolute -left-20 top-1/2 flex space-x-2 opacity-80">
-                   <div className="h-1 w-12 bg-white/80 rounded-full animate-pulse"></div>
-                   <div className="h-1 w-20 bg-white/80 rounded-full animate-pulse" style={{ animationDelay: '100ms' }}></div>
-                   <div className="h-1 w-8 bg-white/80 rounded-full animate-pulse" style={{ animationDelay: '300ms' }}></div>
-                </div>
-                <img src="/paraquedas/aviao(1).png" alt="Avião" className="w-full h-full object-contain drop-shadow-xl z-10" />
+                {objectA.id === 'astronaut' ? (
+                  <>
+                    <img src="/imagens/astronalta/chama da nave.png" alt="Chama" className="absolute -left-24 top-1/2 -translate-y-1/2 w-36 h-24 object-contain drop-shadow-xl z-0 animate-pulse" />
+                    <img src="/imagens/astronalta/nave.png" alt="Nave" className="w-full h-full object-contain drop-shadow-xl z-10" />
+                  </>
+                ) : (
+                  <>
+                    {/* Wind trail */}
+                    <div className="absolute -left-20 top-1/2 flex space-x-2 opacity-80">
+                       <div className="h-1 w-12 bg-white/80 rounded-full animate-pulse"></div>
+                       <div className="h-1 w-20 bg-white/80 rounded-full animate-pulse" style={{ animationDelay: '100ms' }}></div>
+                       <div className="h-1 w-8 bg-white/80 rounded-full animate-pulse" style={{ animationDelay: '300ms' }}></div>
+                    </div>
+                    <img src="/paraquedas/aviao(1).png" alt="Avião" className="w-full h-full object-contain drop-shadow-xl z-10" />
+                  </>
+                )}
               </div>
             )}
 
@@ -389,7 +420,7 @@ export function SimulationCanvas({
               const multiplierA = (simulationMode === 'paraquedas' && isMobile) ? 1.35 : 1.0;
               return (
                 <div 
-                  className={`absolute flex flex-col items-center justify-end z-20 ${devMode ? 'border-2 border-dashed border-red-500 bg-red-500/20' : ''} ${yA >= height && simulationMode === 'paraquedas' && !planeArrived ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}
+                  className={`absolute flex flex-col items-center justify-end z-[50] ${devMode ? 'border-2 border-dashed border-red-500 bg-red-500/20' : ''} ${yA >= height && simulationMode === 'paraquedas' && !planeArrived ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}
                   style={{ bottom: `${yAPercent}%`, left: simulationMode === 'paraquedas' ? '50%' : '45%', transform: 'translateX(-50%)', width: objectA.radius * scaleFactor * multiplierA, height: objectA.radius * scaleFactor * multiplierA }}
                 >
                   {showHeights && (
@@ -399,7 +430,7 @@ export function SimulationCanvas({
                   )}
                   {renderObject(objectA, 'A', isFallingA, parachuteDeployedA)}
                   {/* Vectors */}
-                  {showVectors && (
+                  {showVectors && yA > 0 && (
                     <>
                       {/* Top Vectors (Drag) */}
                       {FdA > 0 && (
@@ -436,7 +467,7 @@ export function SimulationCanvas({
             {/* Falling Object B (Right) */}
             {simulationMode !== 'paraquedas' && (
             <div 
-              className={`absolute flex flex-col items-center justify-end z-20 ${devMode ? 'border-2 border-dashed border-red-500 bg-red-500/20' : ''}`}
+              className={`absolute flex flex-col items-center justify-end z-[50] ${devMode ? 'border-2 border-dashed border-red-500 bg-red-500/20' : ''}`}
               style={{ bottom: `${yBPercent}%`, left: '65%', transform: 'translateX(-50%)', width: objectB.radius * scaleFactor, height: objectB.radius * scaleFactor }}
             >
               {showHeights && (
@@ -446,7 +477,7 @@ export function SimulationCanvas({
               )}
               {renderObject(objectB, 'B', isFallingB, parachuteDeployedB)}
               {/* Vectors */}
-              {showVectors && (
+              {showVectors && yB > 0 && (
                 <>
                   {/* Top Vectors (Drag) */}
                   {FdB > 0 && (
@@ -482,15 +513,15 @@ export function SimulationCanvas({
         );
       })()}      {simulationMode === 'paraquedas' && (
         <>
-          {/* Mobile Info Toggle */}
+          {/* Info Toggle */}
           <button 
             onClick={() => setShowInfo(!showInfo)}
-            className="sm:hidden absolute top-4 right-4 z-50 bg-white p-2 rounded-full border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a]"
+            className="absolute top-4 right-4 z-50 bg-white p-2 rounded-full border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a]"
           >
             {showInfo ? <X className="w-5 h-5" /> : <Info className="w-5 h-5" />}
           </button>
           
-          <div className={`absolute top-16 left-4 right-4 sm:top-4 sm:left-auto sm:right-4 bg-white/90 sm:bg-white/95 backdrop-blur-sm p-4 sm:p-6 rounded-xl border-[2px] sm:border-[3px] border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] z-40 sm:w-[380px] max-h-[calc(90%-4rem)] sm:max-h-[calc(90%-2rem)] overflow-y-auto transition-opacity ${showInfo ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none sm:opacity-100 sm:pointer-events-auto'}`}>
+          <div className={`absolute top-16 left-4 right-4 sm:top-16 sm:left-auto sm:right-4 bg-white/90 sm:bg-white/95 backdrop-blur-sm p-4 sm:p-6 rounded-xl border-[2px] sm:border-[3px] border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] z-40 sm:w-[380px] max-h-[calc(90%-4rem)] overflow-y-auto transition-opacity ${showInfo ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
           <h3 className="font-black text-sm sm:text-lg uppercase mb-3 sm:mb-4 border-b-2 border-slate-900 pb-2 sm:pb-2 flex items-center justify-between">
             <span>Dados da Simulação</span>
             {isFallingA && <span className="flex h-2 w-2 sm:h-3 sm:w-3 relative"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 sm:h-3 sm:w-3 bg-red-500"></span></span>}

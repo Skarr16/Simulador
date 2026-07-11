@@ -60,10 +60,22 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
             
             <div className="bg-white p-4 rounded-xl border-[3px] border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] space-y-4">
               <div>
-                <label className="block text-xs font-black text-slate-500 mb-2 uppercase">Planeta</label>
+                <label className="block text-xs font-black text-slate-500 mb-2 uppercase">Locais</label>
                 <select 
                   value={config.environmentId}
-                  onChange={(e) => setConfig({ ...config, environmentId: e.target.value })}
+                  onChange={(e) => {
+                    let nextObjectA = config.objectAId;
+                    let nextObjectB = config.objectBId;
+                    if (e.target.value !== 'moon') {
+                      if (nextObjectA === 'astronaut') nextObjectA = config.simulationMode === 'paraquedas' ? 'skydiver' : 'bowling';
+                      if (nextObjectB === 'astronaut') nextObjectB = config.simulationMode === 'paraquedas' ? 'skydiver' : 'bowling';
+                    }
+                    
+                    let nextEnableAirResistance = config.enableAirResistance;
+                    if (e.target.value === 'moon') nextEnableAirResistance = false;
+
+                    setConfig({ ...config, environmentId: e.target.value, objectAId: nextObjectA, objectBId: nextObjectB, enableAirResistance: nextEnableAirResistance });
+                  }}
                   disabled={disabled}
                   className="w-full bg-[#F4F1EB] border-2 border-slate-900 rounded-lg p-2 font-bold outline-none focus:ring-2 focus:ring-[#0055FF] disabled:opacity-50"
                 >
@@ -75,7 +87,7 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
 
               {config.simulationMode !== 'paraquedas' && (
                 <div>
-                  <label className="block text-xs font-black text-slate-500 mb-2 uppercase">Local / Estrutura</label>
+                  <label className="block text-xs font-black text-slate-500 mb-2 uppercase">Alturas / Estruturas</label>
                   <select 
                     value={config.structureId}
                     onChange={handleStructureChange}
@@ -83,7 +95,7 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                     className="w-full bg-[#F4F1EB] border-2 border-slate-900 rounded-lg p-2 font-bold outline-none focus:ring-2 focus:ring-[#0055FF] disabled:opacity-50"
                   >
                     {Object.values(STRUCTURES).map(struct => (
-                      <option key={struct.id} value={struct.id}>{struct.name} ({struct.height}m)</option>
+                      <option key={struct.id} value={struct.id}>{struct.id === 'custom' ? struct.name : `${struct.name} (${struct.height}m)`}</option>
                     ))}
                   </select>
                 </div>
@@ -93,17 +105,17 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                 <label className="flex items-center justify-between cursor-pointer group">
                   <div className="flex items-center gap-2">
                     <Wind className="w-4 h-4 text-slate-700" />
-                    <span className="text-sm font-black uppercase text-slate-900">Resistência do Ar</span>
+                    <span className={`text-sm font-black uppercase ${customEnvs[config.environmentId].rho === 0 ? 'text-slate-400 line-through' : 'text-slate-900'}`}>Resistência do Ar</span>
                   </div>
-                  <div className={`w-12 h-6 flex items-center border-2 border-slate-900 rounded-full p-0.5 transition-colors ${config.enableAirResistance ? 'bg-[#00C48C]' : 'bg-slate-200'}`}>
+                  <div className={`w-12 h-6 flex items-center border-2 border-slate-900 rounded-full p-0.5 transition-colors ${config.enableAirResistance && customEnvs[config.environmentId].rho > 0 ? 'bg-[#00C48C]' : 'bg-slate-200'}`}>
                     <input 
                       type="checkbox" 
                       className="hidden" 
-                      checked={config.enableAirResistance}
+                      checked={config.enableAirResistance && customEnvs[config.environmentId].rho > 0}
                       onChange={(e) => setConfig({ ...config, enableAirResistance: e.target.checked })}
-                      disabled={disabled || customEnvs[config.environmentId].rho === 0}
+                      disabled={disabled || customEnvs[config.environmentId].rho === 0} 
                     />
-                    <div className={`w-4 h-4 rounded-full shadow-sm transform transition-transform ${config.enableAirResistance ? 'translate-x-6 bg-white' : 'translate-x-0 bg-slate-500'}`} />
+                    <div className={`w-4 h-4 rounded-full shadow-sm transform transition-transform ${(config.enableAirResistance && customEnvs[config.environmentId].rho > 0) ? 'translate-x-6 bg-white' : 'translate-x-0 bg-slate-500'}`} />
                   </div>
                 </label>
                 {customEnvs[config.environmentId].rho === 0 && (
@@ -128,7 +140,9 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                   disabled={disabled}
                   className="w-full bg-[#F4F1EB] border-2 border-slate-900 rounded-lg p-2 font-bold outline-none focus:ring-2 focus:ring-[#FF3366] disabled:opacity-50"
                 >
-                  {Object.values(customObjects).map(obj => (
+                  {Object.values(customObjects)
+                    .filter(obj => obj.id !== 'astronaut' || config.environmentId === 'moon')
+                    .map(obj => (
                     <option key={obj.id} value={obj.id}>{obj.name} ({obj.mass}kg)</option>
                   ))}
                 </select>
@@ -143,48 +157,52 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                     disabled={disabled}
                     className="w-full bg-[#F4F1EB] border-2 border-slate-900 rounded-lg p-2 font-bold outline-none focus:ring-2 focus:ring-[#0055FF] disabled:opacity-50"
                   >
-                    {Object.values(customObjects).map(obj => (
+                    {Object.values(customObjects)
+                      .filter(obj => obj.id !== 'astronaut' || config.environmentId === 'moon')
+                      .map(obj => (
                       <option key={obj.id} value={obj.id}>{obj.name} ({obj.mass}kg)</option>
                     ))}
                   </select>
                 </div>
               )}
               
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-xs font-black text-slate-900 uppercase">Altura Inicial Manual</label>
-                  <div className="flex items-center gap-1">
-                    <input 
-                      type="number" 
-                      min={config.simulationMode === 'paraquedas' ? "1000" : "10"} 
-                      max={config.simulationMode === 'paraquedas' ? "10000" : "10000"} 
-                      value={config.height || ''} 
-                      onChange={(e) => {
-                        const val = parseInt(e.target.value, 10);
-                        if (!isNaN(val)) {
-                          setConfig({ ...config, height: val, structureId: 'custom' });
-                        } else {
-                          setConfig({ ...config, height: 0, structureId: 'custom' });
-                        }
-                      }}
-                      className="w-20 bg-[#F4F1EB] border-2 border-slate-900 rounded-lg px-2 py-1 text-right font-mono font-black text-xs outline-none focus:ring-2 focus:ring-[#0055FF] disabled:opacity-50"
-                      disabled={disabled} 
-                    />
-                    <span className="text-xs font-black text-slate-900">m</span>
+              {config.structureId === 'custom' && (
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-xs font-black text-slate-900 uppercase">Altura Inicial Manual</label>
+                    <div className="flex items-center gap-1">
+                      <input 
+                        type="number" 
+                        min={config.simulationMode === 'paraquedas' ? "1000" : "10"} 
+                        max={config.simulationMode === 'paraquedas' ? "10000" : "10000"} 
+                        value={config.height || ''} 
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value, 10);
+                          if (!isNaN(val)) {
+                            setConfig({ ...config, height: val, structureId: 'custom' });
+                          } else {
+                            setConfig({ ...config, height: 0, structureId: 'custom' });
+                          }
+                        }}
+                        className="w-20 bg-[#F4F1EB] border-2 border-slate-900 rounded-lg px-2 py-1 text-right font-mono font-black text-xs outline-none focus:ring-2 focus:ring-[#0055FF] disabled:opacity-50"
+                        disabled={disabled} 
+                      />
+                      <span className="text-xs font-black text-slate-900">m</span>
+                    </div>
                   </div>
+                  <input 
+                    type="range" 
+                    min={config.simulationMode === 'paraquedas' ? "1000" : "10"} 
+                    max={config.simulationMode === 'paraquedas' ? "10000" : "200"} 
+                    step={config.simulationMode === 'paraquedas' ? "500" : "1"} 
+                    value={config.height || 0} 
+                    onChange={handleHeightChange} 
+                    className="w-full accent-slate-900" 
+                    disabled={disabled} 
+                  />
+                  <div className="text-right text-xs font-mono font-bold text-slate-500 mt-1">Valor atual: {config.height} m</div>
                 </div>
-                <input 
-                  type="range" 
-                  min={config.simulationMode === 'paraquedas' ? "1000" : "10"} 
-                  max={config.simulationMode === 'paraquedas' ? "10000" : "200"} 
-                  step={config.simulationMode === 'paraquedas' ? "500" : "1"} 
-                  value={config.height || 0} 
-                  onChange={handleHeightChange} 
-                  className="w-full accent-slate-900" 
-                  disabled={disabled} 
-                />
-                <div className="text-right text-xs font-mono font-bold text-slate-500 mt-1">Valor atual: {config.height} m</div>
-              </div>
+              )}
             </div>
           </section>
 
@@ -240,6 +258,17 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                 <span className="text-sm font-black uppercase text-slate-700">Mostrar Alturas</span>
                 <div className={`w-12 h-6 flex items-center border-2 border-slate-900 rounded-full p-0.5 transition-colors ${toggles.showHeights ? 'bg-[#00C48C]' : 'bg-slate-200'}`}>
                   <div className={`w-4 h-4 rounded-full shadow-sm transform transition-transform ${toggles.showHeights ? 'translate-x-6 bg-white' : 'translate-x-0 bg-slate-500'}`} />
+                </div>
+              </button>
+              <div className="h-px bg-slate-200 w-full my-2"></div>
+              <button 
+                type="button"
+                onClick={() => setToggles({ ...toggles, devMode: !toggles.devMode })}
+                className="flex items-center justify-between w-full hover:bg-slate-50 p-2 rounded-lg transition-colors text-left"
+              >
+                <span className="text-sm font-black uppercase text-[#FF3366]">Modo Desenvolvedor</span>
+                <div className={`w-12 h-6 flex items-center border-2 border-slate-900 rounded-full p-0.5 transition-colors ${toggles.devMode ? 'bg-[#FF3366]' : 'bg-slate-200'}`}>
+                  <div className={`w-4 h-4 rounded-full shadow-sm transform transition-transform ${toggles.devMode ? 'translate-x-6 bg-white' : 'translate-x-0 bg-slate-500'}`} />
                 </div>
               </button>
             </div>

@@ -38,12 +38,12 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
 
       if (config.simulationMode === 'paraquedas') {
         // Deploy parachute at 60% of the height
-        if (yA < config.height * 0.6) {
+        if (yA < config.height * 0.6 && objectA.id === 'skydiver') {
           currentAreaA = objectA.area + 5; // Parachute area
           currentCdA = 1.75; // Parachute drag coefficient
           parachuteDeployedA = true;
         }
-        if (yB < config.height * 0.6) {
+        if (yB < config.height * 0.6 && objectB.id === 'skydiver') {
           currentAreaB = objectB.area + 5;
           currentCdB = 1.75;
           parachuteDeployedB = true;
