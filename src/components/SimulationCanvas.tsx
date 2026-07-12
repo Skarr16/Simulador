@@ -30,24 +30,27 @@ export function SimulationCanvas({
 
   const [scaleFactor, setScaleFactor] = useState(1);
   const [showInfo, setShowInfo] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      setWindowWidth(window.innerWidth);
     };
     window.addEventListener('resize', handleResize);
     handleResize();
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const isMobile = windowWidth < 768;
+  const isTablet = windowWidth >= 768 && windowWidth < 1024;
+
   const [devOffsets, setDevOffsets] = useState<Record<string, {left: number, bottom: number, width: number, height: number}>>({});
   
   const mobileOffsets: Record<string, {left: number, bottom: number, width: number, height: number}> = {
-    pisa: { left: -12, bottom: -18, width: 75, height: 95 },
-    eiffel: { left: 4, bottom: -18, width: 35, height: 95 },
-    cristo: { left: 8, bottom: -18, width: 35, height: 95 },
-    gize: { left: 10, bottom: -21, width: 40, height: 95 }
+    pisa: { left: -19, bottom: -20, width: 97, height: 110 },
+    eiffel: { left: -15, bottom: -22, width: 88, height: 108 },
+    cristo: { left: -21, bottom: -20, width: 100, height: 98 },
+    gize: { left: -50, bottom: -26, width: 144, height: 120 }
   };
 
   const desktopOffsets: Record<string, {left: number, bottom: number, width: number, height: number}> = {
@@ -211,7 +214,7 @@ export function SimulationCanvas({
 
       {/* Dev Structure Offset Tweak Panel */}
       {devMode && structureId && structureId !== 'custom' && (
-        <div className="absolute top-4 right-4 bg-white/90 p-4 border-2 border-slate-900 rounded-lg shadow-lg z-50 flex flex-col gap-2 w-64 pointer-events-auto text-xs font-mono font-black text-slate-900">
+        <div className="absolute top-4 right-4 bg-white/90 p-4 border-2 border-slate-900 rounded-lg shadow-lg z-[100] flex flex-col gap-2 w-64 pointer-events-auto text-xs font-mono font-black text-slate-900">
           <div className="mb-2 text-sm text-center">Ajuste de Imagem ({structureId})</div>
           <label className="flex flex-col gap-1">Left ({currentOffset.left}%)<input type="range" min="-50" max="100" value={currentOffset.left} onChange={(e) => updateOffset('left', Number(e.target.value))} /></label>
           <label className="flex flex-col gap-1">Bottom ({currentOffset.bottom}%)<input type="range" min="-50" max="100" value={currentOffset.bottom} onChange={(e) => updateOffset('bottom', Number(e.target.value))} /></label>
@@ -331,12 +334,13 @@ export function SimulationCanvas({
           } else if (obj.id === 'skydiver') {
              const currentY = letter === 'A' ? yA : yB;
              let imgSrc = "/paraquedas/boneco caindo (1).png";
-             let transformClass = "";
+             let transformClass = "translate-y-0 scale-[1.3] md:scale-[1.15] lg:scale-[1.15] origin-bottom"; // Falling without parachute
              if (currentY <= 0) {
                 imgSrc = "/paraquedas/boneco no chao.png";
-                transformClass = "translate-y-[24%] scale-[1.3]";
+                transformClass = "translate-y-0 scale-[1.3] md:scale-[1.15] lg:scale-[1.15] origin-bottom"; // Standing on ground
              } else if (parachuteDeployed) {
                 imgSrc = "/paraquedas/boneco caindo com paraquedas (1).png";
+                transformClass = "translate-y-0 scale-[1.3] md:scale-[1.15] lg:scale-[1.15] origin-bottom"; // Falling with parachute
              }
              content = (
                <div className={`w-full h-full relative flex items-center justify-center drop-shadow-md ${parachuteDeployed && isFalling ? 'animate-[float_2s_ease-in-out_infinite]' : ''} ${transformClass}`}>
@@ -345,8 +349,9 @@ export function SimulationCanvas({
              );
           } else if (obj.id === 'astronaut') {
              const currentY = letter === 'A' ? yA : yB;
+             let transformClass = "translate-y-0 scale-[1.3] md:scale-[1.15] lg:scale-[1.15] origin-bottom";
              content = (
-               <div className={`w-full h-full relative flex items-center justify-center drop-shadow-md`}>
+               <div className={`w-full h-full relative flex items-center justify-center drop-shadow-md ${transformClass}`}>
                   <img src={(currentY <= 0) ? "/astronalta/astronalta no chão.png" : "/astronalta/astronalta caindo.png"} className="w-full h-full object-contain object-bottom" />
                </div>
              );
@@ -364,20 +369,12 @@ export function SimulationCanvas({
              <div className="group relative w-full h-full cursor-help flex flex-col items-center justify-end">
                {content}
                {/* Tooltip */}
-               <div className={`absolute ${
-                 isObjA 
-                   ? 'left-full top-1/2 -translate-y-1/2 ml-3' 
-                   : 'right-full top-1/2 -translate-y-1/2 mr-3'
-               } w-36 bg-slate-900 text-white text-xs p-2.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-lg border border-slate-700`}>
+               <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-36 bg-slate-900 text-white text-xs p-2.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-lg border border-slate-700`}>
                  <div className="font-black border-b border-slate-700 pb-1 mb-1">{obj.name}</div>
                  <div>Massa: {obj.mass} kg</div>
-                 <div>Área: {obj.area} m²</div>
-                 <div>Cd: {obj.cd}</div>
-                 <div className={`absolute ${
-                   isObjA 
-                     ? 'right-full top-1/2 -translate-y-1/2 border-r-slate-900' 
-                     : 'left-full top-1/2 -translate-y-1/2 border-l-slate-900'
-                 } border-4 border-transparent`}></div>
+                 <div>Área: {parachuteDeployed && obj.id === 'skydiver' ? (obj.area + 5).toFixed(2) : obj.area} m²</div>
+                 <div>Cd: {parachuteDeployed && obj.id === 'skydiver' ? '1.75' : obj.cd}</div>
+                 <div className={`absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900`}></div>
                </div>
              </div>
           );
@@ -393,18 +390,22 @@ export function SimulationCanvas({
                   yA >= height ? 'animate-[flyIn_2s_ease-out_forwards]' : 
                   yA <= 0 ? 'hidden' : 
                   'animate-[flyAway_3s_ease-in_forwards]'
+                } ${
+                  objectA.id === 'astronaut' 
+                    ? 'w-[160px] h-[65px] md:w-[220px] md:h-[90px]' 
+                    : 'w-[200px] h-[80px] md:w-[280px] md:h-[110px] lg:w-[350px] lg:h-[140px]'
                 }`}
-                style={{ bottom: `${groundOffset + canvasHeightPercent + 15}%`, left: '50%', width: objectA.id === 'astronaut' ? 220 : 350, height: objectA.id === 'astronaut' ? 90 : 140 }}
+                style={{ bottom: `${groundOffset + canvasHeightPercent + 15}%`, left: '50%' }}
               >
                 {objectA.id === 'astronaut' ? (
                   <>
-                    <img src="/astronalta/chama da nave.png" alt="Chama" className="absolute -left-24 top-1/2 -translate-y-1/2 w-36 h-24 object-contain drop-shadow-xl z-0 animate-pulse" />
+                    <img src="/astronalta/chama da nave.png" alt="Chama" className="absolute -left-12 md:-left-24 top-1/2 -translate-y-1/2 w-20 md:w-36 h-14 md:h-24 object-contain drop-shadow-xl z-0 animate-pulse" />
                     <img src="/astronalta/nave.png" alt="Nave" className="w-full h-full object-contain drop-shadow-xl z-10" />
                   </>
                 ) : (
                   <>
                     {/* Wind trail */}
-                    <div className="absolute -left-20 top-1/2 flex space-x-2 opacity-80">
+                    <div className="absolute -left-10 md:-left-20 top-1/2 flex space-x-2 opacity-80 scale-75 md:scale-100 origin-right">
                        <div className="h-1 w-12 bg-white/80 rounded-full animate-pulse"></div>
                        <div className="h-1 w-20 bg-white/80 rounded-full animate-pulse" style={{ animationDelay: '100ms' }}></div>
                        <div className="h-1 w-8 bg-white/80 rounded-full animate-pulse" style={{ animationDelay: '300ms' }}></div>
@@ -417,7 +418,7 @@ export function SimulationCanvas({
 
             {/* Falling Object A (Left) */}
             {(() => {
-              const multiplierA = (simulationMode === 'paraquedas' && isMobile) ? 1.35 : 1.0;
+              const multiplierA = simulationMode === 'paraquedas' ? 1.0 : 1.0;
               return (
                 <div 
                   className={`absolute flex flex-col items-center justify-end z-[50] ${devMode ? 'border-2 border-dashed border-red-500 bg-red-500/20' : ''} ${yA >= height && simulationMode === 'paraquedas' && !planeArrived ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}
@@ -516,12 +517,12 @@ export function SimulationCanvas({
           {/* Info Toggle */}
           <button 
             onClick={() => setShowInfo(!showInfo)}
-            className="absolute top-4 right-4 z-50 bg-white p-2 rounded-full border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a]"
+            className="absolute top-4 right-4 z-[70] bg-white p-2 rounded-full border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a]"
           >
             {showInfo ? <X className="w-5 h-5" /> : <Info className="w-5 h-5" />}
           </button>
           
-          <div className={`absolute top-16 left-4 right-4 sm:top-16 sm:left-auto sm:right-4 bg-white/90 sm:bg-white/95 backdrop-blur-sm p-4 sm:p-6 rounded-xl border-[2px] sm:border-[3px] border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] z-40 sm:w-[380px] max-h-[calc(90%-4rem)] overflow-y-auto transition-opacity ${showInfo ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+          <div className={`absolute top-16 left-4 right-4 sm:top-16 sm:left-auto sm:right-4 bg-white/90 sm:bg-white/95 backdrop-blur-sm p-4 sm:p-6 rounded-xl border-[2px] sm:border-[3px] border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] z-[60] sm:w-[380px] max-h-[calc(90%-4rem)] overflow-y-auto transition-opacity ${showInfo ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
           <h3 className="font-black text-sm sm:text-lg uppercase mb-3 sm:mb-4 border-b-2 border-slate-900 pb-2 sm:pb-2 flex items-center justify-between">
             <span>Dados da Simulação</span>
             {isFallingA && <span className="flex h-2 w-2 sm:h-3 sm:w-3 relative"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 sm:h-3 sm:w-3 bg-red-500"></span></span>}
