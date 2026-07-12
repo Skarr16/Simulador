@@ -172,6 +172,9 @@ export function SimulationCanvas({
         </svg>
       )}
 
+      {/* Imaginary X-axis at y=0 */}
+      <div className="absolute left-0 right-0 border-t-2 border-dashed border-slate-900/40 z-20 pointer-events-none" style={{ bottom: '10%' }}></div>
+
       {/* Height Indicator */}
       <div className={`absolute left-0 top-0 bottom-0 w-24 z-40 ${env.id === 'moon' ? 'text-white' : 'text-slate-900'}`}>
         <div className={`absolute left-4 sm:left-6 top-[10%] bottom-[10%] border-l-[3px] ${env.id === 'moon' ? 'border-white' : 'border-slate-900'}`}></div>
