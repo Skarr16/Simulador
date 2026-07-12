@@ -173,7 +173,7 @@ export function SimulationCanvas({
       )}
 
       {/* Height Indicator */}
-      <div className={`absolute left-0 top-0 bottom-0 w-24 z-10 ${env.id === 'moon' ? 'text-white' : 'text-slate-900'}`}>
+      <div className={`absolute left-0 top-0 bottom-0 w-24 z-40 ${env.id === 'moon' ? 'text-white' : 'text-slate-900'}`}>
         <div className={`absolute left-4 sm:left-6 top-[10%] bottom-[10%] border-l-[3px] ${env.id === 'moon' ? 'border-white' : 'border-slate-900'}`}></div>
         {Array.from({ length: 11 }).map((_, i) => {
           const percent = i * 10;
@@ -181,7 +181,7 @@ export function SimulationCanvas({
           const bottomPercent = 10 + percent * 0.55;
           const isMajor = i % 2 === 0;
           return (
-            <div key={i} className="absolute flex items-center left-4 sm:left-6 -translate-y-1/2" style={{ bottom: `${bottomPercent}%` }}>
+            <div key={i} className="absolute flex items-center left-4 sm:left-6 translate-y-1/2" style={{ bottom: `${bottomPercent}%` }}>
               <div className={`h-[3px] ${env.id === 'moon' ? 'bg-white' : 'bg-slate-900'} ${isMajor ? 'w-4 sm:w-6' : 'w-2 sm:w-3'}`}></div>
               {isMajor && (
                 <span className={`px-1.5 py-0.5 ml-1 sm:ml-2 border-[3px] rounded-md text-xs sm:text-sm font-black shadow-sm ${env.id === 'moon' ? 'bg-[#1a1a2e] border-white' : 'bg-[#F4F1EB] border-slate-900'}`}>
