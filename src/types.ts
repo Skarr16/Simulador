@@ -6,6 +6,7 @@ export interface PhysicsObject {
   cd: number; // drag coefficient
   color: string;
   radius: number; // visual relative size
+  image?: string;
 }
 
 export interface Environment {

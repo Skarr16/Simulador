@@ -1,0 +1,11 @@
+                  </select>
+                </div>
+              )}
+
+              <div>
+                <label className="flex items-center justify-between cursor-pointer group">
+                  <div className="flex items-center gap-2">
+                    <Wind className="w-4 h-4 text-slate-700" />
+                    <span className={`text-sm font-black uppercase ${customEnvs[config.environmentId].rho === 0 ? 'text-slate-400 line-through' : 'text-slate-900'}`}>Resistência do Ar</span>
+                  </div>
+                  <div className={`w-12 h-6 flex items-center border-2 border-slate-900 rounded-full p-0.5 transition-colors ${config.enableAirResistance && customEnvs[config.environmentId].rho > 0 ? 'bg-[#00C48C]' : 'bg-slate-200'}`}>

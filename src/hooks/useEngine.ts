@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { SimulationConfig, SimulationState, PhysicsObject, Environment } from '../types';
 import { OBJECTS, ENVIRONMENTS } from '../lib/constants';
 
-export function useEngine(config: SimulationConfig, customObjects?: Record<string, PhysicsObject>, customEnvs?: Record<string, Environment>) {
+export function useEngine(config: SimulationConfig, customObjects?: Record<string, PhysicsObject>, customEnvs?: Record<string, Environment>, speedMultiplier: number = 1) {
   const [isRunning, setIsRunning] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   const [resetCount, setResetCount] = useState(0);
@@ -97,7 +97,8 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
   const startTimeRef = useRef<number | null>(null);
 
   const animate = useCallback((timestamp: number) => {
-    const timeScale = config.simulationMode === 'paraquedas' ? 10 : 1;
+    let timeScale = config.simulationMode === 'paraquedas' ? 10 : 1;
+    timeScale *= speedMultiplier;
     if (!startTimeRef.current) startTimeRef.current = timestamp - ((time * 1000) / timeScale);
     const elapsed = ((timestamp - startTimeRef.current) / 1000) * timeScale;
     
@@ -116,7 +117,7 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
     if (frameIndex < simulationData.length - 1 && isRunning) {
       requestRef.current = requestAnimationFrame(animate);
     }
-  }, [simulationData, time, isRunning]);
+  }, [simulationData, time, isRunning, speedMultiplier, config.simulationMode]);
 
   useEffect(() => {
     if (isRunning) {
@@ -129,6 +130,10 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
       if (requestRef.current) cancelAnimationFrame(requestRef.current);
     };
   }, [isRunning, animate]);
+
+  useEffect(() => {
+    startTimeRef.current = null;
+  }, [speedMultiplier, config.simulationMode]);
 
   const start = () => {
     if (!isRunning) {

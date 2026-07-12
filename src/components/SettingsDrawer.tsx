@@ -8,8 +8,8 @@ interface SettingsDrawerProps {
   onClose: () => void;
   config: SimulationConfig;
   setConfig: (config: SimulationConfig) => void;
-  toggles: { vectors: boolean; graphs: boolean; energies: boolean; table: boolean; devMode: boolean; showHeights: boolean; showGravity: boolean; };
-  setToggles: (toggles: { vectors: boolean; graphs: boolean; energies: boolean; table: boolean; devMode: boolean; showHeights: boolean; showGravity: boolean; }) => void;
+  toggles: { vectors: boolean; graphs: boolean; table: boolean; devMode: boolean; showHeights: boolean; showGravity: boolean; };
+  setToggles: (toggles: { vectors: boolean; graphs: boolean; table: boolean; devMode: boolean; showHeights: boolean; showGravity: boolean; }) => void;
   disabled: boolean;
   customObjects: Record<string, PhysicsObject>;
   customEnvs: Record<string, Environment>;
@@ -101,6 +101,44 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                 </div>
               )}
 
+              {config.structureId === 'custom' && (
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-xs font-black text-slate-900 uppercase">Altura Inicial Manual</label>
+                    <div className="flex items-center gap-1">
+                      <input 
+                        type="number" 
+                        min={config.simulationMode === 'paraquedas' ? "1000" : "10"} 
+                        max={config.simulationMode === 'paraquedas' ? "10000" : "10000"} 
+                        value={config.height || ''} 
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value, 10);
+                          if (!isNaN(val)) {
+                            setConfig({ ...config, height: val, structureId: 'custom' });
+                          } else {
+                            setConfig({ ...config, height: 0, structureId: 'custom' });
+                          }
+                        }}
+                        className="w-20 bg-[#F4F1EB] border-2 border-slate-900 rounded-lg px-2 py-1 text-right font-mono font-black text-xs outline-none focus:ring-2 focus:ring-[#0055FF] disabled:opacity-50"
+                        disabled={disabled} 
+                      />
+                      <span className="text-xs font-black text-slate-900">m</span>
+                    </div>
+                  </div>
+                  <input 
+                    type="range" 
+                    min={config.simulationMode === 'paraquedas' ? "1000" : "10"} 
+                    max={config.simulationMode === 'paraquedas' ? "10000" : "200"} 
+                    step={config.simulationMode === 'paraquedas' ? "500" : "1"} 
+                    value={config.height || 0} 
+                    onChange={handleHeightChange} 
+                    className="w-full accent-slate-900" 
+                    disabled={disabled} 
+                  />
+                  <div className="text-right text-xs font-mono font-bold text-slate-500 mt-1">Valor atual: {config.height} m</div>
+                </div>
+              )}
+
               <div>
                 <label className="flex items-center justify-between cursor-pointer group">
                   <div className="flex items-center gap-2">
@@ -165,44 +203,6 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                   </select>
                 </div>
               )}
-              
-              {config.structureId === 'custom' && (
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="block text-xs font-black text-slate-900 uppercase">Altura Inicial Manual</label>
-                    <div className="flex items-center gap-1">
-                      <input 
-                        type="number" 
-                        min={config.simulationMode === 'paraquedas' ? "1000" : "10"} 
-                        max={config.simulationMode === 'paraquedas' ? "10000" : "10000"} 
-                        value={config.height || ''} 
-                        onChange={(e) => {
-                          const val = parseInt(e.target.value, 10);
-                          if (!isNaN(val)) {
-                            setConfig({ ...config, height: val, structureId: 'custom' });
-                          } else {
-                            setConfig({ ...config, height: 0, structureId: 'custom' });
-                          }
-                        }}
-                        className="w-20 bg-[#F4F1EB] border-2 border-slate-900 rounded-lg px-2 py-1 text-right font-mono font-black text-xs outline-none focus:ring-2 focus:ring-[#0055FF] disabled:opacity-50"
-                        disabled={disabled} 
-                      />
-                      <span className="text-xs font-black text-slate-900">m</span>
-                    </div>
-                  </div>
-                  <input 
-                    type="range" 
-                    min={config.simulationMode === 'paraquedas' ? "1000" : "10"} 
-                    max={config.simulationMode === 'paraquedas' ? "10000" : "200"} 
-                    step={config.simulationMode === 'paraquedas' ? "500" : "1"} 
-                    value={config.height || 0} 
-                    onChange={handleHeightChange} 
-                    className="w-full accent-slate-900" 
-                    disabled={disabled} 
-                  />
-                  <div className="text-right text-xs font-mono font-bold text-slate-500 mt-1">Valor atual: {config.height} m</div>
-                </div>
-              )}
             </div>
           </section>
 
@@ -228,16 +228,6 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                 <span className="text-sm font-black uppercase text-slate-700">Gráficos de Queda</span>
                 <div className={`w-12 h-6 flex items-center border-2 border-slate-900 rounded-full p-0.5 transition-colors ${toggles.graphs ? 'bg-[#00C48C]' : 'bg-slate-200'}`}>
                   <div className={`w-4 h-4 rounded-full shadow-sm transform transition-transform ${toggles.graphs ? 'translate-x-6 bg-white' : 'translate-x-0 bg-slate-500'}`} />
-                </div>
-              </button>
-              <button 
-                type="button"
-                onClick={() => setToggles({ ...toggles, energies: !toggles.energies })}
-                className="flex items-center justify-between w-full hover:bg-slate-50 p-2 rounded-lg transition-colors text-left"
-              >
-                <span className="text-sm font-black uppercase text-slate-700">Medidor de Energia</span>
-                <div className={`w-12 h-6 flex items-center border-2 border-slate-900 rounded-full p-0.5 transition-colors ${toggles.energies ? 'bg-[#00C48C]' : 'bg-slate-200'}`}>
-                  <div className={`w-4 h-4 rounded-full shadow-sm transform transition-transform ${toggles.energies ? 'translate-x-6 bg-white' : 'translate-x-0 bg-slate-500'}`} />
                 </div>
               </button>
               <button 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Info, X } from 'lucide-react';
+import { Info, X, FastForward } from 'lucide-react';
 import { PhysicsObject, Environment } from '../types';
 
 interface SimulationCanvasProps {
@@ -22,11 +22,13 @@ interface SimulationCanvasProps {
   parachuteDeployedA?: boolean;
   parachuteDeployedB?: boolean;
   simulationMode?: string;
+  speedMultiplier?: number;
+  onSpeedChange?: (speed: number) => void;
   onToggleEnv?: () => void;
 }
 
 export function SimulationCanvas({ 
-  height, structureId, resetCount, yA, yB, vA, vB, FdA, FdB, objectA, objectB, env, showVectors, showHeights, showGravity, devMode, parachuteDeployedA, parachuteDeployedB, simulationMode, onToggleEnv 
+  height, structureId, resetCount, yA, yB, vA, vB, FdA, FdB, objectA, objectB, env, showVectors, showHeights, showGravity, devMode, parachuteDeployedA, parachuteDeployedB, simulationMode, speedMultiplier = 1, onSpeedChange, onToggleEnv 
 }: SimulationCanvasProps) {
 
   const [scaleFactor, setScaleFactor] = useState(1);
@@ -55,7 +57,7 @@ export function SimulationCanvas({
   };
 
   const desktopOffsets: Record<string, {left: number, bottom: number, width: number, height: number}> = {
-    pisa: { left: -29, bottom: -21, width: 88, height: 107 },
+    pisa: { left: -32, bottom: -18, width: 88, height: 107 },
     eiffel: { left: -6, bottom: -20, width: 40, height: 100 },
     cristo: { left: -2, bottom: -22, width: 40, height: 107 },
     gize: { left: -1, bottom: -28, width: 46, height: 108 }
@@ -178,10 +180,10 @@ export function SimulationCanvas({
 
       {/* Gravity Indicator */}
       {showGravity && (
-        <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-[60] bg-white border-[3px] border-slate-900 rounded-xl p-2 sm:p-3 shadow-[4px_4px_0px_0px_#0f172a] flex flex-col items-center justify-center">
+        <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-[60] bg-white border-[3px] border-slate-900 rounded-xl p-2 sm:p-3 shadow-[4px_4px_0px_0px_#0f172a] flex flex-col items-center justify-center">
           <span className="text-[10px] sm:text-xs font-black uppercase text-slate-500 mb-1">Gravidade</span>
           <span className="text-sm sm:text-lg font-black text-slate-900 tabular-nums leading-none">
-            {env.g.toFixed(2)} <span className="text-[10px] sm:text-xs">m/s²</span>
+            {env.g.toFixed(2)} <span className="text-xs sm:text-sm font-bold ml-0.5 text-slate-700">m/s²</span>
           </span>
         </div>
       )}
@@ -215,6 +217,19 @@ export function SimulationCanvas({
         >
           {env.id === 'earth' ? 'Terra' : env.name}
         </button>
+
+        {/* Accelerate Time Button */}
+        {onSpeedChange && (
+          <button
+            onClick={() => onSpeedChange(speedMultiplier === 1 ? 2 : speedMultiplier === 2 ? 5 : 1)}
+            className="absolute right-4 text-slate-900 font-black text-xs md:text-sm flex items-center gap-1 uppercase bg-white/80 px-2 py-1 md:px-3 md:py-1 rounded-full border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a] hover:bg-white active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_#0f172a] transition-all z-10"
+            title="Acelerar tempo"
+          >
+            <FastForward className="w-3 h-3 md:w-4 md:h-4" />
+            <span>{speedMultiplier}x</span>
+          </button>
+        )}
+
         {env.id === 'moon' && (
           <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden">
             <div className="absolute top-[30%] left-[15%] w-16 h-6 rounded-[50%] bg-[#475569] shadow-[inset_0_4px_6px_rgba(0,0,0,0.6),0_1px_2px_rgba(255,255,255,0.2)]"></div>
@@ -270,91 +285,32 @@ export function SimulationCanvas({
       {(() => {
         const renderObject = (obj: PhysicsObject, letter: string, isFalling: boolean, parachuteDeployed?: boolean) => {
           let content = null;
-          if (obj.id === 'bowling') {
+          if (obj.image) {
+             let extraClass = '';
+             let sizeClass = 'w-full h-full scale-[1.2] origin-bottom'; // Base scale for images
+             if (obj.id === 'paper_flat') {
+                extraClass = isFalling ? 'animate-[wiggle_0.5s_ease-in-out_infinite] translate-y-4' : 'translate-y-4';
+             } else if (obj.id === 'book') {
+                extraClass = isFalling ? '-rotate-12 translate-y-4' : 'translate-y-4';
+             } else if (obj.id === 'feather') {
+                extraClass = isFalling ? 'animate-[float_2s_ease-in-out_infinite]' : '';
+             }
              content = (
-               <div className="w-full h-full rounded-full border-[3px] border-slate-900 bg-slate-800 relative overflow-hidden flex items-center justify-center shadow-inner">
-                  <div className="absolute top-1/4 left-1/4 w-1/5 h-1/5 bg-white/20 rounded-full"></div>
-                  <div className="absolute top-[20%] right-[30%] w-[15%] h-[15%] bg-slate-900 rounded-full"></div>
-                  <div className="absolute top-[40%] right-[20%] w-[15%] h-[15%] bg-slate-900 rounded-full"></div>
-                  <div className="absolute top-[40%] right-[45%] w-[15%] h-[15%] bg-slate-900 rounded-full"></div>
-                  <span className="text-white font-black text-xs z-10 mt-6">{letter}</span>
-               </div>
-             );
-          } else if (obj.id === 'soccer') {
-             content = (
-               <div className="w-full h-full rounded-full border-[3px] border-slate-900 bg-white relative overflow-hidden flex items-center justify-center">
-                  {/* Simplistic soccer pattern */}
-                  <div className="absolute w-[40%] h-[40%] bg-slate-900 rounded-sm rotate-45 top-[30%] left-[30%]"></div>
-                  <div className="absolute w-[30%] h-[30%] bg-slate-900 rounded-sm -rotate-12 -top-[10%] left-[10%]"></div>
-                  <div className="absolute w-[30%] h-[30%] bg-slate-900 rounded-sm 12 bottom-[0%] right-[10%]"></div>
-                  <span className="text-slate-100 font-black text-xs z-10 mix-blend-difference">{letter}</span>
-               </div>
-             );
-          } else if (obj.id === 'golf') {
-             content = (
-               <div className="w-full h-full rounded-full border-[3px] border-slate-900 bg-white relative overflow-hidden flex items-center justify-center shadow-inner">
-                  <div className="w-full h-full opacity-30" style={{ backgroundImage: 'radial-gradient(circle, #0f172a 1px, transparent 1px)', backgroundSize: '4px 4px' }}></div>
-                  <span className="text-slate-900 font-black text-[10px] z-10 absolute">{letter}</span>
-               </div>
-             );
-          } else if (obj.id === 'pingpong') {
-             content = (
-               <div className="w-full h-full rounded-full border-[3px] border-slate-900 bg-orange-500 relative flex items-center justify-center shadow-inner">
-                  <div className="absolute top-1/4 left-1/4 w-1/4 h-1/4 bg-white/40 rounded-full"></div>
-                  <span className="text-white font-black text-[10px] z-10 absolute">{letter}</span>
-               </div>
-             );
-          } else if (obj.id === 'paper_crumpled') {
-             content = (
-               <div className="w-full h-full rounded-full border-[3px] border-slate-900 bg-slate-200 relative flex items-center justify-center">
-                  <svg className="absolute inset-0 w-full h-full opacity-50" viewBox="0 0 100 100">
-                     <path d="M 20 20 L 40 10 L 60 30 L 80 20 L 90 50 L 70 80 L 40 90 L 10 70 Z" fill="none" stroke="#0f172a" strokeWidth="4" />
-                     <path d="M 30 30 L 50 60 L 70 40" fill="none" stroke="#0f172a" strokeWidth="2" />
-                  </svg>
-                  <span className="text-slate-900 font-black text-[10px] z-10">{letter}</span>
-               </div>
-             );
-          } else if (obj.id === 'paper_flat') {
-             content = (
-               <div className={`w-[200%] h-[25%] rounded-sm border-[3px] border-slate-900 bg-white relative flex items-center justify-center shadow-sm ${isFalling ? 'animate-[wiggle_0.5s_ease-in-out_infinite]' : ''}`}>
-                  <div className="absolute top-1 left-1 right-1 h-1 bg-red-400 opacity-50"></div>
-                  <div className="w-full h-full flex justify-evenly px-1 opacity-20">
-                     <div className="h-full w-[1px] bg-blue-500"></div>
-                     <div className="h-full w-[1px] bg-blue-500"></div>
-                     <div className="h-full w-[1px] bg-blue-500"></div>
-                  </div>
-                  <span className="text-slate-900 font-black text-xs z-10 absolute">{letter}</span>
-               </div>
-             );
-          } else if (obj.id === 'book') {
-             content = (
-               <div className={`w-[200%] h-[35%] rounded-sm border-[3px] border-slate-900 bg-red-700 relative flex items-center justify-center shadow-md ${isFalling ? '-rotate-12' : ''}`}>
-                  <div className="absolute top-0 left-0 right-0 h-2 bg-red-900 border-b-[3px] border-slate-900"></div>
-                  <div className="absolute bottom-1 left-1 right-1 h-1 bg-white border-t-[1px] border-slate-400"></div>
-                  <span className="text-white font-black text-xs z-10 absolute mt-2">{letter}</span>
-               </div>
-             );
-          } else if (obj.id === 'feather') {
-             content = (
-               <div className={`w-full h-full relative flex items-center justify-center ${isFalling ? 'animate-[float_2s_ease-in-out_infinite]' : ''}`}>
-                  <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md">
-                     <path d="M 50 90 Q 50 50 50 10" fill="none" stroke="#0f172a" strokeWidth="4" />
-                     <path d="M 50 10 C 70 20 80 40 50 80 C 20 40 30 20 50 10" fill="#fcd34d" stroke="#0f172a" strokeWidth="3" />
-                     <path d="M 50 20 L 65 15 M 50 30 L 70 25 M 50 40 L 65 35 M 50 50 L 60 47.5 M 50 25 L 35 20 M 50 35 L 30 30 M 50 45 L 35 42.5" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" />
-                  </svg>
-                  <span className="text-slate-900 font-black text-[10px] z-10 absolute mt-4">{letter}</span>
+               <div className={`relative flex items-center justify-center drop-shadow-md ${sizeClass} ${extraClass}`}>
+                  <img src={obj.image} className="w-full h-full object-contain object-bottom" alt={obj.name} />
+                  <span className="text-slate-900 font-black text-xs z-10 absolute bg-white/80 px-1 rounded-full shadow-sm">{letter}</span>
                </div>
              );
           } else if (obj.id === 'skydiver') {
              const currentY = letter === 'A' ? yA : yB;
              let imgSrc = "/paraquedas/boneco caindo (1).png";
-             let transformClass = "translate-y-0 scale-[1.3] md:scale-[1.15] lg:scale-[1.15] origin-bottom"; // Falling without parachute
+             let transformClass = "translate-y-0 scale-[1.0] md:scale-[0.9] lg:scale-[0.9] origin-bottom"; // Falling without parachute
              if (currentY <= 0) {
                 imgSrc = "/paraquedas/boneco no chao.png";
-                transformClass = "translate-y-0 scale-[1.3] md:scale-[1.15] lg:scale-[1.15] origin-bottom"; // Standing on ground
+                transformClass = "translate-y-0 scale-[1.0] md:scale-[0.9] lg:scale-[0.9] origin-bottom"; // Standing on ground
              } else if (parachuteDeployed) {
                 imgSrc = "/paraquedas/boneco caindo com paraquedas (1).png";
-                transformClass = "translate-y-0 scale-[1.3] md:scale-[1.15] lg:scale-[1.15] origin-bottom"; // Falling with parachute
+                transformClass = "translate-y-0 scale-[1.0] md:scale-[0.9] lg:scale-[0.9] origin-bottom"; // Falling with parachute
              }
              content = (
                <div className={`w-full h-full relative flex items-center justify-center drop-shadow-md ${parachuteDeployed && isFalling ? 'animate-[float_2s_ease-in-out_infinite]' : ''} ${transformClass}`}>
@@ -442,16 +398,16 @@ export function SimulationCanvas({
                   className={`absolute flex flex-col items-center justify-end z-[50] hover:z-[9999] focus-within:z-[9999] ${devMode ? 'border-2 border-dashed border-red-500 bg-red-500/20' : ''} ${yA >= height && simulationMode === 'paraquedas' && !planeArrived ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}
                   style={{ bottom: `${yAPercent}%`, left: simulationMode === 'paraquedas' ? '50%' : '45%', transform: 'translateX(-50%)', width: objectA.radius * scaleFactor * multiplierA, height: objectA.radius * scaleFactor * multiplierA }}
                 >
-                  {showHeights && (
-                    <div className={`absolute bg-white/90 px-2 py-1 rounded-md border-[3px] border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] whitespace-nowrap z-[60] ${
+                  {renderObject(objectA, 'A', isFallingA, parachuteDeployedA)}
+                  {showHeights && yA > 0 && (
+                    <div className={`absolute bg-white/90 px-2 py-1 rounded-md border-[3px] border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] whitespace-nowrap z-[100] ${
                       simulationMode === 'paraquedas'
                         ? 'left-full ml-2 sm:ml-4 top-1/2 -translate-y-1/2'
-                        : 'bottom-[100%] mb-2 left-1/2 -translate-x-1/2 md:bottom-auto md:mb-0 md:top-1/2 md:-translate-y-1/2 md:right-full md:left-auto md:mr-4'
+                        : 'right-full mr-2 sm:mr-4 top-1/2 -translate-y-1/2'
                     }`}>
                       <span className="text-xs sm:text-sm font-black text-slate-900">{yA.toFixed(1)} m</span>
                     </div>
                   )}
-                  {renderObject(objectA, 'A', isFallingA, parachuteDeployedA)}
                   {/* Vectors */}
                   {showVectors && yA > 0 && (
                     <>
@@ -493,12 +449,12 @@ export function SimulationCanvas({
               className={`absolute flex flex-col items-center justify-end z-[50] hover:z-[9999] focus-within:z-[9999] ${devMode ? 'border-2 border-dashed border-red-500 bg-red-500/20' : ''}`}
               style={{ bottom: `${yBPercent}%`, left: '65%', transform: 'translateX(-50%)', width: objectB.radius * scaleFactor, height: objectB.radius * scaleFactor }}
             >
-              {showHeights && (
-                <div className="absolute left-full ml-2 sm:ml-4 top-1/2 -translate-y-1/2 bg-white/90 px-2 py-1 rounded-md border-[3px] border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] whitespace-nowrap z-50">
+              {renderObject(objectB, 'B', isFallingB, parachuteDeployedB)}
+              {showHeights && yB > 0 && (
+                <div className="absolute left-full ml-2 sm:ml-4 top-1/2 -translate-y-1/2 bg-white/90 px-2 py-1 rounded-md border-[3px] border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] whitespace-nowrap z-[100]">
                   <span className="text-xs sm:text-sm font-black text-slate-900">{yB.toFixed(1)} m</span>
                 </div>
               )}
-              {renderObject(objectB, 'B', isFallingB, parachuteDeployedB)}
               {/* Vectors */}
               {showVectors && yB > 0 && (
                 <>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Square, RotateCcw, Activity, Settings2, LineChart as ChartIcon, Zap, ShieldAlert, Wind, QrCode } from 'lucide-react';
+import { Play, Square, RotateCcw, Activity, Settings2, LineChart as ChartIcon, Zap, ShieldAlert, Wind, QrCode, FastForward } from 'lucide-react';
 import { SimulationCanvas } from './components/SimulationCanvas';
 import { ChartsArea } from './components/ChartsArea';
 import { EnergyDisplay } from './components/EnergyDisplay';
@@ -12,7 +12,11 @@ import { SimulationConfig } from './types';
 import { OBJECTS, ENVIRONMENTS } from './lib/constants';
 
 export default function App() {
-  const [config, setConfig] = useState<SimulationConfig>({
+  const [simulationMode, setSimulationMode] = useState<'livre' | 'paraquedas'>('livre');
+  const [speedMultiplier, setSpeedMultiplier] = useState(1);
+
+  const [configLivre, setConfigLivre] = useState<SimulationConfig>({
+    simulationMode: 'livre',
     height: 56,
     structureId: 'pisa',
     objectAId: 'bowling',
@@ -21,10 +25,22 @@ export default function App() {
     enableAirResistance: true,
   });
 
+  const [configParaquedas, setConfigParaquedas] = useState<SimulationConfig>({
+    simulationMode: 'paraquedas',
+    height: 4000,
+    structureId: 'custom',
+    objectAId: 'skydiver',
+    objectBId: 'skydiver',
+    environmentId: 'earth',
+    enableAirResistance: true,
+  });
+
+  const config = simulationMode === 'livre' ? configLivre : configParaquedas;
+  const setConfig = simulationMode === 'livre' ? setConfigLivre : setConfigParaquedas;
+
   const [toggles, setToggles] = useState({
     vectors: true,
     graphs: false,
-    energies: false,
     table: false,
     devMode: false,
     showHeights: true,
@@ -38,7 +54,9 @@ export default function App() {
   const [customObjects, setCustomObjects] = useState(OBJECTS);
   const [customEnvs, setCustomEnvs] = useState(ENVIRONMENTS);
 
-  const engine = useEngine(config, customObjects, customEnvs);
+  const engineLivre = useEngine(configLivre, customObjects, customEnvs, speedMultiplier);
+  const engineParaquedas = useEngine(configParaquedas, customObjects, customEnvs, speedMultiplier);
+  const engine = simulationMode === 'livre' ? engineLivre : engineParaquedas;
 
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
   const [tooltipTimer, setTooltipTimer] = useState<any>(null);
@@ -89,8 +107,11 @@ export default function App() {
 
             {/* Button 1: Queda Livre */}
             <button
-              onClick={() => setConfig({ ...config, simulationMode: 'livre', height: 56, structureId: 'pisa', objectAId: 'bowling', objectBId: 'feather' })}
-              className={`flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 ${(!config.simulationMode || config.simulationMode === 'livre') ? 'bg-[#00C48C] text-white' : 'bg-white text-slate-900'} rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
+              onClick={() => {
+                engineParaquedas.pause();
+                setSimulationMode('livre');
+              }}
+              className={`flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 ${simulationMode === 'livre' ? 'bg-[#00C48C] text-white' : 'bg-white text-slate-900'} rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
             >
               <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
               <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Queda Livre</span>
@@ -98,8 +119,11 @@ export default function App() {
 
             {/* Button 2: Paraquedas */}
             <button 
-              onClick={() => setConfig({ ...config, simulationMode: 'paraquedas', objectAId: 'skydiver', objectBId: 'skydiver', height: 4000, structureId: 'custom', enableAirResistance: true })}
-              className={`flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 ${config.simulationMode === 'paraquedas' ? 'bg-[#00C48C] text-white' : 'bg-white text-slate-900'} rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
+              onClick={() => {
+                engineLivre.pause();
+                setSimulationMode('paraquedas');
+              }}
+              className={`flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 ${simulationMode === 'paraquedas' ? 'bg-[#00C48C] text-white' : 'bg-white text-slate-900'} rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
             >
               <Wind className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
               <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Paraquedas</span>
@@ -180,6 +204,8 @@ export default function App() {
                 parachuteDeployedA={engine.currentState.parachuteDeployedA}
                 parachuteDeployedB={engine.currentState.parachuteDeployedB}
                 simulationMode={config.simulationMode}
+                speedMultiplier={speedMultiplier}
+                onSpeedChange={setSpeedMultiplier}
                 onToggleEnv={() => {
                   const keys = Object.keys(customEnvs);
                   const currentIndex = keys.indexOf(config.environmentId);
@@ -239,15 +265,9 @@ export default function App() {
         </div>
 
         {/* Dynamic Data Panels (Optional Sidebar) */}
-        {(toggles.energies || toggles.graphs || toggles.table) && (
+        {(toggles.graphs || toggles.table) && (
           <div className="w-full lg:w-[450px] p-4 flex flex-col gap-6 overflow-visible lg:overflow-y-auto shrink-0 border-t-[3px] lg:border-t-0 lg:border-l-[3px] border-slate-900 bg-[#F4F1EB] z-20">
-            {toggles.energies && (
-              <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-                <EnergyDisplay kA={engine.kA} uA={engine.uA} kB={engine.kB} uB={engine.uB} />
-              </div>
-            )}
-            
-            {toggles.graphs && (
+                        {toggles.graphs && (
               <div className="animate-in fade-in slide-in-from-right-4 duration-300 flex-1 min-h-[300px]">
                 <ChartsArea data={engine.dataPoints} />
               </div>
