@@ -17,6 +17,7 @@ interface SimulationCanvasProps {
   env: Environment;
   showVectors: boolean;
   showHeights?: boolean;
+  showGravity?: boolean;
   devMode?: boolean;
   parachuteDeployedA?: boolean;
   parachuteDeployedB?: boolean;
@@ -25,7 +26,7 @@ interface SimulationCanvasProps {
 }
 
 export function SimulationCanvas({ 
-  height, structureId, resetCount, yA, yB, vA, vB, FdA, FdB, objectA, objectB, env, showVectors, showHeights, devMode, parachuteDeployedA, parachuteDeployedB, simulationMode, onToggleEnv 
+  height, structureId, resetCount, yA, yB, vA, vB, FdA, FdB, objectA, objectB, env, showVectors, showHeights, showGravity, devMode, parachuteDeployedA, parachuteDeployedB, simulationMode, onToggleEnv 
 }: SimulationCanvasProps) {
 
   const [scaleFactor, setScaleFactor] = useState(1);
@@ -174,6 +175,16 @@ export function SimulationCanvas({
 
       {/* Imaginary X-axis at y=0 */}
       <div className="absolute left-0 right-0 border-t-2 border-dashed border-slate-900/40 z-20 pointer-events-none" style={{ bottom: '10%' }}></div>
+
+      {/* Gravity Indicator */}
+      {showGravity && (
+        <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-[60] bg-white border-[3px] border-slate-900 rounded-xl p-2 sm:p-3 shadow-[4px_4px_0px_0px_#0f172a] flex flex-col items-center justify-center">
+          <span className="text-[10px] sm:text-xs font-black uppercase text-slate-500 mb-1">Gravidade</span>
+          <span className="text-sm sm:text-lg font-black text-slate-900 tabular-nums leading-none">
+            {env.g.toFixed(2)} <span className="text-[10px] sm:text-xs">m/s²</span>
+          </span>
+        </div>
+      )}
 
       {/* Height Indicator */}
       <div className={`absolute left-0 top-0 bottom-0 w-24 z-40 ${env.id === 'moon' ? 'text-white' : 'text-slate-900'}`}>
@@ -368,16 +379,20 @@ export function SimulationCanvas({
           }
 
           const isObjA = letter === 'A';
+          const currentV = isObjA ? vA : vB;
           return (
-             <div className="group relative w-full h-full cursor-help flex flex-col items-center justify-end">
+             <div 
+               className="group relative w-full h-full cursor-help flex flex-col items-center justify-end z-[100] hover:z-[9999] focus-within:z-[9999]"
+               tabIndex={0}
+             >
                {content}
                {/* Tooltip */}
-               <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-36 bg-slate-900 text-white text-xs p-2.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-lg border border-slate-700`}>
+               <div className={`absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-44 bg-slate-900 text-white text-xs p-2.5 rounded-lg opacity-0 group-hover:opacity-100 group-focus:opacity-100 active:opacity-100 transition-opacity pointer-events-none z-[9999] shadow-lg border border-slate-700`}>
                  <div className="font-black border-b border-slate-700 pb-1 mb-1">{obj.name}</div>
-                 <div>Massa: {obj.mass} kg</div>
+                 <div>Massa: {obj.mass.toFixed(3)} kg</div>
+                 <div>Velocidade: {currentV.toFixed(1)} m/s</div>
                  <div>Área: {parachuteDeployed && obj.id === 'skydiver' ? (obj.area + 5).toFixed(2) : obj.area} m²</div>
                  <div>Cd: {parachuteDeployed && obj.id === 'skydiver' ? '1.75' : obj.cd}</div>
-                 <div className={`absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900`}></div>
                </div>
              </div>
           );
@@ -424,11 +439,15 @@ export function SimulationCanvas({
               const multiplierA = simulationMode === 'paraquedas' ? 1.0 : 1.0;
               return (
                 <div 
-                  className={`absolute flex flex-col items-center justify-end z-[50] ${devMode ? 'border-2 border-dashed border-red-500 bg-red-500/20' : ''} ${yA >= height && simulationMode === 'paraquedas' && !planeArrived ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}
+                  className={`absolute flex flex-col items-center justify-end z-[50] hover:z-[9999] focus-within:z-[9999] ${devMode ? 'border-2 border-dashed border-red-500 bg-red-500/20' : ''} ${yA >= height && simulationMode === 'paraquedas' && !planeArrived ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}
                   style={{ bottom: `${yAPercent}%`, left: simulationMode === 'paraquedas' ? '50%' : '45%', transform: 'translateX(-50%)', width: objectA.radius * scaleFactor * multiplierA, height: objectA.radius * scaleFactor * multiplierA }}
                 >
                   {showHeights && (
-                    <div className="absolute right-full mr-2 sm:mr-4 top-1/2 -translate-y-1/2 bg-white/90 px-2 py-1 rounded-md border-[3px] border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] whitespace-nowrap z-50">
+                    <div className={`absolute bg-white/90 px-2 py-1 rounded-md border-[3px] border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] whitespace-nowrap z-[60] ${
+                      simulationMode === 'paraquedas'
+                        ? 'left-full ml-2 sm:ml-4 top-1/2 -translate-y-1/2'
+                        : 'bottom-[100%] mb-2 left-1/2 -translate-x-1/2 md:bottom-auto md:mb-0 md:top-1/2 md:-translate-y-1/2 md:right-full md:left-auto md:mr-4'
+                    }`}>
                       <span className="text-xs sm:text-sm font-black text-slate-900">{yA.toFixed(1)} m</span>
                     </div>
                   )}
@@ -459,7 +478,7 @@ export function SimulationCanvas({
                            <div className="w-1 sm:w-1.5 bg-slate-900 relative" style={{ height: 15 + Math.min(P_A, 50) }}>
                              <div className="absolute -bottom-[7px] sm:-bottom-2 left-1/2 -translate-x-1/2 border-l-[5px] sm:border-l-[8px] border-r-[5px] sm:border-r-[8px] border-t-[7px] sm:border-t-[10px] border-x-transparent border-t-slate-900"></div>
                            </div>
-                           <span className="text-[10px] font-black bg-white/80 px-1 rounded mt-3 shadow-sm border border-slate-200 text-center whitespace-nowrap">P: {P_A.toFixed(1)} N</span>
+                           <span className="text-[10px] font-black bg-white/80 px-1 rounded mt-3 shadow-sm border border-slate-200 text-center whitespace-nowrap">P: {P_A.toFixed(3)} N</span>
                         </div>
                       </div>
                     </>
@@ -471,7 +490,7 @@ export function SimulationCanvas({
             {/* Falling Object B (Right) */}
             {simulationMode !== 'paraquedas' && (
             <div 
-              className={`absolute flex flex-col items-center justify-end z-[50] ${devMode ? 'border-2 border-dashed border-red-500 bg-red-500/20' : ''}`}
+              className={`absolute flex flex-col items-center justify-end z-[50] hover:z-[9999] focus-within:z-[9999] ${devMode ? 'border-2 border-dashed border-red-500 bg-red-500/20' : ''}`}
               style={{ bottom: `${yBPercent}%`, left: '65%', transform: 'translateX(-50%)', width: objectB.radius * scaleFactor, height: objectB.radius * scaleFactor }}
             >
               {showHeights && (
@@ -506,7 +525,7 @@ export function SimulationCanvas({
                        <div className="w-1 sm:w-1.5 bg-slate-900 relative" style={{ height: 15 + Math.min(P_B, 50) }}>
                          <div className="absolute -bottom-[7px] sm:-bottom-2 left-1/2 -translate-x-1/2 border-l-[5px] sm:border-l-[8px] border-r-[5px] sm:border-r-[8px] border-t-[7px] sm:border-t-[10px] border-x-transparent border-t-slate-900"></div>
                        </div>
-                       <span className="text-[10px] font-black bg-white/80 px-1 rounded mt-3 shadow-sm border border-slate-200 text-center whitespace-nowrap">P: {P_B.toFixed(1)} N</span>
+                       <span className="text-[10px] font-black bg-white/80 px-1 rounded mt-3 shadow-sm border border-slate-200 text-center whitespace-nowrap">P: {P_B.toFixed(3)} N</span>
                     </div>
                   </div>
                 </>
@@ -542,7 +561,7 @@ export function SimulationCanvas({
              </div>
              <div className="bg-slate-100 p-2 sm:p-3 rounded-lg border border-slate-200 shadow-inner flex flex-col justify-center items-center sm:items-start text-center sm:text-left">
                <div className="text-[10px] sm:text-xs uppercase font-bold text-slate-500 mb-0.5 sm:mb-1">Peso (P)</div>
-               <div className="font-black text-sm sm:text-2xl text-slate-900 tabular-nums tracking-tighter">{P_A.toFixed(1)} <span className="text-[10px] sm:text-base">N</span></div>
+               <div className="font-black text-sm sm:text-2xl text-slate-900 tabular-nums tracking-tighter">{P_A.toFixed(3)} <span className="text-[10px] sm:text-base">N</span></div>
              </div>
              <div className="bg-slate-100 p-2 sm:p-3 rounded-lg border border-slate-200 shadow-inner flex flex-col justify-center items-center sm:items-start text-center sm:text-left">
                <div className="text-[10px] sm:text-xs uppercase font-bold text-slate-500 mb-0.5 sm:mb-1">Altura (y)</div>

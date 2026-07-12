@@ -28,6 +28,7 @@ export default function App() {
     table: false,
     devMode: false,
     showHeights: true,
+    showGravity: false,
   });
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -174,6 +175,7 @@ export default function App() {
                 env={engine.env}
                 showVectors={toggles.vectors}
                 showHeights={toggles.showHeights}
+                showGravity={toggles.showGravity}
                 devMode={toggles.devMode}
                 parachuteDeployedA={engine.currentState.parachuteDeployedA}
                 parachuteDeployedB={engine.currentState.parachuteDeployedB}
