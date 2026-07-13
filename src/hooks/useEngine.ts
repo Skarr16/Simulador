@@ -7,6 +7,7 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
   const [isFinished, setIsFinished] = useState(false);
   const [resetCount, setResetCount] = useState(0);
   const [time, setTime] = useState(0);
+  const [manualParachuteTime, setManualParachuteTime] = useState<number | null>(null);
   
   const currentObjects = customObjects || OBJECTS;
   const currentEnvs = customEnvs || ENVIRONMENTS;
@@ -37,13 +38,13 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
       let parachuteDeployedB = false;
 
       if (config.simulationMode === 'paraquedas') {
-        // Deploy parachute at 60% of the height
-        if (yA < config.height * 0.6 && objectA.id === 'skydiver') {
+        const shouldDeploy = manualParachuteTime !== null && t >= manualParachuteTime;
+        if (shouldDeploy && objectA.id === 'skydiver') {
           currentAreaA = objectA.parachuteArea !== undefined ? objectA.parachuteArea : objectA.area + 5;
           currentCdA = objectA.parachuteCd !== undefined ? objectA.parachuteCd : 1.75;
           parachuteDeployedA = true;
         }
-        if (yB < config.height * 0.6 && objectB.id === 'skydiver') {
+        if (shouldDeploy && objectB.id === 'skydiver') {
           currentAreaB = objectB.parachuteArea !== undefined ? objectB.parachuteArea : objectB.area + 5;
           currentCdB = objectB.parachuteCd !== undefined ? objectB.parachuteCd : 1.75;
           parachuteDeployedB = true;
@@ -89,7 +90,7 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
     });
     
     return data;
-  }, [config, objectA, objectB, env]);
+  }, [config, objectA, objectB, env, manualParachuteTime]);
 
   const [currentState, setCurrentState] = useState<SimulationState>(simulationData[0]);
 
@@ -149,6 +150,11 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
   };
 
   const pause = () => setIsRunning(false);
+  const deployParachute = () => {
+    if (manualParachuteTime === null) {
+      setManualParachuteTime(time);
+    }
+  };
 
   const reset = () => {
     setIsRunning(false);
@@ -156,13 +162,14 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
     setTime(0);
     setResetCount(c => c + 1);
     startTimeRef.current = null;
+    setManualParachuteTime(null);
     setCurrentState(simulationData[0]);
   };
 
   // Reset when config changes
   useEffect(() => {
     reset();
-  }, [simulationData]);
+  }, [config, objectA, objectB, env]);
 
   // Derived Values
   const kA = 0.5 * objectA.mass * currentState.vA * currentState.vA;
@@ -183,6 +190,7 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
   return {
     start,
     pause,
+    deployParachute,
     reset,
     isRunning,
     isFinished,
