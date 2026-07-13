@@ -53,14 +53,24 @@ export function SimulationCanvas({
     pisa: { left: -19, bottom: -20, width: 97, height: 110 },
     eiffel: { left: -15, bottom: -22, width: 88, height: 108 },
     cristo: { left: -21, bottom: -20, width: 100, height: 98 },
-    gize: { left: -50, bottom: -26, width: 144, height: 120 }
+    gize: { left: -50, bottom: -26, width: 144, height: 120 },
+    custom: { left: -20, bottom: -24, width: 78, height: 120 }
+  };
+
+  const tabletOffsets: Record<string, {left: number, bottom: number, width: number, height: number}> = {
+    pisa: { left: -25, bottom: -20, width: 95, height: 110 },
+    eiffel: { left: -10, bottom: -20, width: 60, height: 105 },
+    cristo: { left: -10, bottom: -20, width: 60, height: 105 },
+    gize: { left: -30, bottom: -26, width: 100, height: 115 },
+    custom: { left: -24, bottom: 2, width: 60, height: 65 }
   };
 
   const desktopOffsets: Record<string, {left: number, bottom: number, width: number, height: number}> = {
     pisa: { left: -32, bottom: -18, width: 88, height: 107 },
     eiffel: { left: -6, bottom: -20, width: 40, height: 100 },
     cristo: { left: -2, bottom: -22, width: 40, height: 107 },
-    gize: { left: -1, bottom: -28, width: 46, height: 108 }
+    gize: { left: -1, bottom: -28, width: 46, height: 108 },
+    custom: { left: -24, bottom: 3, width: 60, height: 65 }
   };
 
   const groundOffset = 10; 
@@ -86,13 +96,13 @@ export function SimulationCanvas({
     }
   }, [simulationMode, yA, height, resetCount]);
 
-  const currentOffset = structureId && structureId !== 'custom'
-    ? (devOffsets[structureId] || (isMobile ? mobileOffsets[structureId] : desktopOffsets[structureId]) || { left: 20, bottom: 10, width: 40, height: 85 })
+  const currentOffset = structureId
+    ? (devOffsets[structureId] || (isMobile ? mobileOffsets[structureId] : (isTablet ? tabletOffsets[structureId] : desktopOffsets[structureId])) || { left: 20, bottom: 10, width: 40, height: 85 })
     : { left: 20, bottom: 10, width: 40, height: 85 };
 
   const updateOffset = (key: 'left' | 'bottom' | 'width' | 'height', value: number) => {
-    if (structureId && structureId !== 'custom') {
-      const base = isMobile ? mobileOffsets[structureId] : desktopOffsets[structureId];
+    if (structureId) {
+      const base = isMobile ? mobileOffsets[structureId] : (isTablet ? tabletOffsets[structureId] : desktopOffsets[structureId]);
       setDevOffsets(prev => ({
         ...prev,
         [structureId]: {
@@ -134,7 +144,7 @@ export function SimulationCanvas({
   const P_B = objectB.mass * env.g;
 
   return (
-    <div className={`relative w-full flex-1 h-full min-h-0 overflow-hidden font-sans ${env.id === 'moon' ? 'bg-[#1a1a2e]' : 'bg-[#F4F1EB]'}`}>
+    <div className={`relative w-full flex-1 h-full min-h-0 overflow-hidden font-sans ${env.id === 'moon' ? 'bg-[#1a1a2e]' : env.id === 'custom' ? 'bg-[#fad47c]' : 'bg-[#F4F1EB]'}`}>
       
       {/* Decorative Vector Elements */}
       {env.id === 'earth' && (
@@ -147,6 +157,25 @@ export function SimulationCanvas({
         </svg>
       )}
 
+      {env.id === 'custom' && (
+        <div className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-hidden bg-gradient-to-b from-[#fad47c] to-[#f4ba66]">
+           {/* Distant Sun */}
+           <div className="absolute top-20 right-[15%] w-12 h-12 bg-[#fff5e6] rounded-full opacity-80 shadow-[0_0_40px_15px_rgba(255,245,230,0.4)]"></div>
+           {/* Dust clouds */}
+           <svg className="absolute top-24 left-[10%] w-48 h-20 opacity-30 blur-[2px]" viewBox="0 0 100 50">
+              <path d="M 25 40 A 15 15 0 0 1 25 10 A 20 20 0 0 1 65 10 A 15 15 0 0 1 85 20 A 15 15 0 0 1 80 40 Z" fill="#e8a87c"/>
+           </svg>
+           <svg className="absolute top-10 left-[60%] w-64 h-32 opacity-20 blur-[3px]" viewBox="0 0 100 50">
+              <path d="M 25 40 A 15 15 0 0 1 25 10 A 20 20 0 0 1 65 10 A 15 15 0 0 1 85 20 A 15 15 0 0 1 80 40 Z" fill="#e8a87c"/>
+           </svg>
+           <svg className="absolute top-40 left-[80%] w-32 h-16 opacity-30 blur-[1px]" viewBox="0 0 100 50">
+              <path d="M 25 40 A 15 15 0 0 1 25 10 A 20 20 0 0 1 65 10 A 15 15 0 0 1 85 20 A 15 15 0 0 1 80 40 Z" fill="#e8a87c"/>
+           </svg>
+           {/* Atmosphere/dust gradient */}
+           <div className="absolute inset-0 bg-gradient-to-t from-[#c1440e]/30 to-transparent mix-blend-multiply"></div>
+        </div>
+      )}
+      
       {env.id === 'earth' && (
         <div className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-hidden bg-[#87CEEB]">
            {/* Sun */}
@@ -189,8 +218,8 @@ export function SimulationCanvas({
       )}
 
       {/* Height Indicator */}
-      <div className={`absolute left-0 top-0 bottom-0 w-24 z-40 ${env.id === 'moon' ? 'text-white' : 'text-slate-900'}`}>
-        <div className={`absolute left-4 sm:left-6 top-[10%] bottom-[10%] border-l-[3px] ${env.id === 'moon' ? 'border-white' : 'border-slate-900'}`}></div>
+      <div className={`absolute left-0 top-0 bottom-0 w-24 z-40 ${env.id === 'moon' ? 'text-white' : env.id === 'custom' ? 'text-[#451004]' : 'text-slate-900'}`}>
+        <div className={`absolute left-4 sm:left-6 top-[10%] bottom-[10%] border-l-[3px] ${env.id === 'moon' ? 'border-white' : env.id === 'custom' ? 'border-[#451004]' : 'border-slate-900'}`}></div>
         {Array.from({ length: 11 }).map((_, i) => {
           const percent = i * 10;
           const val = (height * percent / 100).toFixed(1);
@@ -198,9 +227,9 @@ export function SimulationCanvas({
           const isMajor = i % 2 === 0;
           return (
             <div key={i} className="absolute flex items-center left-4 sm:left-6 translate-y-1/2" style={{ bottom: `${bottomPercent}%` }}>
-              <div className={`h-[3px] ${env.id === 'moon' ? 'bg-white' : 'bg-slate-900'} ${isMajor ? 'w-4 sm:w-6' : 'w-2 sm:w-3'}`}></div>
+              <div className={`h-[3px] ${env.id === 'moon' ? 'bg-white' : env.id === 'custom' ? 'bg-[#451004]' : 'bg-slate-900'} ${isMajor ? 'w-4 sm:w-6' : 'w-2 sm:w-3'}`}></div>
               {isMajor && (
-                <span className={`px-1.5 py-0.5 ml-1 sm:ml-2 border-[3px] rounded-md text-xs sm:text-sm font-black shadow-sm ${env.id === 'moon' ? 'bg-[#1a1a2e] border-white' : 'bg-[#F4F1EB] border-slate-900'}`}>
+                <span className={`px-1.5 py-0.5 ml-1 sm:ml-2 border-[3px] rounded-md text-xs sm:text-sm font-black shadow-sm ${env.id === 'moon' ? 'bg-[#1a1a2e] border-white' : env.id === 'custom' ? 'bg-[#f4ba66] border-[#451004] text-[#451004]' : 'bg-[#F4F1EB] border-slate-900'}`}>
                   {val}m
                 </span>
               )}
@@ -210,7 +239,7 @@ export function SimulationCanvas({
       </div>
 
       {/* Ground */}
-      <div className={`absolute bottom-0 left-0 right-0 h-[10%] border-t-[3px] border-slate-900 z-30 flex items-center justify-center ${env.id === 'moon' ? 'bg-[#64748b]' : 'bg-[#00C48C]'}`}>
+      <div className={`absolute bottom-0 left-0 right-0 h-[10%] border-t-[3px] border-slate-900 z-30 flex items-center justify-center ${env.id === 'moon' ? 'bg-[#64748b]' : env.id === 'custom' ? 'bg-[#95290f]' : 'bg-[#00C48C]'}`}>
         <button 
           onClick={onToggleEnv}
           className="text-slate-900 font-black text-sm uppercase tracking-widest bg-white/80 px-4 py-1 rounded-full border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a] hover:bg-white active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_#0f172a] transition-all z-10"
@@ -230,6 +259,18 @@ export function SimulationCanvas({
           </button>
         )}
 
+        {env.id === 'custom' && (
+          <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden opacity-90">
+            <div className="absolute top-[20%] left-[10%] w-24 h-6 rounded-[50%] bg-[#bd4821] shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
+            <div className="absolute top-[50%] left-[65%] w-32 h-8 rounded-[50%] bg-[#bd4821] shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"></div>
+            <div className="absolute top-[30%] left-[40%] w-16 h-4 rounded-[50%] bg-[#bd4821] shadow-[inset_0_1px_3px_rgba(0,0,0,0.3)]"></div>
+            
+            <div className="absolute top-[45%] left-[15%] w-12 h-3 rounded-[50%] bg-[#451004] shadow-[0_1px_2px_rgba(255,255,255,0.1)]"></div>
+            <div className="absolute top-[75%] left-[80%] w-14 h-4 rounded-[50%] bg-[#451004] shadow-[0_1px_2px_rgba(255,255,255,0.1)]"></div>
+            <div className="absolute top-[60%] left-[30%] w-8 h-2 rounded-[50%] bg-[#451004] shadow-[0_1px_2px_rgba(255,255,255,0.1)]"></div>
+          </div>
+        )}
+        
         {env.id === 'moon' && (
           <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden">
             <div className="absolute top-[30%] left-[15%] w-16 h-6 rounded-[50%] bg-[#475569] shadow-[inset_0_4px_6px_rgba(0,0,0,0.6),0_1px_2px_rgba(255,255,255,0.2)]"></div>
@@ -242,7 +283,7 @@ export function SimulationCanvas({
       </div>
 
       {/* Dev Structure Offset Tweak Panel */}
-      {devMode && structureId && structureId !== 'custom' && (
+      {devMode && structureId && (
         <div className="absolute top-4 right-4 bg-white/90 p-4 border-2 border-slate-900 rounded-lg shadow-lg z-[100] flex flex-col gap-2 w-64 pointer-events-auto text-xs font-mono font-black text-slate-900">
           <div className="mb-2 text-sm text-center">Ajuste de Imagem ({structureId})</div>
           <label className="flex flex-col gap-1">Left ({currentOffset.left}%)<input type="range" min="-50" max="100" value={currentOffset.left} onChange={(e) => updateOffset('left', Number(e.target.value))} /></label>
@@ -253,7 +294,7 @@ export function SimulationCanvas({
       )}
 
       {/* Structures */}
-      {structureId !== 'custom' && (
+      {structureId && (
         <div 
           className="absolute z-0 flex flex-col items-center justify-end pointer-events-none"
           style={{ bottom: `${currentOffset.bottom}%`, left: `${currentOffset.left}%`, width: `${currentOffset.width}%`, height: `${currentOffset.height}%` }}
@@ -262,19 +303,18 @@ export function SimulationCanvas({
           {structureId === 'pisa' && (
              <img src="/queda livre/torre de pisa.png" alt="Torre de Pisa" className="w-full h-full object-contain mix-blend-multiply" />
           )}
-
           {structureId === 'eiffel' && (
              <img src="/queda livre/torre effel.png" alt="Torre Eiffel" className="w-full h-full object-contain mix-blend-multiply" />
           )}
-
           {structureId === 'cristo' && (
              <img src="/queda livre/cristo redentor.png" alt="Cristo Redentor" className="w-full h-full object-contain mix-blend-multiply" />
           )}
-
           {structureId === 'gize' && (
              <img src="/queda livre/piramide de gize.png" alt="Pirâmide de Gizé" className="w-full h-full object-contain mix-blend-multiply" />
           )}
-
+          {structureId === 'custom' && (
+             <img src="/queda livre/penhasco.png" alt="Penhasco" className="w-full h-full object-contain mix-blend-multiply" />
+          )}
           <div className="bg-white/90 px-3 py-1 rounded-full border-2 border-slate-900 mt-2 font-black text-xs text-slate-900 shadow-[2px_2px_0px_0px_#0f172a] whitespace-nowrap">
             {getStructureName(structureId)}
           </div>
@@ -290,6 +330,8 @@ export function SimulationCanvas({
              let sizeClass = 'w-full h-full scale-[1.2] origin-bottom'; // Base scale for images
              if (obj.id === 'paper_flat') {
                 extraClass = isFalling ? 'animate-[wiggle_0.5s_ease-in-out_infinite] translate-y-4' : 'translate-y-4';
+             } else if (obj.id === 'custom') {
+                extraClass = isFalling ? 'translate-y-4' : 'translate-y-4';
              } else if (obj.id === 'book') {
                 extraClass = isFalling ? '-rotate-12 translate-y-4' : 'translate-y-4';
              } else if (obj.id === 'feather') {
@@ -396,7 +438,7 @@ export function SimulationCanvas({
               return (
                 <div 
                   className={`absolute flex flex-col items-center justify-end z-[50] hover:z-[9999] focus-within:z-[9999] ${devMode ? 'border-2 border-dashed border-red-500 bg-red-500/20' : ''} ${yA >= height && simulationMode === 'paraquedas' && !planeArrived ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}
-                  style={{ bottom: `${yAPercent}%`, left: simulationMode === 'paraquedas' ? '50%' : '45%', transform: 'translateX(-50%)', width: objectA.radius * scaleFactor * multiplierA, height: objectA.radius * scaleFactor * multiplierA }}
+                  style={{ bottom: `${yAPercent}%`, left: simulationMode === 'paraquedas' ? '50%' : (isMobile ? '35%' : '40%'), transform: 'translateX(-50%)', width: objectA.radius * scaleFactor * multiplierA, height: objectA.radius * scaleFactor * multiplierA }}
                 >
                   {renderObject(objectA, 'A', isFallingA, parachuteDeployedA)}
                   {showHeights && yA > 0 && (
@@ -447,7 +489,7 @@ export function SimulationCanvas({
             {simulationMode !== 'paraquedas' && (
             <div 
               className={`absolute flex flex-col items-center justify-end z-[50] hover:z-[9999] focus-within:z-[9999] ${devMode ? 'border-2 border-dashed border-red-500 bg-red-500/20' : ''}`}
-              style={{ bottom: `${yBPercent}%`, left: '65%', transform: 'translateX(-50%)', width: objectB.radius * scaleFactor, height: objectB.radius * scaleFactor }}
+              style={{ bottom: `${yBPercent}%`, left: isMobile ? '65%' : '70%', transform: 'translateX(-50%)', width: objectB.radius * scaleFactor, height: objectB.radius * scaleFactor }}
             >
               {renderObject(objectB, 'B', isFallingB, parachuteDeployedB)}
               {showHeights && yB > 0 && (

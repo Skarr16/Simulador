@@ -7,13 +7,15 @@ import { DataTable } from './components/DataTable';
 import { SettingsDrawer } from './components/SettingsDrawer';
 import { AdminModal } from './components/AdminModal';
 import { QrCodeModal } from './components/QrCodeModal';
+import { TutorialModal } from './components/TutorialModal';
+import { BookOpen } from 'lucide-react';
 import { useEngine } from './hooks/useEngine';
 import { soundEngine } from './lib/audio';
 import { SimulationConfig } from './types';
 import { OBJECTS, ENVIRONMENTS } from './lib/constants';
 
 export default function App() {
-  const [simulationMode, setSimulationMode] = useState<'livre' | 'paraquedas'>('livre');
+  const [simulationMode, setSimulationMode] = useState<'livre' | 'paraquedas'>('paraquedas');
   const [speedMultiplier, setSpeedMultiplier] = useState(1);
 
   const [configLivre, setConfigLivre] = useState<SimulationConfig>({
@@ -52,6 +54,7 @@ export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isQrCodeOpen, setIsQrCodeOpen] = useState(false);
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   
   const [customObjects, setCustomObjects] = useState(OBJECTS);
   const [customEnvs, setCustomEnvs] = useState(ENVIRONMENTS);
@@ -192,6 +195,15 @@ export default function App() {
               <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider hidden sm:inline">Som</span>
             </button>
 
+            {/* Button Tutorial */}
+            <button 
+              onClick={() => setIsTutorialOpen(true)}
+              className="flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-[#FFB800] text-slate-900 rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
+            >
+              <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
+              <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Tutorial</span>
+            </button>
+
             {/* Button 6: QR Code */}
             <button 
               onClick={() => setIsQrCodeOpen(true)}
@@ -199,18 +211,6 @@ export default function App() {
             >
               <QrCode className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
               <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">QR Code</span>
-            </button>
-
-            {/* Button 1: Queda Livre */}
-            <button
-              onClick={() => {
-                engineParaquedas.pause();
-                setSimulationMode('livre');
-              }}
-              className={`flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 ${simulationMode === 'livre' ? 'bg-[#00C48C] text-white' : 'bg-white text-slate-900'} rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
-            >
-              <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
-              <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Queda Livre</span>
             </button>
 
             {/* Button 2: Paraquedas */}
@@ -222,42 +222,20 @@ export default function App() {
               className={`flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 ${simulationMode === 'paraquedas' ? 'bg-[#00C48C] text-white' : 'bg-white text-slate-900'} rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
             >
               <Wind className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
-              <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Paraquedas</span>
+              <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Queda Livre</span>
             </button>
 
-            {/* Botão de Alternar Personagem (Só no Paraquedas) */}
-            {config.simulationMode === 'paraquedas' && (
-              <button 
-                onClick={() => {
-                  if (config.objectAId === 'astronaut') {
-                    setConfig({ ...config, objectAId: 'skydiver', objectBId: 'skydiver' });
-                  } else {
-                    if (config.environmentId !== 'moon') {
-                      alert("O astronauta só pode ser usado na Lua! Mude o local primeiro.");
-                    } else {
-                      setConfig({ ...config, objectAId: 'astronaut', objectBId: 'astronaut' });
-                    }
-                  }
-                }}
-                className={`flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-white text-slate-900 rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
-              >
-                <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
-                <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">
-                  {config.objectAId === 'astronaut' ? 'Usar Paraquedista' : 'Usar Astronauta'}
-                </span>
-              </button>
-            )}
-
-            {/* Button 4: Avançado (Antigo Admin) */}
-            {toggles.devMode && (
-              <button 
-                onClick={() => setIsAdminOpen(true)}
-                className="flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-[#FF3366] text-white rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
-              >
-                <ShieldAlert className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
-                <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Avançado</span>
-              </button>
-            )}
+            {/* Button 1: Queda Livre */}
+            <button
+              onClick={() => {
+                engineParaquedas.pause();
+                setSimulationMode('livre');
+              }}
+              className={`flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 ${simulationMode === 'livre' ? 'bg-[#00C48C] text-white' : 'bg-white text-slate-900'} rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
+            >
+              <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
+              <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Queda Simultânea</span>
+            </button>
 
             {/* Button 5: Configurar */}
             <button 
@@ -317,7 +295,11 @@ export default function App() {
                   }
 
                   let nextEnableAirResistance = config.enableAirResistance;
-                  if (nextEnvId === 'moon') nextEnableAirResistance = false;
+                  if (nextEnvId === 'moon') {
+                    nextEnableAirResistance = false;
+                  } else if (config.environmentId === 'moon') {
+                    nextEnableAirResistance = true;
+                  }
 
                   setConfig({ 
                     ...config, 
@@ -365,7 +347,7 @@ export default function App() {
           <div className="w-full lg:w-[450px] p-4 flex flex-col gap-6 overflow-visible lg:overflow-y-auto shrink-0 border-t-[3px] lg:border-t-0 lg:border-l-[3px] border-slate-900 bg-[#F4F1EB] z-20">
                         {toggles.graphs && (
               <div className="animate-in fade-in slide-in-from-right-4 duration-300 flex-1 min-h-[300px]">
-                <ChartsArea data={engine.dataPoints} />
+                <ChartsArea data={engine.dataPoints} simulationMode={simulationMode} />
               </div>
             )}
 
@@ -384,6 +366,7 @@ export default function App() {
         )}
       </main>
 
+      <TutorialModal isOpen={isTutorialOpen} onClose={() => setIsTutorialOpen(false)} simulationMode={simulationMode} />
       <SettingsDrawer 
         isOpen={isSettingsOpen} 
         onClose={() => setIsSettingsOpen(false)} 
@@ -395,6 +378,7 @@ export default function App() {
         customObjects={customObjects}
         setCustomObjects={setCustomObjects}
         customEnvs={customEnvs}
+        setCustomEnvs={setCustomEnvs}
       />
 
       <AdminModal

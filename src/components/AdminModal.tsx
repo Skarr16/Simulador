@@ -20,6 +20,51 @@ export function AdminModal({ isOpen, onClose, customObjects, setCustomObjects, c
   const [selectedObj, setSelectedObj] = useState<string>(Object.keys(localObjects)[0]);
   const [selectedEnv, setSelectedEnv] = useState<string>(Object.keys(localEnvs)[0]);
 
+  const [newObj, setNewObj] = useState<PhysicsObject | null>(null);
+  const [newEnv, setNewEnv] = useState<Environment | null>(null);
+
+  const handleExportJSON = (data: any, filename: string) => {
+    const jsonStr = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportJSONObjects = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const imported = JSON.parse(ev.target?.result as string);
+        setLocalObjects(prev => ({ ...prev, ...imported }));
+      } catch (err) {
+        alert('JSON inválido.');
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleImportJSONEnvs = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const imported = JSON.parse(ev.target?.result as string);
+        setLocalEnvs(prev => ({ ...prev, ...imported }));
+      } catch (err) {
+        alert('JSON inválido.');
+      }
+    };
+    reader.readAsText(file);
+  };
+
+
   if (!isOpen) return null;
 
   const handleSave = () => {
@@ -99,43 +144,117 @@ export function AdminModal({ isOpen, onClose, customObjects, setCustomObjects, c
                 <label className="block text-sm font-black uppercase text-slate-900 mb-2">Selecione o Objeto</label>
                 <select 
                   value={selectedObj}
-                  onChange={(e) => setSelectedObj(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedObj(e.target.value);
+                    if (e.target.value === 'new') {
+                      setNewObj({
+                        id: 'obj_' + Date.now(),
+                        name: 'Novo Objeto',
+                        mass: 1,
+                        area: 0.1,
+                        cd: 0.5,
+                        color: '#000000',
+                        radius: 30
+                      });
+                    } else {
+                      setNewObj(null);
+                    }
+                  }}
                   className="w-full bg-white border-2 border-slate-900 rounded-lg p-2 font-bold"
                 >
+                  <option value="new">+ Criar Novo Objeto</option>
                   {Object.values(localObjects).map((obj: any) => (
                     <option key={obj.id} value={obj.id}>{obj.name}</option>
                   ))}
                 </select>
               </div>
               
-              {localObjects[selectedObj] && (
+              {selectedObj === 'new' && newObj ? (
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1">
                     <label className="text-xs font-black uppercase text-slate-700">Nome</label>
-                    <input type="text" value={localObjects[selectedObj].name} onChange={e => updateObject(selectedObj, 'name', e.target.value)} className="border-2 border-slate-900 rounded p-1 font-bold" />
+                    <input type="text" value={newObj.name} onChange={e => setNewObj({...newObj, name: e.target.value})} className="border-2 border-slate-900 rounded p-1 font-bold" />
                   </div>
                   <div className="flex flex-col gap-1">
                     <label className="text-xs font-black uppercase text-slate-700">Massa (kg)</label>
-                    <input type="number" step="0.001" value={localObjects[selectedObj].mass} onChange={e => updateObject(selectedObj, 'mass', Number(e.target.value))} className="border-2 border-slate-900 rounded p-1 font-bold" />
+                    <input type="number" step="0.001" value={newObj.mass} onChange={e => setNewObj({...newObj, mass: Number(e.target.value)})} className="border-2 border-slate-900 rounded p-1 font-bold" />
                   </div>
                   <div className="flex flex-col gap-1">
                     <label className="text-xs font-black uppercase text-slate-700">Área (m²)</label>
-                    <input type="number" step="0.0001" value={localObjects[selectedObj].area} onChange={e => updateObject(selectedObj, 'area', Number(e.target.value))} className="border-2 border-slate-900 rounded p-1 font-bold" />
+                    <input type="number" step="0.0001" value={newObj.area} onChange={e => setNewObj({...newObj, area: Number(e.target.value)})} className="border-2 border-slate-900 rounded p-1 font-bold" />
                   </div>
                   <div className="flex flex-col gap-1">
                     <label className="text-xs font-black uppercase text-slate-700">Cd (Arrasto)</label>
-                    <input type="number" step="0.01" value={localObjects[selectedObj].cd} onChange={e => updateObject(selectedObj, 'cd', Number(e.target.value))} className="border-2 border-slate-900 rounded p-1 font-bold" />
+                    <input type="number" step="0.01" value={newObj.cd} onChange={e => setNewObj({...newObj, cd: Number(e.target.value)})} className="border-2 border-slate-900 rounded p-1 font-bold" />
                   </div>
                   <div className="flex flex-col gap-1">
                     <label className="text-xs font-black uppercase text-slate-700">Tamanho da Imagem (px)</label>
-                    <input type="number" step="10" value={localObjects[selectedObj].radius} onChange={e => updateObject(selectedObj, 'radius', Number(e.target.value))} className="border-2 border-slate-900 rounded p-1 font-bold" />
+                    <input type="number" step="10" value={newObj.radius} onChange={e => setNewObj({...newObj, radius: Number(e.target.value)})} className="border-2 border-slate-900 rounded p-1 font-bold" />
                   </div>
                   <div className="flex flex-col gap-1">
                     <label className="text-xs font-black uppercase text-slate-700">Cor</label>
-                    <input type="color" value={localObjects[selectedObj].color} onChange={e => updateObject(selectedObj, 'color', e.target.value)} className="w-full h-8 border-2 border-slate-900 rounded cursor-pointer" />
+                    <input type="color" value={newObj.color} onChange={e => setNewObj({...newObj, color: e.target.value})} className="w-full h-8 border-2 border-slate-900 rounded cursor-pointer" />
+                  </div>
+                  <div className="col-span-2 mt-2">
+                    <button 
+                      onClick={() => {
+                        setLocalObjects(prev => ({...prev, [newObj.id]: newObj}));
+                        setSelectedObj(newObj.id);
+                        setNewObj(null);
+                      }}
+                      className="w-full bg-[#00C48C] text-slate-900 font-black px-4 py-2 rounded-xl border-2 border-slate-900 shadow-[4px_4px_0px_0px_#0f172a]"
+                    >
+                      Salvar Objeto
+                    </button>
                   </div>
                 </div>
-              )}
+              ) : localObjects[selectedObj] ? (
+                <div className="grid grid-cols-2 gap-4 opacity-70">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-black uppercase text-slate-700">Nome</label>
+                    <input type="text" disabled value={localObjects[selectedObj].name} className="border-2 border-slate-900 rounded p-1 font-bold bg-slate-200" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-black uppercase text-slate-700">Massa (kg)</label>
+                    <input type="number" disabled value={localObjects[selectedObj].mass} className="border-2 border-slate-900 rounded p-1 font-bold bg-slate-200" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-black uppercase text-slate-700">Área (m²)</label>
+                    <input type="number" disabled value={localObjects[selectedObj].area} className="border-2 border-slate-900 rounded p-1 font-bold bg-slate-200" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-black uppercase text-slate-700">Cd (Arrasto)</label>
+                    <input type="number" disabled value={localObjects[selectedObj].cd} className="border-2 border-slate-900 rounded p-1 font-bold bg-slate-200" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-black uppercase text-slate-700">Tamanho da Imagem (px)</label>
+                    <input type="number" disabled value={localObjects[selectedObj].radius} className="border-2 border-slate-900 rounded p-1 font-bold bg-slate-200" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-black uppercase text-slate-700">Cor</label>
+                    <input type="color" disabled value={localObjects[selectedObj].color} className="w-full h-8 border-2 border-slate-900 rounded bg-slate-200" />
+                  </div>
+                  <div className="col-span-2 text-xs text-center text-slate-500 font-bold mt-2">
+                    (Objetos existentes não podem ser editados)
+                  </div>
+                </div>
+              ) : null}
+
+              <div className="border-t-2 border-slate-900 pt-4 mt-4">
+                <h4 className="font-black uppercase text-slate-900 mb-3 text-sm">Importar / Exportar</h4>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => handleExportJSON(localObjects, 'objetos.json')}
+                    className="flex-1 bg-white text-slate-900 font-black px-3 py-2 rounded-lg border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a] text-xs uppercase"
+                  >
+                    Exportar JSON
+                  </button>
+                  <label className="flex-1 bg-white text-slate-900 font-black px-3 py-2 rounded-lg border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a] text-xs uppercase text-center cursor-pointer">
+                    Importar JSON
+                    <input type="file" accept=".json" onChange={handleImportJSONObjects} className="hidden" />
+                  </label>
+                </div>
+              </div>
             </div>
           )}
 
@@ -145,31 +264,99 @@ export function AdminModal({ isOpen, onClose, customObjects, setCustomObjects, c
                 <label className="block text-sm font-black uppercase text-slate-900 mb-2">Selecione o Ambiente</label>
                 <select 
                   value={selectedEnv}
-                  onChange={(e) => setSelectedEnv(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedEnv(e.target.value);
+                    if (e.target.value === 'new') {
+                      setNewEnv({
+                        id: 'env_' + Date.now(),
+                        name: 'Novo Ambiente',
+                        gravity: 9.81,
+                        airDensity: 1.225,
+                        color: '#ffffff'
+                      });
+                    } else {
+                      setNewEnv(null);
+                    }
+                  }}
                   className="w-full bg-white border-2 border-slate-900 rounded-lg p-2 font-bold"
                 >
+                  <option value="new">+ Criar Novo Ambiente</option>
                   {Object.values(localEnvs).map((env: any) => (
                     <option key={env.id} value={env.id}>{env.name}</option>
                   ))}
                 </select>
               </div>
               
-              {localEnvs[selectedEnv] && (
+              {selectedEnv === 'new' && newEnv ? (
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1">
                     <label className="text-xs font-black uppercase text-slate-700">Nome</label>
-                    <input type="text" value={localEnvs[selectedEnv].name} onChange={e => updateEnv(selectedEnv, 'name', e.target.value)} className="border-2 border-slate-900 rounded p-1 font-bold" />
+                    <input type="text" value={newEnv.name} onChange={e => setNewEnv({...newEnv, name: e.target.value})} className="border-2 border-slate-900 rounded p-1 font-bold" />
                   </div>
                   <div className="flex flex-col gap-1">
                     <label className="text-xs font-black uppercase text-slate-700">Gravidade (m/s²)</label>
-                    <input type="number" step="0.01" value={localEnvs[selectedEnv].g} onChange={e => updateEnv(selectedEnv, 'g', Number(e.target.value))} className="border-2 border-slate-900 rounded p-1 font-bold" />
+                    <input type="number" step="0.01" value={newEnv.gravity} onChange={e => setNewEnv({...newEnv, gravity: Number(e.target.value)})} className="border-2 border-slate-900 rounded p-1 font-bold" />
                   </div>
                   <div className="flex flex-col gap-1">
                     <label className="text-xs font-black uppercase text-slate-700">Densidade do Ar (kg/m³)</label>
-                    <input type="number" step="0.001" value={localEnvs[selectedEnv].rho} onChange={e => updateEnv(selectedEnv, 'rho', Number(e.target.value))} className="border-2 border-slate-900 rounded p-1 font-bold" />
+                    <input type="number" step="0.001" value={newEnv.airDensity} onChange={e => setNewEnv({...newEnv, airDensity: Number(e.target.value)})} className="border-2 border-slate-900 rounded p-1 font-bold" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-black uppercase text-slate-700">Cor de Fundo</label>
+                    <input type="color" value={newEnv.color} onChange={e => setNewEnv({...newEnv, color: e.target.value})} className="w-full h-8 border-2 border-slate-900 rounded cursor-pointer" />
+                  </div>
+                  <div className="col-span-2 mt-2">
+                    <button 
+                      onClick={() => {
+                        setLocalEnvs(prev => ({...prev, [newEnv.id]: newEnv}));
+                        setSelectedEnv(newEnv.id);
+                        setNewEnv(null);
+                      }}
+                      className="w-full bg-[#00C48C] text-slate-900 font-black px-4 py-2 rounded-xl border-2 border-slate-900 shadow-[4px_4px_0px_0px_#0f172a]"
+                    >
+                      Salvar Ambiente
+                    </button>
                   </div>
                 </div>
-              )}
+              ) : localEnvs[selectedEnv] ? (
+                <div className="grid grid-cols-2 gap-4 opacity-70">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-black uppercase text-slate-700">Nome</label>
+                    <input type="text" disabled value={localEnvs[selectedEnv].name} className="border-2 border-slate-900 rounded p-1 font-bold bg-slate-200" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-black uppercase text-slate-700">Gravidade (m/s²)</label>
+                    <input type="number" disabled value={localEnvs[selectedEnv].gravity} className="border-2 border-slate-900 rounded p-1 font-bold bg-slate-200" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-black uppercase text-slate-700">Densidade do Ar (kg/m³)</label>
+                    <input type="number" disabled value={localEnvs[selectedEnv].airDensity} className="border-2 border-slate-900 rounded p-1 font-bold bg-slate-200" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-black uppercase text-slate-700">Cor de Fundo</label>
+                    <input type="color" disabled value={localEnvs[selectedEnv].color} className="w-full h-8 border-2 border-slate-900 rounded bg-slate-200" />
+                  </div>
+                  <div className="col-span-2 text-xs text-center text-slate-500 font-bold mt-2">
+                    (Ambientes existentes não podem ser editados)
+                  </div>
+                </div>
+              ) : null}
+
+              <div className="border-t-2 border-slate-900 pt-4 mt-4">
+                <h4 className="font-black uppercase text-slate-900 mb-3 text-sm">Importar / Exportar</h4>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => handleExportJSON(localEnvs, 'ambientes.json')}
+                    className="flex-1 bg-white text-slate-900 font-black px-3 py-2 rounded-lg border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a] text-xs uppercase"
+                  >
+                    Exportar JSON
+                  </button>
+                  <label className="flex-1 bg-white text-slate-900 font-black px-3 py-2 rounded-lg border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a] text-xs uppercase text-center cursor-pointer">
+                    Importar JSON
+                    <input type="file" accept=".json" onChange={handleImportJSONEnvs} className="hidden" />
+                  </label>
+                </div>
+              </div>
             </div>
           )}
 

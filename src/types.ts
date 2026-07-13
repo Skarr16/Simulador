@@ -5,6 +5,7 @@ export interface PhysicsObject {
   area: number; // m^2
   cd: number; // drag coefficient
   color: string;
+  diameterInfo?: string;
   radius: number; // visual relative size
   image?: string;
   parachuteArea?: number; // m^2

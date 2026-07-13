@@ -14,9 +14,10 @@ interface SettingsDrawerProps {
   customObjects: Record<string, PhysicsObject>;
   setCustomObjects: (objects: Record<string, PhysicsObject>) => void;
   customEnvs: Record<string, Environment>;
+  setCustomEnvs: (envs: Record<string, Environment>) => void;
 }
 
-export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, setToggles, disabled, customObjects, setCustomObjects, customEnvs }: SettingsDrawerProps) {
+export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, setToggles, disabled, customObjects, setCustomObjects, customEnvs, setCustomEnvs }: SettingsDrawerProps) {
   const handleStructureChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const structureId = e.target.value;
     const structure = STRUCTURES[structureId];
@@ -71,9 +72,14 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                       if (nextObjectA === 'astronaut') nextObjectA = config.simulationMode === 'paraquedas' ? 'skydiver' : 'bowling';
                       if (nextObjectB === 'astronaut') nextObjectB = config.simulationMode === 'paraquedas' ? 'skydiver' : 'bowling';
                     }
-                    
+
                     let nextEnableAirResistance = config.enableAirResistance;
-                    if (e.target.value === 'moon') nextEnableAirResistance = false;
+                    if (e.target.value === 'moon') {
+                      nextEnableAirResistance = false;
+                    } else if (config.environmentId === 'moon') {
+                      // Se estava na lua e mudou para outro lugar, reativamos
+                      nextEnableAirResistance = true;
+                    }
 
                     setConfig({ ...config, environmentId: e.target.value, objectAId: nextObjectA, objectBId: nextObjectB, enableAirResistance: nextEnableAirResistance });
                   }}
@@ -86,8 +92,81 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                 </select>
               </div>
 
-              {config.simulationMode !== 'paraquedas' && (
-                <div>
+              {config.environmentId === 'custom' && (
+                <div className="space-y-3 bg-slate-50 p-3 rounded-lg border-2 border-slate-200">
+                  <div className="flex justify-between items-center">
+                    <label className="block text-xs font-black text-slate-500 uppercase">Gravidade (m/s²)</label>
+                    <input 
+                      type="number"
+                      step="0.01"
+                      value={customEnvs.custom.g}
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value);
+                        if (!isNaN(val)) {
+                          setCustomEnvs({
+                            ...customEnvs,
+                            custom: { ...customEnvs.custom, g: val }
+                          });
+                        }
+                      }}
+                      disabled={disabled}
+                      className="w-20 bg-white border-2 border-slate-900 rounded-lg px-2 py-1 text-right font-mono font-black text-xs outline-none focus:ring-2 focus:ring-[#0055FF] disabled:opacity-50"
+                    />
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="30"
+                    step="0.1"
+                    value={customEnvs.custom.g}
+                    onChange={(e) => {
+                      setCustomEnvs({
+                        ...customEnvs,
+                        custom: { ...customEnvs.custom, g: Number(e.target.value) }
+                      });
+                    }}
+                    disabled={disabled}
+                    className="w-full accent-slate-900"
+                  />
+                  
+                  <div className="flex justify-between items-center">
+                    <label className="block text-xs font-black text-slate-500 uppercase">Dens. do Ar (kg/m³)</label>
+                    <input 
+                      type="number"
+                      step="0.01"
+                      value={customEnvs.custom.rho}
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value);
+                        if (!isNaN(val)) {
+                          setCustomEnvs({
+                            ...customEnvs,
+                            custom: { ...customEnvs.custom, rho: val }
+                          });
+                        }
+                      }}
+                      disabled={disabled}
+                      className="w-20 bg-white border-2 border-slate-900 rounded-lg px-2 py-1 text-right font-mono font-black text-xs outline-none focus:ring-2 focus:ring-[#0055FF] disabled:opacity-50"
+                    />
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="5"
+                    step="0.05"
+                    value={customEnvs.custom.rho}
+                    onChange={(e) => {
+                      setCustomEnvs({
+                        ...customEnvs,
+                        custom: { ...customEnvs.custom, rho: Number(e.target.value) }
+                      });
+                    }}
+                    disabled={disabled}
+                    className="w-full accent-slate-900"
+                  />
+                </div>
+              )}
+
+              <div>
                   <label className="block text-xs font-black text-slate-500 mb-2 uppercase">Alturas / Estruturas</label>
                   <select 
                     value={config.structureId}
@@ -100,7 +179,6 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                     ))}
                   </select>
                 </div>
-              )}
 
               {config.structureId === 'custom' && (
                 <div>
@@ -166,7 +244,10 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
 
           {/* Objects */}
           <section className="space-y-4">
-            <h3 className="text-sm font-black text-slate-900 uppercase">Objetos em Queda</h3>
+            <h3 className="text-sm font-black text-slate-900 uppercase flex items-center justify-between">
+              <span>Objetos em Queda</span>
+              <span className="text-[10px] font-bold text-slate-500 normal-case bg-slate-100 px-2 py-1 rounded-md border border-slate-200">Formato: Nome (Massa, Área)</span>
+            </h3>
             
             <div className="bg-white p-4 rounded-xl border-[3px] border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] space-y-4">
               <div>
@@ -180,9 +261,9 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                   className="w-full bg-[#F4F1EB] border-2 border-slate-900 rounded-lg p-2 font-bold outline-none focus:ring-2 focus:ring-[#FF3366] disabled:opacity-50"
                 >
                   {Object.values(customObjects)
-                    .filter(obj => obj.id !== 'astronaut' || config.environmentId === 'moon')
+                    .filter(obj => obj.id !== 'astronaut' || config.environmentId !== 'earth')
                     .map(obj => (
-                    <option key={obj.id} value={obj.id}>{obj.name} ({obj.mass}kg)</option>
+                    <option key={obj.id} value={obj.id}>{obj.name} ({obj.mass}kg{`, ${obj.area}m²`})</option>
                   ))}
                 </select>
                 {config.objectAId === 'skydiver' && (
@@ -257,6 +338,47 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                       </div>
                    </div>
                 )}
+
+                {config.objectAId === 'custom' && customObjects.custom && (
+                   <div className="mt-3 p-3 bg-slate-50 border-2 border-slate-200 rounded-lg space-y-3">
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-700 mb-1 uppercase">Massa</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                             type="number" step="0.1" min="0.1"
+                             value={customObjects.custom.mass || ''}
+                             onChange={(e) => setCustomObjects({ ...customObjects, custom: { ...customObjects.custom, mass: parseFloat(e.target.value) || 0 }})}
+                             disabled={disabled}
+                             className="w-full p-1.5 border-2 border-slate-300 rounded font-mono text-sm outline-none focus:border-[#FF3366] disabled:opacity-50"
+                          />
+                          <span className="text-xs font-black text-slate-500">kg</span>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-700 mb-1 uppercase">Área</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                             type="number" step="0.01" min="0.01"
+                             value={customObjects.custom.area || ''}
+                             onChange={(e) => setCustomObjects({ ...customObjects, custom: { ...customObjects.custom, area: parseFloat(e.target.value) || 0 }})}
+                             disabled={disabled}
+                             className="w-full p-1.5 border-2 border-slate-300 rounded font-mono text-sm outline-none focus:border-[#FF3366] disabled:opacity-50"
+                          />
+                          <span className="text-xs font-black text-slate-500">m²</span>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-700 mb-1 uppercase">Coef. Arrasto (Cd)</label>
+                        <input
+                           type="number" step="0.01" min="0.01"
+                           value={customObjects.custom.cd || ''}
+                           onChange={(e) => setCustomObjects({ ...customObjects, custom: { ...customObjects.custom, cd: parseFloat(e.target.value) || 0 }})}
+                           disabled={disabled}
+                           className="w-full p-1.5 border-2 border-slate-300 rounded font-mono text-sm outline-none focus:border-[#FF3366] disabled:opacity-50"
+                        />
+                      </div>
+                   </div>
+                )}
               </div>
 
               {config.simulationMode !== 'paraquedas' && (
@@ -269,9 +391,9 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                     className="w-full bg-[#F4F1EB] border-2 border-slate-900 rounded-lg p-2 font-bold outline-none focus:ring-2 focus:ring-[#0055FF] disabled:opacity-50"
                   >
                     {Object.values(customObjects)
-                      .filter(obj => obj.id !== 'astronaut' || config.environmentId === 'moon')
-                      .map(obj => (
-                      <option key={obj.id} value={obj.id}>{obj.name} ({obj.mass}kg)</option>
+                    .filter(obj => obj.id !== 'astronaut' || config.environmentId !== 'earth')
+                    .map(obj => (
+                      <option key={obj.id} value={obj.id}>{obj.name} ({obj.mass}kg{`, ${obj.area}m²`})</option>
                     ))}
                   </select>
                   {config.objectBId === 'skydiver' && (
@@ -346,6 +468,47 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                         </div>
                      </div>
                   )}
+
+                  {config.objectBId === 'custom' && customObjects.custom && (
+                   <div className="mt-3 p-3 bg-slate-50 border-2 border-slate-200 rounded-lg space-y-3">
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-700 mb-1 uppercase">Massa</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                             type="number" step="0.1" min="0.1"
+                             value={customObjects.custom.mass || ''}
+                             onChange={(e) => setCustomObjects({ ...customObjects, custom: { ...customObjects.custom, mass: parseFloat(e.target.value) || 0 }})}
+                             disabled={disabled}
+                             className="w-full p-1.5 border-2 border-slate-300 rounded font-mono text-sm outline-none focus:border-[#0055FF] disabled:opacity-50"
+                          />
+                          <span className="text-xs font-black text-slate-500">kg</span>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-700 mb-1 uppercase">Área</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                             type="number" step="0.01" min="0.01"
+                             value={customObjects.custom.area || ''}
+                             onChange={(e) => setCustomObjects({ ...customObjects, custom: { ...customObjects.custom, area: parseFloat(e.target.value) || 0 }})}
+                             disabled={disabled}
+                             className="w-full p-1.5 border-2 border-slate-300 rounded font-mono text-sm outline-none focus:border-[#0055FF] disabled:opacity-50"
+                          />
+                          <span className="text-xs font-black text-slate-500">m²</span>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-700 mb-1 uppercase">Coef. Arrasto (Cd)</label>
+                        <input
+                           type="number" step="0.01" min="0.01"
+                           value={customObjects.custom.cd || ''}
+                           onChange={(e) => setCustomObjects({ ...customObjects, custom: { ...customObjects.custom, cd: parseFloat(e.target.value) || 0 }})}
+                           disabled={disabled}
+                           className="w-full p-1.5 border-2 border-slate-300 rounded font-mono text-sm outline-none focus:border-[#0055FF] disabled:opacity-50"
+                        />
+                      </div>
+                   </div>
+                  )}
                 </div>
               )}
             </div>
@@ -403,17 +566,6 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                 <span className="text-sm font-black uppercase text-slate-700">Mostrar Gravidade</span>
                 <div className={`w-12 h-6 flex items-center border-2 border-slate-900 rounded-full p-0.5 transition-colors ${toggles.showGravity ? 'bg-[#00C48C]' : 'bg-slate-200'}`}>
                   <div className={`w-4 h-4 rounded-full shadow-sm transform transition-transform ${toggles.showGravity ? 'translate-x-6 bg-white' : 'translate-x-0 bg-slate-500'}`} />
-                </div>
-              </button>
-              <div className="h-px bg-slate-200 w-full my-2"></div>
-              <button 
-                type="button"
-                onClick={() => setToggles({ ...toggles, devMode: !toggles.devMode })}
-                className="flex items-center justify-between w-full hover:bg-slate-50 p-2 rounded-lg transition-colors text-left"
-              >
-                <span className="text-sm font-black uppercase text-[#FF3366]">Modo Desenvolvedor</span>
-                <div className={`w-12 h-6 flex items-center border-2 border-slate-900 rounded-full p-0.5 transition-colors ${toggles.devMode ? 'bg-[#FF3366]' : 'bg-slate-200'}`}>
-                  <div className={`w-4 h-4 rounded-full shadow-sm transform transition-transform ${toggles.devMode ? 'translate-x-6 bg-white' : 'translate-x-0 bg-slate-500'}`} />
                 </div>
               </button>
             </div>
