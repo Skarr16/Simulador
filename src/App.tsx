@@ -183,7 +183,7 @@ export default function App() {
         <div className="px-4 py-2.5 flex items-center justify-center min-h-16 h-auto overflow-visible">
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 max-w-full overflow-visible">
             
-            <button 
+            <button type="button" 
               onClick={() => {
                 const nextState = !toggles.sound;
                 setToggles(prev => ({ ...prev, sound: nextState }));
@@ -196,7 +196,7 @@ export default function App() {
             </button>
 
             {/* Button Tutorial */}
-            <button 
+            <button type="button" 
               onClick={() => setIsTutorialOpen(true)}
               className="flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-[#FFB800] text-slate-900 rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
             >
@@ -205,7 +205,7 @@ export default function App() {
             </button>
 
             {/* Button 6: QR Code */}
-            <button 
+            <button type="button" 
               onClick={() => setIsQrCodeOpen(true)}
               className="flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-[#A855F7] text-white rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
             >
@@ -214,7 +214,7 @@ export default function App() {
             </button>
 
             {/* Button 2: Paraquedas */}
-            <button 
+            <button type="button" 
               onClick={() => {
                 engineLivre.pause();
                 setSimulationMode('paraquedas');
@@ -238,7 +238,7 @@ export default function App() {
             </button>
 
             {/* Button 5: Configurar */}
-            <button 
+            <button type="button" 
               onClick={() => setIsSettingsOpen(true)}
               className="flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-[#FFB800] text-slate-900 rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
             >
@@ -314,22 +314,22 @@ export default function App() {
 
             {/* Playback Controls (Floating) */}
             <div className="mt-4 pointer-events-auto bg-white p-3 sm:p-4 rounded-2xl shadow-[6px_6px_0px_0px_#0f172a] border-[3px] border-slate-900 flex flex-row flex-wrap items-center justify-center gap-2 sm:gap-4 shrink-0">
-              <button 
+              <button type="button" 
                 onClick={engine.start}
                 disabled={engine.isRunning}
                 className="flex items-center justify-center gap-1 sm:gap-2 px-2 py-2 sm:px-6 sm:py-2 bg-[#00C48C] hover:bg-[#00a877] disabled:bg-slate-200 disabled:text-slate-400 text-slate-900 font-black rounded-xl border-[2px] sm:border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] sm:shadow-[4px_4px_0px_0px_#0f172a] hover:translate-y-1 hover:shadow-[0px_0px_0px_0px_#0f172a] disabled:hover:translate-y-0 disabled:hover:shadow-[3px_3px_0px_0px_#0f172a] sm:disabled:hover:shadow-[4px_4px_0px_0px_#0f172a] disabled:cursor-not-allowed transition-all flex-1 sm:flex-none text-[10px] sm:text-base"
               >
                 <Play className="w-3 h-3 sm:w-4 sm:h-4 fill-current" /> <span>INICIAR</span>
               </button>
-              <button 
+              <button type="button" 
                 onClick={engine.pause}
                 disabled={!engine.isRunning}
                 className="flex items-center justify-center gap-1 sm:gap-2 px-2 py-2 sm:px-6 sm:py-2 bg-[#FFB800] hover:bg-[#e6a600] disabled:bg-slate-200 disabled:text-slate-400 text-slate-900 font-black rounded-xl border-[2px] sm:border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] sm:shadow-[4px_4px_0px_0px_#0f172a] hover:translate-y-1 hover:shadow-[0px_0px_0px_0px_#0f172a] disabled:hover:translate-y-0 disabled:hover:shadow-[3px_3px_0px_0px_#0f172a] sm:disabled:hover:shadow-[4px_4px_0px_0px_#0f172a] disabled:cursor-not-allowed transition-all flex-1 sm:flex-none text-[10px] sm:text-base"
               >
                 <Square className="w-3 h-3 sm:w-4 sm:h-4 fill-current" /> <span>PAUSAR</span>
               </button>
-              {config.simulationMode === 'paraquedas' && (engine.objectA.id === 'skydiver' || engine.objectB.id === 'skydiver') && (
-                <button 
+              {config.simulationMode === 'paraquedas' && config.objectAId === 'skydiver' && (
+                <button type="button" 
                   onClick={engine.deployParachute}
                   disabled={!engine.isRunning || engine.currentState.parachuteDeployedA || engine.isFinished}
                   className="flex items-center justify-center gap-1 sm:gap-2 px-2 py-2 sm:px-6 sm:py-2 bg-[#FF3366] hover:bg-[#e62e5c] disabled:bg-slate-200 disabled:text-slate-400 text-white disabled:text-slate-400 font-black rounded-xl border-[2px] sm:border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] sm:shadow-[4px_4px_0px_0px_#0f172a] hover:translate-y-1 hover:shadow-[0px_0px_0px_0px_#0f172a] disabled:hover:translate-y-0 disabled:hover:shadow-[3px_3px_0px_0px_#0f172a] sm:disabled:hover:shadow-[4px_4px_0px_0px_#0f172a] disabled:cursor-not-allowed transition-all flex-1 sm:flex-none text-[10px] sm:text-base"
@@ -337,7 +337,7 @@ export default function App() {
                   <Wind className="w-3 h-3 sm:w-4 sm:h-4" /> <span>ABRIR</span>
                 </button>
               )}
-              <button 
+              <button type="button" 
                 onClick={engine.reset}
                 className="flex items-center justify-center gap-1 sm:gap-2 px-2 py-2 sm:px-6 sm:py-2 bg-white hover:bg-slate-50 disabled:bg-slate-200 disabled:text-slate-400 text-slate-900 font-black rounded-xl border-[2px] sm:border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] sm:shadow-[4px_4px_0px_0px_#0f172a] hover:translate-y-1 hover:shadow-[0px_0px_0px_0px_#0f172a] disabled:hover:translate-y-0 disabled:hover:shadow-[3px_3px_0px_0px_#0f172a] sm:disabled:hover:shadow-[4px_4px_0px_0px_#0f172a] disabled:cursor-not-allowed transition-all flex-1 sm:flex-none text-[10px] sm:text-base"
               >

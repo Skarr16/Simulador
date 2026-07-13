@@ -53,7 +53,7 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
 
       let FdA = 0;
       if (config.enableAirResistance && yA > 0) {
-        FdA = 0.5 * env.rho * vA * vA * currentCdA * currentAreaA;
+        FdA = 0.5 * env.rho * vA * Math.abs(vA) * currentCdA * currentAreaA;
       }
       let aA = env.g - (FdA / objectA.mass);
       if (yA <= 0) {
@@ -62,7 +62,7 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
       
       let FdB = 0;
       if (config.enableAirResistance && yB > 0) {
-        FdB = 0.5 * env.rho * vB * vB * currentCdB * currentAreaB;
+        FdB = 0.5 * env.rho * vB * Math.abs(vB) * currentCdB * currentAreaB;
       }
       let aB = env.g - (FdB / objectB.mass);
       if (yB <= 0) {
@@ -74,11 +74,21 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
       });
       
       if (yA > 0) {
-        vA += aA * dt;
+        let vtA = config.enableAirResistance && currentAreaA > 0 ? Math.sqrt((2 * objectA.mass * env.g) / (env.rho * currentCdA * currentAreaA)) : Infinity;
+        if (vA > vtA && vA + aA * dt < vtA) {
+          vA = vtA;
+        } else {
+          vA += aA * dt;
+        }
         yA -= vA * dt;
       }
       if (yB > 0) {
-        vB += aB * dt;
+        let vtB = config.enableAirResistance && currentAreaB > 0 ? Math.sqrt((2 * objectB.mass * env.g) / (env.rho * currentCdB * currentAreaB)) : Infinity;
+        if (vB > vtB && vB + aB * dt < vtB) {
+          vB = vtB;
+        } else {
+          vB += aB * dt;
+        }
         yB -= vB * dt;
       }
       t += dt;
@@ -156,7 +166,7 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
     }
   };
 
-  const reset = () => {
+  const reset = () => { console.log('RESET CALLED!', new Error().stack);
     setIsRunning(false);
     setIsFinished(false);
     setTime(0);
