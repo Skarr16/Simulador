@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Play, Square, RotateCcw, Activity, Settings2, LineChart as ChartIcon, Zap, ShieldAlert, Wind, QrCode, FastForward } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Play, Square, RotateCcw, Activity, Settings2, LineChart as ChartIcon, Zap, ShieldAlert, Wind, QrCode, FastForward, Volume2, VolumeX } from 'lucide-react';
 import { SimulationCanvas } from './components/SimulationCanvas';
 import { ChartsArea } from './components/ChartsArea';
 import { EnergyDisplay } from './components/EnergyDisplay';
@@ -8,6 +8,7 @@ import { SettingsDrawer } from './components/SettingsDrawer';
 import { AdminModal } from './components/AdminModal';
 import { QrCodeModal } from './components/QrCodeModal';
 import { useEngine } from './hooks/useEngine';
+import { soundEngine } from './lib/audio';
 import { SimulationConfig } from './types';
 import { OBJECTS, ENVIRONMENTS } from './lib/constants';
 
@@ -45,6 +46,7 @@ export default function App() {
     devMode: false,
     showHeights: true,
     showGravity: false,
+    sound: false,
   });
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -57,6 +59,88 @@ export default function App() {
   const engineLivre = useEngine(configLivre, customObjects, customEnvs, speedMultiplier);
   const engineParaquedas = useEngine(configParaquedas, customObjects, customEnvs, speedMultiplier);
   const engine = simulationMode === 'livre' ? engineLivre : engineParaquedas;
+
+  const prevDeployedA = useRef(false);
+  const prevDeployedB = useRef(false);
+  const prevIsRunning = useRef(false);
+  const prevYA = useRef(configLivre.height);
+  const prevYB = useRef(configLivre.height);
+  const prevVA = useRef(0);
+  const prevVB = useRef(0);
+
+  useEffect(() => {
+    const handleGlobalClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('button')) {
+        soundEngine.playClick();
+      }
+    };
+    document.addEventListener('click', handleGlobalClick);
+    return () => document.removeEventListener('click', handleGlobalClick);
+  }, []);
+
+  useEffect(() => {
+    if (!toggles.sound) return;
+
+    // Wind Sound
+    if (engine.isRunning) {
+      if (!prevIsRunning.current) {
+        soundEngine.startWind();
+      }
+      const maxV = Math.max(engine.currentState.vA, engine.currentState.vB);
+      soundEngine.updateWind(maxV);
+    } else if (prevIsRunning.current) {
+      soundEngine.stopWind();
+    }
+    prevIsRunning.current = engine.isRunning;
+
+    // Parachute deploy
+    if (engine.currentState.parachuteDeployedA && !prevDeployedA.current) {
+      soundEngine.playParachute();
+    }
+    if (engine.currentState.parachuteDeployedB && !prevDeployedB.current) {
+      soundEngine.playParachute();
+    }
+    prevDeployedA.current = engine.currentState.parachuteDeployedA || false;
+    prevDeployedB.current = engine.currentState.parachuteDeployedB || false;
+
+    // Impact
+    if (engine.currentState.yA <= 0 && prevYA.current > 0) {
+      if (engine.objectA.id === 'skydiver') {
+        soundEngine.playWhatsapp();
+      } else {
+        soundEngine.playMetallicImpact(Math.max(prevVA.current, 10));
+      }
+    }
+    if (engine.currentState.yB <= 0 && prevYB.current > 0 && config.simulationMode !== 'paraquedas') {
+      if (engine.objectB.id === 'skydiver') {
+        soundEngine.playWhatsapp();
+      } else {
+        soundEngine.playMetallicImpact(Math.max(prevVB.current, 10));
+      }
+    }
+
+    if (engine.isFinished) {
+      soundEngine.stopWind();
+    }
+    
+    prevYA.current = engine.currentState.yA;
+    prevYB.current = engine.currentState.yB;
+    prevVA.current = engine.currentState.vA;
+    prevVB.current = engine.currentState.vB;
+  }, [engine.currentState, engine.isRunning, engine.isFinished, toggles.sound, config.simulationMode]);
+
+  useEffect(() => {
+    // Reset refs when resetting simulation
+    if (!engine.isRunning && !engine.isFinished && engine.time === 0) {
+       prevDeployedA.current = false;
+       prevDeployedB.current = false;
+       prevYA.current = engine.currentState.yA;
+       prevYB.current = engine.currentState.yB;
+       prevVA.current = 0;
+       prevVB.current = 0;
+    }
+  }, [engine.resetCount, engine.isRunning, engine.isFinished, engine.time, engine.currentState.yA, engine.currentState.yB]);
 
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
   const [tooltipTimer, setTooltipTimer] = useState<any>(null);
@@ -96,6 +180,18 @@ export default function App() {
         <div className="px-4 py-2.5 flex items-center justify-center min-h-16 h-auto overflow-visible">
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 max-w-full overflow-visible">
             
+            <button 
+              onClick={() => {
+                const nextState = !toggles.sound;
+                setToggles(prev => ({ ...prev, sound: nextState }));
+                soundEngine.toggle(nextState);
+              }}
+              className={`flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 ${toggles.sound ? 'bg-[#FF3366] text-white' : 'bg-white text-slate-900'} rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
+            >
+              {toggles.sound ? <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <VolumeX className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
+              <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider hidden sm:inline">Som</span>
+            </button>
+
             {/* Button 6: QR Code */}
             <button 
               onClick={() => setIsQrCodeOpen(true)}
@@ -297,6 +393,7 @@ export default function App() {
         setToggles={setToggles} 
         disabled={engine.isRunning} 
         customObjects={customObjects}
+        setCustomObjects={setCustomObjects}
         customEnvs={customEnvs}
       />
 

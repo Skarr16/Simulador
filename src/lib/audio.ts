@@ -1,0 +1,298 @@
+class SoundEngine {
+  private ctx: AudioContext | null = null;
+  private masterGain: GainNode | null = null;
+  public isEnabled: boolean = false;
+
+  private windNode: AudioBufferSourceNode | null = null;
+  private windGain: GainNode | null = null;
+  private windFilter: BiquadFilterNode | null = null;
+
+  private fallOsc: OscillatorNode | null = null;
+  private fallOscGain: GainNode | null = null;
+
+  private whatsappBuffer: AudioBuffer | null = null;
+
+  async init() {
+    if (this.ctx) return;
+    try {
+      this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      this.masterGain = this.ctx.createGain();
+      this.masterGain.connect(this.ctx.destination);
+      this.masterGain.gain.value = 0.5;
+      
+      // Load MP3
+      try {
+        const response = await fetch('/whatsapp.mp3');
+        const arrayBuffer = await response.arrayBuffer();
+        this.whatsappBuffer = await this.ctx.decodeAudioData(arrayBuffer);
+      } catch (e) {
+        console.error('Failed to load MP3', e);
+      }
+    } catch (e) {
+      console.error('AudioContext not supported');
+    }
+  }
+
+  toggle(enabled: boolean) {
+    this.isEnabled = enabled;
+    if (enabled && !this.ctx) {
+      this.init();
+    }
+    if (this.ctx && this.ctx.state === 'suspended' && enabled) {
+      this.ctx.resume();
+    }
+    if (!enabled && this.windNode) {
+      this.stopWind();
+    }
+  }
+
+  
+  playClick() {
+    if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(400, this.ctx.currentTime + 0.05);
+    
+    gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
+    
+    osc.connect(gain);
+    gain.connect(this.masterGain);
+    
+    osc.start();
+    osc.stop(this.ctx.currentTime + 0.05);
+  }
+
+  playSoftImpact(velocity: number) {
+    if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    
+    const bufferSize = this.ctx.sampleRate * 0.4;
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.ctx.sampleRate * 0.05));
+    }
+    
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = buffer;
+    
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(100, this.ctx.currentTime);
+    
+    const gain = this.ctx.createGain();
+    const vol = Math.min(1.0, velocity / 30) * 0.5;
+    gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+    
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.masterGain);
+    
+    noise.start();
+  }
+
+  playMetallicImpact(velocity: number) {
+    if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    
+    // Mix two oscillators for a metallic clang
+    const osc1 = this.ctx.createOscillator();
+    const osc2 = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    
+    osc1.type = 'square';
+    osc1.frequency.setValueAtTime(300, this.ctx.currentTime);
+    osc1.frequency.exponentialRampToValueAtTime(150, this.ctx.currentTime + 0.1);
+    
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(800, this.ctx.currentTime);
+    osc2.frequency.exponentialRampToValueAtTime(200, this.ctx.currentTime + 0.2);
+    
+    const vol = Math.min(1.0, velocity / 50) * 0.6;
+    gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.25);
+    
+    osc1.connect(gain);
+    osc2.connect(gain);
+    gain.connect(this.masterGain);
+    
+    osc1.start();
+    osc2.start();
+    osc1.stop(this.ctx.currentTime + 0.25);
+    osc2.stop(this.ctx.currentTime + 0.25);
+  }
+
+  playWhatsapp() {
+    if (!this.isEnabled || !this.ctx || !this.masterGain || !this.whatsappBuffer) return;
+    
+    const source = this.ctx.createBufferSource();
+    source.buffer = this.whatsappBuffer;
+    
+    const gain = this.ctx.createGain();
+    gain.gain.value = 1.0;
+    
+    source.connect(gain);
+    gain.connect(this.masterGain);
+    
+    source.start();
+  }
+
+  playImpact(velocity: number) {
+    if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    
+    // Create noise buffer for a "puhhff" thud sound
+    const bufferSize = this.ctx.sampleRate * 0.3; // 0.3 seconds
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1);
+    }
+    
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = buffer;
+    
+    // Lowpass filter to make it a "puhhff" thud instead of sharp static
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(150 + (velocity * 2), this.ctx.currentTime);
+    filter.frequency.exponentialRampToValueAtTime(50, this.ctx.currentTime + 0.2);
+    
+    const gain = this.ctx.createGain();
+    const vol = Math.min(1.0, velocity / 50) * 1.5;
+    gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+    
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.masterGain);
+    
+    noise.start();
+  }
+
+  playParachute() {
+    if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    
+    const bufferSize = this.ctx.sampleRate * 0.5; // 0.5 seconds
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.ctx.sampleRate * 0.1));
+    }
+    
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = buffer;
+    
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 1000;
+    
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.5, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.5);
+    
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.masterGain);
+    
+    noise.start();
+  }
+
+  startWind() {
+    if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    if (this.windNode) return; // Already playing
+
+    // --- Wind Noise Setup ---
+    const bufferSize = this.ctx.sampleRate * 2;
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    
+    this.windNode = this.ctx.createBufferSource();
+    this.windNode.buffer = buffer;
+    this.windNode.loop = true;
+    
+    this.windFilter = this.ctx.createBiquadFilter();
+    this.windFilter.type = 'lowpass';
+    this.windFilter.frequency.value = 400; // Will be modulated
+    
+    this.windGain = this.ctx.createGain();
+    this.windGain.gain.value = 0; // Starts at 0
+    
+    this.windNode.connect(this.windFilter);
+    this.windFilter.connect(this.windGain);
+    this.windGain.connect(this.masterGain);
+    
+    this.windNode.start();
+
+    // --- Falling Tone Setup ---
+    this.fallOsc = this.ctx.createOscillator();
+    this.fallOsc.type = 'triangle';
+    this.fallOsc.frequency.value = 800;
+    
+    this.fallOscGain = this.ctx.createGain();
+    this.fallOscGain.gain.value = 0;
+    
+    this.fallOsc.connect(this.fallOscGain);
+    this.fallOscGain.connect(this.masterGain);
+    
+    this.fallOsc.start();
+  }
+
+  updateWind(velocity: number) {
+    if (!this.isEnabled || !this.windGain || !this.ctx || !this.windFilter) return;
+    
+    // Max wind sound around 80 m/s
+    const windVol = Math.min(1.0, velocity / 80) * 0.5;
+    this.windGain.gain.setTargetAtTime(windVol, this.ctx.currentTime, 0.1);
+    
+    const windFreq = 200 + (velocity * 20);
+    this.windFilter.frequency.setTargetAtTime(Math.min(windFreq, 3000), this.ctx.currentTime, 0.1);
+
+    if (this.fallOsc && this.fallOscGain) {
+      // Cartoon falling effect: pitch goes down as velocity increases
+      const pitch = Math.max(100, 800 - (velocity * 5));
+      this.fallOsc.frequency.setTargetAtTime(pitch, this.ctx.currentTime, 0.1);
+
+      // Fade in the falling tone as velocity increases
+      const oscVol = Math.min(1.0, velocity / 100) * 0.15;
+      this.fallOscGain.gain.setTargetAtTime(oscVol, this.ctx.currentTime, 0.1);
+    }
+  }
+
+  stopWind() {
+    if (!this.ctx) return;
+    
+    if (this.windGain) {
+      this.windGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.1);
+    }
+    if (this.fallOscGain) {
+      this.fallOscGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.1);
+    }
+    
+    // Stop and clear after fade
+    setTimeout(() => {
+      if (this.windNode) {
+        try { this.windNode.stop(); } catch(e) {}
+        this.windNode = null;
+        this.windGain = null;
+        this.windFilter = null;
+      }
+      if (this.fallOsc) {
+        try { this.fallOsc.stop(); } catch(e) {}
+        this.fallOsc = null;
+        this.fallOscGain = null;
+      }
+    }, 200);
+  }
+}
+
+export const soundEngine = new SoundEngine();

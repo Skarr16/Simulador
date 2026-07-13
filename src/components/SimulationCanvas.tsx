@@ -421,7 +421,7 @@ export function SimulationCanvas({
                         </div>
                       )}
                       {/* Bottom Vectors (Velocity & Weight) */}
-                      <div className="absolute top-[100%] left-1/2 -translate-x-1/2 mt-1 flex flex-row gap-3 pointer-events-none z-30">
+                      <div className="absolute top-[100%] left-1/2 -translate-x-1/2 mt-1 flex flex-row gap-8 sm:gap-12 pointer-events-none z-30">
                         {vA > 0 && (
                             <div className="flex flex-col items-center text-[#0055FF]">
                                 <div className="w-1 sm:w-1.5 bg-[#0055FF] relative" style={{ height: 15 + getVelScale(vA) }}>
@@ -430,11 +430,11 @@ export function SimulationCanvas({
                                 <span className="text-[10px] font-black bg-white/80 px-1 rounded mt-3 shadow-sm border border-slate-200 text-center whitespace-nowrap">v: {vA.toFixed(1)} m/s</span>
                             </div>
                         )}
-                        <div className="flex flex-col items-center text-slate-900">
-                           <div className="w-1 sm:w-1.5 bg-slate-900 relative" style={{ height: 15 + Math.min(P_A, 50) }}>
-                             <div className="absolute -bottom-[7px] sm:-bottom-2 left-1/2 -translate-x-1/2 border-l-[5px] sm:border-l-[8px] border-r-[5px] sm:border-r-[8px] border-t-[7px] sm:border-t-[10px] border-x-transparent border-t-slate-900"></div>
+                        <div className={`flex flex-col items-center ${env.id === 'moon' ? 'text-white' : 'text-slate-900'}`}>
+                           <div className={`w-1 sm:w-1.5 ${env.id === 'moon' ? 'bg-white' : 'bg-slate-900'} relative`} style={{ height: 15 + Math.min(P_A, 50) }}>
+                             <div className={`absolute -bottom-[7px] sm:-bottom-2 left-1/2 -translate-x-1/2 border-l-[5px] sm:border-l-[8px] border-r-[5px] sm:border-r-[8px] border-t-[7px] sm:border-t-[10px] border-x-transparent ${env.id === 'moon' ? 'border-t-white' : 'border-t-slate-900'}`}></div>
                            </div>
-                           <span className="text-[10px] font-black bg-white/80 px-1 rounded mt-3 shadow-sm border border-slate-200 text-center whitespace-nowrap">P: {P_A.toFixed(3)} N</span>
+                           <span className="text-[10px] font-black bg-white/80 px-1 rounded mt-3 shadow-sm border border-slate-200 text-slate-900 text-center whitespace-nowrap">P: {P_A.toFixed(3)} N</span>
                         </div>
                       </div>
                     </>
@@ -468,7 +468,7 @@ export function SimulationCanvas({
                     </div>
                   )}
                   {/* Bottom Vectors (Velocity & Weight) */}
-                  <div className="absolute top-[100%] left-1/2 -translate-x-1/2 mt-1 flex flex-row gap-3 pointer-events-none z-30">
+                  <div className="absolute top-[100%] left-1/2 -translate-x-1/2 mt-1 flex flex-row gap-8 sm:gap-12 pointer-events-none z-30">
                     {vB > 0 && (
                         <div className="flex flex-col items-center text-[#0055FF]">
                             <div className="w-1 sm:w-1.5 bg-[#0055FF] relative" style={{ height: 15 + getVelScale(vB) }}>
@@ -477,11 +477,11 @@ export function SimulationCanvas({
                             <span className="text-[10px] font-black bg-white/80 px-1 rounded mt-3 shadow-sm border border-slate-200 text-center whitespace-nowrap">v: {vB.toFixed(1)} m/s</span>
                         </div>
                     )}
-                    <div className="flex flex-col items-center text-slate-900">
-                       <div className="w-1 sm:w-1.5 bg-slate-900 relative" style={{ height: 15 + Math.min(P_B, 50) }}>
-                         <div className="absolute -bottom-[7px] sm:-bottom-2 left-1/2 -translate-x-1/2 border-l-[5px] sm:border-l-[8px] border-r-[5px] sm:border-r-[8px] border-t-[7px] sm:border-t-[10px] border-x-transparent border-t-slate-900"></div>
+                    <div className={`flex flex-col items-center ${env.id === 'moon' ? 'text-white' : 'text-slate-900'}`}>
+                       <div className={`w-1 sm:w-1.5 ${env.id === 'moon' ? 'bg-white' : 'bg-slate-900'} relative`} style={{ height: 15 + Math.min(P_B, 50) }}>
+                         <div className={`absolute -bottom-[7px] sm:-bottom-2 left-1/2 -translate-x-1/2 border-l-[5px] sm:border-l-[8px] border-r-[5px] sm:border-r-[8px] border-t-[7px] sm:border-t-[10px] border-x-transparent ${env.id === 'moon' ? 'border-t-white' : 'border-t-slate-900'}`}></div>
                        </div>
-                       <span className="text-[10px] font-black bg-white/80 px-1 rounded mt-3 shadow-sm border border-slate-200 text-center whitespace-nowrap">P: {P_B.toFixed(3)} N</span>
+                       <span className="text-[10px] font-black bg-white/80 px-1 rounded mt-3 shadow-sm border border-slate-200 text-slate-900 text-center whitespace-nowrap">P: {P_B.toFixed(3)} N</span>
                     </div>
                   </div>
                 </>

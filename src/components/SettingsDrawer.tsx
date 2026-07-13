@@ -12,10 +12,11 @@ interface SettingsDrawerProps {
   setToggles: (toggles: { vectors: boolean; graphs: boolean; table: boolean; devMode: boolean; showHeights: boolean; showGravity: boolean; }) => void;
   disabled: boolean;
   customObjects: Record<string, PhysicsObject>;
+  setCustomObjects: (objects: Record<string, PhysicsObject>) => void;
   customEnvs: Record<string, Environment>;
 }
 
-export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, setToggles, disabled, customObjects, customEnvs }: SettingsDrawerProps) {
+export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, setToggles, disabled, customObjects, setCustomObjects, customEnvs }: SettingsDrawerProps) {
   const handleStructureChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const structureId = e.target.value;
     const structure = STRUCTURES[structureId];
@@ -184,6 +185,78 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                     <option key={obj.id} value={obj.id}>{obj.name} ({obj.mass}kg)</option>
                   ))}
                 </select>
+                {config.objectAId === 'skydiver' && (
+                   <div className="mt-3 p-3 bg-slate-50 border-2 border-slate-200 rounded-lg space-y-3">
+                      <div className="flex gap-3">
+                        <div className="flex-1">
+                          <label className="block text-[10px] font-bold text-slate-700 mb-1 uppercase">Massa da Pessoa</label>
+                          <div className="flex items-center gap-2">
+                             <input 
+                                type="number"
+                                min="1"
+                                value={customObjects.skydiver.personMass || ''}
+                                onChange={(e) => {
+                                  const pMass = parseFloat(e.target.value) || 0;
+                                  const eMass = customObjects.skydiver.equipmentMass || 0;
+                                  setCustomObjects({ ...customObjects, skydiver: { ...customObjects.skydiver, personMass: pMass, mass: pMass + eMass }})
+                                }}
+                                disabled={disabled}
+                                className="w-full p-1.5 border-2 border-slate-300 rounded font-mono text-sm outline-none focus:border-[#FF3366] disabled:opacity-50"
+                             />
+                             <span className="text-xs font-black text-slate-500">kg</span>
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <label className="block text-[10px] font-bold text-slate-700 mb-1 uppercase">Massa do Equip.</label>
+                          <div className="flex items-center gap-2">
+                             <input 
+                                type="number"
+                                min="0"
+                                value={customObjects.skydiver.equipmentMass || ''}
+                                onChange={(e) => {
+                                  const eMass = parseFloat(e.target.value) || 0;
+                                  const pMass = customObjects.skydiver.personMass || 0;
+                                  setCustomObjects({ ...customObjects, skydiver: { ...customObjects.skydiver, equipmentMass: eMass, mass: pMass + eMass }})
+                                }}
+                                disabled={disabled}
+                                className="w-full p-1.5 border-2 border-slate-300 rounded font-mono text-sm outline-none focus:border-[#FF3366] disabled:opacity-50"
+                             />
+                             <span className="text-xs font-black text-slate-500">kg</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-700 mb-1 uppercase">Área do Corpo (Queda Livre)</label>
+                        <div className="flex items-center gap-2">
+                           <input 
+                              type="number"
+                              step="0.1"
+                              min="0.1"
+                              value={customObjects.skydiver.area || ''}
+                              onChange={(e) => setCustomObjects({ ...customObjects, skydiver: { ...customObjects.skydiver, area: parseFloat(e.target.value) || 0 }})}
+                              disabled={disabled}
+                              className="w-full p-1.5 border-2 border-slate-300 rounded font-mono text-sm outline-none focus:border-[#FF3366] disabled:opacity-50"
+                           />
+                           <span className="text-xs font-black text-slate-500">m²</span>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-700 mb-1 uppercase">Área do Paraquedas (Aberto)</label>
+                        <div className="flex items-center gap-2">
+                           <input 
+                              type="number"
+                              step="0.1"
+                              min="0.1"
+                              value={customObjects.skydiver.parachuteArea || ''}
+                              onChange={(e) => setCustomObjects({ ...customObjects, skydiver: { ...customObjects.skydiver, parachuteArea: parseFloat(e.target.value) || 0 }})}
+                              disabled={disabled}
+                              className="w-full p-1.5 border-2 border-slate-300 rounded font-mono text-sm outline-none focus:border-[#FF3366] disabled:opacity-50"
+                           />
+                           <span className="text-xs font-black text-slate-500">m²</span>
+                        </div>
+                      </div>
+                   </div>
+                )}
               </div>
 
               {config.simulationMode !== 'paraquedas' && (
@@ -201,6 +274,78 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                       <option key={obj.id} value={obj.id}>{obj.name} ({obj.mass}kg)</option>
                     ))}
                   </select>
+                  {config.objectBId === 'skydiver' && (
+                     <div className="mt-3 p-3 bg-slate-50 border-2 border-slate-200 rounded-lg space-y-3">
+                        <div className="flex gap-3">
+                          <div className="flex-1">
+                            <label className="block text-[10px] font-bold text-slate-700 mb-1 uppercase">Massa da Pessoa</label>
+                            <div className="flex items-center gap-2">
+                               <input 
+                                  type="number"
+                                  min="1"
+                                  value={customObjects.skydiver.personMass || ''}
+                                  onChange={(e) => {
+                                    const pMass = parseFloat(e.target.value) || 0;
+                                    const eMass = customObjects.skydiver.equipmentMass || 0;
+                                    setCustomObjects({ ...customObjects, skydiver: { ...customObjects.skydiver, personMass: pMass, mass: pMass + eMass }})
+                                  }}
+                                  disabled={disabled}
+                                  className="w-full p-1.5 border-2 border-slate-300 rounded font-mono text-sm outline-none focus:border-[#0055FF] disabled:opacity-50"
+                               />
+                               <span className="text-xs font-black text-slate-500">kg</span>
+                            </div>
+                          </div>
+                          <div className="flex-1">
+                            <label className="block text-[10px] font-bold text-slate-700 mb-1 uppercase">Massa do Equip.</label>
+                            <div className="flex items-center gap-2">
+                               <input 
+                                  type="number"
+                                  min="0"
+                                  value={customObjects.skydiver.equipmentMass || ''}
+                                  onChange={(e) => {
+                                    const eMass = parseFloat(e.target.value) || 0;
+                                    const pMass = customObjects.skydiver.personMass || 0;
+                                    setCustomObjects({ ...customObjects, skydiver: { ...customObjects.skydiver, equipmentMass: eMass, mass: pMass + eMass }})
+                                  }}
+                                  disabled={disabled}
+                                  className="w-full p-1.5 border-2 border-slate-300 rounded font-mono text-sm outline-none focus:border-[#0055FF] disabled:opacity-50"
+                               />
+                               <span className="text-xs font-black text-slate-500">kg</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-700 mb-1 uppercase">Área do Corpo (Queda Livre)</label>
+                          <div className="flex items-center gap-2">
+                             <input 
+                                type="number"
+                                step="0.1"
+                                min="0.1"
+                                value={customObjects.skydiver.area || ''}
+                                onChange={(e) => setCustomObjects({ ...customObjects, skydiver: { ...customObjects.skydiver, area: parseFloat(e.target.value) || 0 }})}
+                                disabled={disabled}
+                                className="w-full p-1.5 border-2 border-slate-300 rounded font-mono text-sm outline-none focus:border-[#0055FF] disabled:opacity-50"
+                             />
+                             <span className="text-xs font-black text-slate-500">m²</span>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-700 mb-1 uppercase">Área do Paraquedas (Aberto)</label>
+                          <div className="flex items-center gap-2">
+                             <input 
+                                type="number"
+                                step="0.1"
+                                min="0.1"
+                                value={customObjects.skydiver.parachuteArea || ''}
+                                onChange={(e) => setCustomObjects({ ...customObjects, skydiver: { ...customObjects.skydiver, parachuteArea: parseFloat(e.target.value) || 0 }})}
+                                disabled={disabled}
+                                className="w-full p-1.5 border-2 border-slate-300 rounded font-mono text-sm outline-none focus:border-[#0055FF] disabled:opacity-50"
+                             />
+                             <span className="text-xs font-black text-slate-500">m²</span>
+                          </div>
+                        </div>
+                     </div>
+                  )}
                 </div>
               )}
             </div>

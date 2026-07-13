@@ -7,6 +7,10 @@ export interface PhysicsObject {
   color: string;
   radius: number; // visual relative size
   image?: string;
+  parachuteArea?: number; // m^2
+  parachuteCd?: number;
+  personMass?: number;
+  equipmentMass?: number;
 }
 
 export interface Environment {
