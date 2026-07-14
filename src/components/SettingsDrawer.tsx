@@ -32,12 +32,12 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
     <>
       {/* Backdrop */}
       <div 
-        className={`fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[60] transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[200] transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         onClick={onClose}
       />
       
       {/* Drawer */}
-      <div className={`fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white border-l-[3px] border-slate-900 shadow-[-8px_0px_0px_0px_rgba(15,23,42,0.1)] z-[70] transform transition-transform duration-300 ease-in-out flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className={`fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white border-l-[3px] border-slate-900 shadow-[-8px_0px_0px_0px_rgba(15,23,42,0.1)] z-[210] transform transition-transform duration-300 ease-in-out flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         
         <div className="flex items-center justify-between p-6 border-b-[3px] border-slate-900 bg-[#FFB800]">
           <div className="flex items-center gap-3">

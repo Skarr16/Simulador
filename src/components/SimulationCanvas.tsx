@@ -210,8 +210,8 @@ export function SimulationCanvas({
 
       {/* Gravity Indicator */}
       {showGravity && (
-        <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-[60] bg-white border-[3px] border-slate-900 rounded-xl p-2 sm:p-3 shadow-[4px_4px_0px_0px_#0f172a] flex flex-col items-center justify-center">
-          <span className="text-[10px] sm:text-xs font-black uppercase text-slate-500 mb-1">Gravidade</span>
+        <div className="absolute top-4 left-4 sm:left-6 sm:top-6 md:top-16 md:left-[60px] z-[60] bg-white border-[3px] border-slate-900 rounded-xl px-2 py-1 sm:px-3 sm:py-1.5 shadow-[4px_4px_0px_0px_#0f172a] flex flex-col items-center justify-center leading-none">
+          <span className="text-[10px] sm:text-xs font-black uppercase text-slate-500">Gravidade</span>
           <span className="text-sm sm:text-lg font-black text-slate-900 tabular-nums leading-none">
             {env.g.toFixed(2)} <span className="text-xs sm:text-sm font-bold ml-0.5 text-slate-700">m/s²</span>
           </span>
@@ -240,7 +240,7 @@ export function SimulationCanvas({
       </div>
 
       {/* Ground */}
-      <div className={`absolute bottom-0 left-0 right-0 h-[10%] border-t-[3px] border-slate-900 z-30 flex items-center justify-center ${env.id === 'moon' ? 'bg-[#64748b]' : env.id === 'custom' ? 'bg-[#95290f]' : 'bg-[#00C48C]'}`}>
+      <div className={`absolute bottom-0 left-0 right-0 h-[10%] border-t-[3px] border-b-[4px] sm:border-b-0 border-slate-900 z-30 flex items-center justify-center ${env.id === 'moon' ? 'bg-[#64748b]' : env.id === 'custom' ? 'bg-[#95290f]' : 'bg-[#00C48C]'}`}>
         <button 
           onClick={onToggleEnv}
           className="text-slate-900 font-black text-sm uppercase tracking-widest bg-white/80 px-4 py-1 rounded-full border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a] hover:bg-white active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_#0f172a] transition-all z-10"
@@ -346,7 +346,7 @@ export function SimulationCanvas({
                </div>
              );
           } else if (obj.id === 'skydiver') {
-             let transformClass = "translate-y-0 scale-[1.0] md:scale-[0.9] lg:scale-[0.9] origin-bottom";
+             let transformClass = "translate-y-0 scale-[1.0] md:scale-[0.9] md:scale-[0.9] origin-bottom";
              const isGround = currentY <= 0;
              const isPara = parachuteDeployed && !isGround;
              const isFallingState = !isGround && !isPara;
@@ -358,7 +358,7 @@ export function SimulationCanvas({
                </div>
              );
           } else if (obj.id === 'astronaut') {
-             let transformClass = "translate-y-0 scale-[1.3] md:scale-[1.15] lg:scale-[1.15] origin-bottom";
+             let transformClass = "translate-y-0 scale-[1.3] md:scale-[1.15] md:scale-[1.15] origin-bottom";
              content = (
                <div className={`w-full h-full relative flex items-center justify-center drop-shadow-md ${transformClass}`}>
                   <img src="/objetos/astronauta/astronalta no chão.png" className={`absolute inset-0 w-full h-full object-contain object-bottom transition-opacity duration-150 ${currentY <= 0 ? 'opacity-100' : 'opacity-0'}`} />
@@ -366,7 +366,7 @@ export function SimulationCanvas({
                </div>
              );
           } else if (obj.id === 'et') {
-             let transformClass = "translate-y-4 md:translate-y-5 lg:translate-y-6 scale-[1.3] md:scale-[1.15] lg:scale-[1.15] origin-bottom";
+             let transformClass = "translate-y-4 md:translate-y-5 md:translate-y-6 scale-[1.3] md:scale-[1.15] md:scale-[1.15] origin-bottom";
              content = (
                <div className={`w-full h-full relative flex items-center justify-center drop-shadow-md ${transformClass}`}>
                   <img src="/objetos/et/et_no_chao.png" className={`absolute inset-0 w-full h-full object-contain object-bottom transition-opacity duration-150 ${currentY <= 0 ? 'opacity-100' : 'opacity-0'}`} />
@@ -416,7 +416,7 @@ export function SimulationCanvas({
                 } ${
                   objectA.id === 'astronaut' || objectA.id === 'et'
                     ? 'w-[160px] h-[65px] md:w-[220px] md:h-[90px]' 
-                    : 'w-[200px] h-[80px] md:w-[280px] md:h-[110px] lg:w-[350px] lg:h-[140px]'
+                    : 'w-[200px] h-[80px] md:w-[280px] md:h-[110px] md:w-[350px] md:h-[140px]'
                 }`}
                 style={{ bottom: `${groundOffset + canvasHeightPercent + 15}%`, left: '50%' }}
               >

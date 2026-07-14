@@ -271,7 +271,7 @@ export default function App() {
     <div className="h-screen flex flex-col bg-[#F4F1EB] text-slate-900 font-sans selection:bg-blue-200 relative overflow-hidden">
       
       {/* Header */}
-      <header className={`bg-white border-b-[3px] border-slate-900 shadow-sm z-[100] flex-shrink-0 overflow-visible transition-transform duration-300 absolute top-0 left-0 right-0 lg:relative ${isHeaderVisible ? 'translate-y-0' : '-translate-y-full'}`}>
+      <header className={`bg-white border-b-[3px] border-slate-900 shadow-sm z-[100] flex-shrink-0 overflow-visible transition-transform duration-300 absolute top-0 left-0 right-0 md:relative ${isHeaderVisible ? 'translate-y-0' : '-translate-y-full md:translate-y-0'}`}>
         <div className="px-4 py-2.5 flex items-center justify-center min-h-16 h-auto overflow-visible">
           <div className="grid grid-cols-3 sm:flex sm:flex-wrap items-center justify-center gap-2 sm:gap-4 w-full">
             
@@ -343,13 +343,18 @@ export default function App() {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col lg:flex-row relative z-10 overflow-hidden" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onWheel={handleWheel}>
+      <main className="flex-1 flex flex-col md:flex-row relative z-10 overflow-y-auto overflow-x-hidden md:overflow-hidden" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onWheel={handleWheel}>
         
         {/* Canvas Area (Takes max space) */}
-        <div className="w-full h-full lg:h-auto lg:flex-1 flex flex-col relative shrink-0 lg:shrink">
-          <div className="lg:absolute lg:inset-4 flex flex-col pointer-events-none h-full w-full lg:h-auto lg:w-auto">
+        <div className="w-full flex-1 min-h-[500px] md:min-h-0 flex flex-col relative md:shrink md:p-0">
+          <div className="flex-1 flex flex-col pointer-events-none md:p-4">
             {/* We make SimulationCanvas accept full width/height of this wrapper */}
-            <div className="w-full h-[100dvh] sm:h-[550px] lg:h-auto lg:flex-1 pointer-events-auto flex lg:rounded-2xl lg:shadow-[6px_6px_0px_0px_#0f172a] lg:border-[3px] lg:border-slate-900 overflow-hidden bg-white">
+            <div className="w-full flex-1 pointer-events-auto flex relative md:rounded-2xl md:shadow-[6px_6px_0px_0px_#0f172a] border-b-[4px] border-slate-900 md:border-[3px] overflow-hidden bg-white">
+              
+              {/* Mode Indicator */}
+              <div className={`absolute left-1/2 -translate-x-1/2 md:left-4 md:translate-x-0 bg-white/95 px-4 py-1.5 rounded-full border-2 border-slate-900 font-black text-sm text-slate-800 shadow-[2px_2px_0px_0px_#0f172a] z-20 whitespace-nowrap pointer-events-none top-4`}>
+                {simulationMode === 'paraquedas' ? 'MODO: QUEDA LIVRE' : 'MODO: QUEDA SIMULTÂNEA'}
+              </div>
               <SimulationCanvas 
                 height={config.height} 
                 structureId={config.structureId}
@@ -413,7 +418,7 @@ export default function App() {
             </div>
 
             {/* Playback Controls (Floating) */}
-            <div className={`absolute bottom-4 left-4 right-4 z-50 lg:static lg:mt-4 pointer-events-auto bg-white p-3 sm:p-4 rounded-2xl shadow-[6px_6px_0px_0px_#0f172a] border-[3px] border-slate-900 grid grid-cols-2 sm:flex sm:flex-row items-center justify-center gap-2 sm:gap-4 shrink-0 transition-transform duration-300 ${isHeaderVisible ? 'translate-y-0' : 'translate-y-[150%] lg:translate-y-0'}`}>
+            <div className={`mt-2 mb-4 mx-2 sm:mx-4 z-50 md:m-0 md:static md:mt-4 pointer-events-auto bg-white p-2 sm:p-3 rounded-2xl shadow-[4px_4px_0px_0px_#0f172a] md:shadow-[6px_6px_0px_0px_#0f172a] border-[3px] border-slate-900 grid grid-cols-2 sm:flex sm:flex-row items-center justify-center gap-2 sm:gap-4 shrink-0`}>
               <button type="button" 
                 onClick={engine.start}
                 disabled={engine.isRunning}
@@ -453,7 +458,7 @@ export default function App() {
 
         {/* Dynamic Data Panels (Optional Sidebar) */}
         {(toggles.graphs || toggles.table) && (
-          <div className="w-full lg:w-[450px] p-4 flex flex-col gap-6 overflow-visible lg:overflow-y-auto shrink-0 border-t-[3px] lg:border-t-0 lg:border-l-[3px] border-slate-900 bg-[#F4F1EB] z-20">
+          <div className="w-full md:w-[350px] lg:w-[450px] p-4 flex flex-col gap-6 overflow-visible md:overflow-y-auto shrink-0 border-t-[3px] md:border-t-0 md:border-l-[3px] border-slate-900 bg-[#F4F1EB] z-20">
                         {toggles.graphs && (
               <div className="animate-in fade-in slide-in-from-right-4 duration-300 flex-1 min-h-[300px]">
                 <ChartsArea data={engine.dataPoints} simulationMode={simulationMode} />
