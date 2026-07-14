@@ -28,7 +28,7 @@ interface SimulationCanvasProps {
 }
 
 export function SimulationCanvas({ 
-  height, structureId, resetCount, yA, yB, vA, vB, FdA, FdB, objectA, objectB, env, showVectors, showHeights, showGravity, devMode, parachuteDeployedA, parachuteDeployedB, simulationMode, speedMultiplier = 1, onSpeedChange, onToggleEnv 
+  height, structureId, resetCount, yA, yB, vA, vB, FdA, FdB, objectA, objectB, env, showVectors, showHeights, showGravity, devMode, parachuteDeployedA, parachuteDeployedB, simulationMode, speedMultiplier = 1, onSpeedChange, onToggleEnv, maxVA = 0, maxVB = 0
 }: SimulationCanvasProps) {
 
   const [scaleFactor, setScaleFactor] = useState(1);
@@ -205,7 +205,6 @@ export function SimulationCanvas({
       )}
 
       {/* Imaginary X-axis at y=0 */}
-      <div className="absolute left-0 right-0 border-t-2 border-dashed border-slate-900/40 z-20 pointer-events-none" style={{ bottom: '10%' }}></div>
 
       {/* Gravity Indicator */}
       {showGravity && (
@@ -325,12 +324,13 @@ export function SimulationCanvas({
       {(() => {
         const renderObject = (obj: PhysicsObject, letter: string, isFalling: boolean, parachuteDeployed?: boolean) => {
           let content = null;
+          const currentY = letter === 'A' ? yA : yB;
           if (obj.image) {
              let extraClass = '';
              let sizeClass = 'w-full h-full scale-[1.2] origin-bottom'; // Base scale for images
              if (obj.id === 'paper_flat') {
                 extraClass = isFalling ? 'animate-[wiggle_0.5s_ease-in-out_infinite] translate-y-4' : 'translate-y-4';
-             } else if (obj.id === 'custom') {
+             } else if (obj.id.startsWith('custom')) {
                 extraClass = isFalling ? 'translate-y-4' : 'translate-y-4';
              } else if (obj.id === 'book') {
                 extraClass = isFalling ? '-rotate-12 translate-y-4' : 'translate-y-4';
@@ -344,7 +344,6 @@ export function SimulationCanvas({
                </div>
              );
           } else if (obj.id === 'skydiver') {
-             const currentY = letter === 'A' ? yA : yB;
              let imgSrc = "/paraquedas/boneco caindo (1).png";
              let transformClass = "translate-y-0 scale-[1.0] md:scale-[0.9] lg:scale-[0.9] origin-bottom"; // Falling without parachute
              if (currentY <= 0) {
@@ -360,7 +359,6 @@ export function SimulationCanvas({
                </div>
              );
           } else if (obj.id === 'astronaut') {
-             const currentY = letter === 'A' ? yA : yB;
              let transformClass = "translate-y-0 scale-[1.3] md:scale-[1.15] lg:scale-[1.15] origin-bottom";
              content = (
                <div className={`w-full h-full relative flex items-center justify-center drop-shadow-md ${transformClass}`}>
@@ -389,6 +387,7 @@ export function SimulationCanvas({
                  <div className="font-black border-b border-slate-700 pb-1 mb-1">{obj.name}</div>
                  <div>Massa: {obj.mass.toFixed(3)} kg</div>
                  <div>Velocidade: {currentV.toFixed(1)} m/s</div>
+                 {(currentY <= 0 && currentV === 0) && <div>Velocidade Máx: {(letter === 'A' ? maxVA : maxVB).toFixed(1)} m/s</div>}
                  <div>Área: {parachuteDeployed && obj.id === 'skydiver' ? (obj.area + 5).toFixed(2) : obj.area} m²</div>
                  <div>Cd: {parachuteDeployed && obj.id === 'skydiver' ? '1.75' : obj.cd}</div>
                </div>

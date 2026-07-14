@@ -1,1 +1,16 @@
 @import "tailwindcss";
+
+@theme {
+  --animate-alert-blink: alert-blink 0.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  
+  @keyframes alert-blink {
+    0%, 100% {
+      background-color: #ef4444;
+      transform: scale(1);
+    }
+    50% {
+      background-color: #facc15;
+      transform: scale(1.05);
+    }
+  }
+}

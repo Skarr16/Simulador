@@ -8,6 +8,7 @@ import { SettingsDrawer } from './components/SettingsDrawer';
 import { AdminModal } from './components/AdminModal';
 import { QrCodeModal } from './components/QrCodeModal';
 import { TutorialModal } from './components/TutorialModal';
+import { FailModal } from './components/FailModal';
 import { BookOpen } from 'lucide-react';
 import { useEngine } from './hooks/useEngine';
 import { soundEngine } from './lib/audio';
@@ -49,6 +50,7 @@ export default function App() {
     showHeights: true,
     showGravity: false,
     sound: false,
+    crashAlert: true,
   });
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -70,6 +72,9 @@ export default function App() {
   const prevYB = useRef(configLivre.height);
   const prevVA = useRef(0);
   const prevVB = useRef(0);
+  const [failMessage, setFailMessage] = useState<string | null>(null);
+  const prevDeployedAForCrash = useRef(false);
+  const prevDeployedBForCrash = useRef(false);
 
   useEffect(() => {
     const handleGlobalClick = (e: MouseEvent) => {
@@ -111,6 +116,10 @@ export default function App() {
     if (engine.currentState.yA <= 0 && prevYA.current > 0) {
       if (engine.objectA.id === 'skydiver') {
         soundEngine.playWhatsapp();
+      } else if (['customA', 'customB', 'book', 'soccer'].includes(engine.objectA.id)) {
+        soundEngine.playImpact(Math.max(prevVA.current, 10));
+      } else if (['paper_crumpled', 'paper_flat', 'feather'].includes(engine.objectA.id)) {
+        soundEngine.playSoftImpact(Math.max(prevVA.current, 10));
       } else {
         soundEngine.playMetallicImpact(Math.max(prevVA.current, 10));
       }
@@ -118,6 +127,10 @@ export default function App() {
     if (engine.currentState.yB <= 0 && prevYB.current > 0 && config.simulationMode !== 'paraquedas') {
       if (engine.objectB.id === 'skydiver') {
         soundEngine.playWhatsapp();
+      } else if (['customA', 'customB', 'book', 'soccer'].includes(engine.objectB.id)) {
+        soundEngine.playImpact(Math.max(prevVB.current, 10));
+      } else if (['paper_crumpled', 'paper_flat', 'feather'].includes(engine.objectB.id)) {
+        soundEngine.playSoftImpact(Math.max(prevVB.current, 10));
       } else {
         soundEngine.playMetallicImpact(Math.max(prevVB.current, 10));
       }
@@ -133,11 +146,37 @@ export default function App() {
     prevVB.current = engine.currentState.vB;
   }, [engine.currentState, engine.isRunning, engine.isFinished, toggles.sound, config.simulationMode]);
 
+  
+  useEffect(() => {
+    if (config.simulationMode === 'paraquedas' && engine.isRunning) {
+      const currentState = engine.currentState;
+      const isSkydiverA = config.objectAId === 'skydiver';
+      const isSkydiverB = config.objectBId === 'skydiver';
+      
+      let failed = false;
+      
+      // Check altitude < 600m without parachute
+      if (isSkydiverA && currentState.yA > 0 && currentState.yA < 600 && !currentState.parachuteDeployedA) {
+        failed = true;
+      }
+      if (isSkydiverB && currentState.yB > 0 && currentState.yB < 600 && !currentState.parachuteDeployedB) {
+        failed = true;
+      }
+      
+      if (failed && toggles.crashAlert) {
+        engine.pause();
+        setFailMessage('Acho que o seu paraquedista quis virar um mergulhador, mas sem água!😅 Tente novamente e acione o paraquedas a tempo');
+      }
+    }
+  }, [engine.currentState, engine.isRunning, config.simulationMode, config.environmentId, engine.objectA, engine.objectB, engine.env]);
+
   useEffect(() => {
     // Reset refs when resetting simulation
     if (!engine.isRunning && !engine.isFinished && engine.time === 0) {
        prevDeployedA.current = false;
        prevDeployedB.current = false;
+       prevDeployedAForCrash.current = false;
+       prevDeployedBForCrash.current = false;
        prevYA.current = engine.currentState.yA;
        prevYB.current = engine.currentState.yB;
        prevVA.current = 0;
@@ -174,6 +213,9 @@ export default function App() {
       if (tooltipTimer) window.clearTimeout(tooltipTimer);
     };
   }, [tooltipTimer]);
+
+  const maxVA = engine.dataPoints.length > 0 ? Math.max(0, ...engine.dataPoints.map(dp => Math.abs(dp.vA))) : 0;
+  const maxVB = engine.dataPoints.length > 0 ? Math.max(0, ...engine.dataPoints.map(dp => Math.abs(dp.vB))) : 0;
 
   return (
     <div className="h-screen flex flex-col bg-[#F4F1EB] text-slate-900 font-sans selection:bg-blue-200 relative overflow-hidden">
@@ -261,6 +303,8 @@ export default function App() {
               <SimulationCanvas 
                 height={config.height} 
                 structureId={config.structureId}
+                maxVA={maxVA}
+                maxVB={maxVB}
                 resetCount={engine.resetCount}
                 yA={engine.currentState.yA}
                 yB={engine.currentState.yB}
@@ -332,7 +376,7 @@ export default function App() {
                 <button type="button" 
                   onClick={engine.deployParachute}
                   disabled={!engine.isRunning || engine.currentState.parachuteDeployedA || engine.isFinished}
-                  className="flex items-center justify-center gap-1 sm:gap-2 px-2 py-2 sm:px-6 sm:py-2 bg-[#FF3366] hover:bg-[#e62e5c] disabled:bg-slate-200 disabled:text-slate-400 text-white disabled:text-slate-400 font-black rounded-xl border-[2px] sm:border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] sm:shadow-[4px_4px_0px_0px_#0f172a] hover:translate-y-1 hover:shadow-[0px_0px_0px_0px_#0f172a] disabled:hover:translate-y-0 disabled:hover:shadow-[3px_3px_0px_0px_#0f172a] sm:disabled:hover:shadow-[4px_4px_0px_0px_#0f172a] disabled:cursor-not-allowed transition-all flex-1 sm:flex-none text-[10px] sm:text-base"
+                  className={`flex items-center justify-center gap-1 sm:gap-2 px-2 py-2 sm:px-6 sm:py-2 hover:bg-[#e62e5c] disabled:bg-slate-200 disabled:text-slate-400 text-white font-black rounded-xl border-[2px] sm:border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] sm:shadow-[4px_4px_0px_0px_#0f172a] hover:translate-y-1 hover:shadow-[0px_0px_0px_0px_#0f172a] disabled:hover:translate-y-0 disabled:hover:shadow-[3px_3px_0px_0px_#0f172a] sm:disabled:hover:shadow-[4px_4px_0px_0px_#0f172a] disabled:cursor-not-allowed transition-all flex-1 sm:flex-none text-[10px] sm:text-base ${(engine.currentState.yA <= 2000 && engine.currentState.yA > 600 && !engine.currentState.parachuteDeployedA && engine.isRunning) ? 'bg-red-600 animate-alert-blink' : 'bg-[#FF3366]'}`}
                 >
                   <Wind className="w-3 h-3 sm:w-4 sm:h-4" /> <span>ABRIR</span>
                 </button>
@@ -404,6 +448,14 @@ export default function App() {
       <QrCodeModal 
         isOpen={isQrCodeOpen}
         onClose={() => setIsQrCodeOpen(false)}
+      />
+      <FailModal 
+        isOpen={!!failMessage} 
+        message={failMessage} 
+        onRestart={() => {
+          setFailMessage(null);
+          engine.reset();
+        }} 
       />
     </div>
   );

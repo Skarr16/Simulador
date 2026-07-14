@@ -12,7 +12,7 @@ interface DataTableProps {
 
 export function DataTable({ dataPoints, initialHeight, objectA, objectB, simulationMode }: DataTableProps) {
   const [selectedObject, setSelectedObject] = useState<'A' | 'B'>('A');
-  const [intervalOption, setIntervalOption] = useState<number>(0.67); // in seconds
+  const [intervalOption, setIntervalOption] = useState<number>(1.0); // in seconds
 
   // Dynamically sample current simulation data
   const sampledData = useMemo(() => {
@@ -170,8 +170,8 @@ export function DataTable({ dataPoints, initialHeight, objectA, objectB, simulat
           >
             <option value={0.2}>0.2s</option>
             <option value={0.5}>0.5s</option>
-            <option value={0.67}>0.67s (Padrão)</option>
-            <option value={1.0}>1.0s</option>
+            <option value={0.67}>0.67s</option>
+            <option value={1.0}>1.0s (Padrão)</option>
             <option value={2.0}>2.0s</option>
           </select>
         </div>

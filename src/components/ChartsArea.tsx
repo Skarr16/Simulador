@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, ReferenceDot } from 'recharts';
 import { Download } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import { SimulationState } from '../types';
@@ -30,8 +30,18 @@ export function ChartsArea({ data, simulationMode }: ChartsAreaProps) {
     return <div className="h-48 flex items-center justify-center font-bold text-slate-400 bg-white rounded-2xl border-[3px] border-slate-900 border-dashed">Aguardando simulação...</div>;
   }
 
+
   // Downsample data for Recharts to improve performance
   const chartData = data.filter((_, i) => i % 10 === 0 || i === data.length - 1);
+  const deployPoint = data.find(d => d.parachuteDeployedA);
+
+  const legendPayload = simulationMode === 'paraquedas' 
+    ? [
+        { value: activeTab === 'position' ? 'Posição' : 'Velocidade', type: 'line', id: 'data', color: '#FF3366' },
+        ...(deployPoint ? [{ value: 'Paraquedas Aberto', type: 'circle', id: 'deploy', color: '#8b5cf6' }] : [])
+      ]
+    : undefined;
+
 
   return (
     <div className="w-full h-80 bg-white border-[3px] border-slate-900 p-4 rounded-2xl shadow-[6px_6px_0px_0px_#0f172a] flex flex-col">
@@ -67,7 +77,6 @@ export function ChartsArea({ data, simulationMode }: ChartsAreaProps) {
       <div className="flex-1 min-h-0" ref={chartRef}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 15, right: 20, left: 0, bottom: 15 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#cbd5e1" />
             <XAxis 
               dataKey="t" 
               type="number" 
@@ -85,17 +94,26 @@ export function ChartsArea({ data, simulationMode }: ChartsAreaProps) {
               labelFormatter={(label: number) => `Tempo: ${label.toFixed(2)}s`}
               contentStyle={{ borderRadius: '8px', border: '3px solid #0f172a', fontWeight: 'bold', color: '#0f172a' }}
             />
-            {simulationMode === 'livre' && <Legend wrapperStyle={{ fontSize: '12px', fontWeight: 'bold', paddingTop: '10px' }} />}
+            <Legend 
+              wrapperStyle={{ fontSize: '12px', fontWeight: 'bold', paddingTop: '10px' }} 
+              {...(legendPayload ? { payload: legendPayload as any } : {})}
+            />
             
             {activeTab === 'position' ? (
               <>
                 <Line type="monotone" dataKey="yA" name={simulationMode === 'paraquedas' ? "Posição" : "Objeto A"} stroke="#FF3366" strokeWidth={4} dot={false} isAnimationActive={false} />
                 {simulationMode === 'livre' && <Line type="monotone" dataKey="yB" name="Objeto B" stroke="#0055FF" strokeWidth={4} dot={false} isAnimationActive={false} />}
+                {simulationMode === 'paraquedas' && deployPoint && (
+                   <ReferenceDot x={deployPoint.t} y={deployPoint.yA} r={6} fill="#8b5cf6" stroke="white" strokeWidth={2} />
+                )}
               </>
             ) : (
               <>
                 <Line type="monotone" dataKey="vA" name={simulationMode === 'paraquedas' ? "Velocidade" : "Objeto A"} stroke="#FF3366" strokeWidth={4} dot={false} isAnimationActive={false} />
                 {simulationMode === 'livre' && <Line type="monotone" dataKey="vB" name="Objeto B" stroke="#0055FF" strokeWidth={4} dot={false} isAnimationActive={false} />}
+                {simulationMode === 'paraquedas' && deployPoint && (
+                   <ReferenceDot x={deployPoint.t} y={deployPoint.vA} r={6} fill="#8b5cf6" stroke="white" strokeWidth={2} />
+                )}
               </>
             )}
             

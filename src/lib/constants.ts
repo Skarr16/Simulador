@@ -9,9 +9,10 @@ export const OBJECTS: Record<string, PhysicsObject> = {
   paper_flat: { id: 'paper_flat', name: 'Folha de Papel', mass: 0.005, area: 0.06, cd: 1.28, color: '#ffffff', radius: 120, image: '/objetos/papel.png' },
   book: { id: 'book', name: 'Livro', mass: 1.0, area: 0.06, cd: 1.05, color: '#b91c1c', radius: 140, image: '/objetos/livro.png' },
   feather: { id: 'feather', name: 'Pena', mass: 0.001, area: 0.005, cd: 1.5, color: '#fcd34d', radius: 80, image: '/objetos/pena.png' },
-  skydiver: { id: 'skydiver', name: 'Paraquedista', mass: 75.0, personMass: 65.0, equipmentMass: 10.0, area: 0.7, cd: 1.0, color: '#FF3366', radius: 250, parachuteArea: 5, parachuteCd: 1.75 },
+  skydiver: { id: 'skydiver', name: 'Paraquedista', mass: 75.0, personMass: 65.0, equipmentMass: 10.0, area: 0.35, cd: 1.0, color: '#FF3366', radius: 250, parachuteArea: 25, parachuteCd: 1.75 },
   astronaut: { id: 'astronaut', name: 'Astronauta', mass: 100.0, area: 0.9, cd: 1.2, color: '#A855F7', radius: 150 },
-  custom: { id: 'custom', name: 'Personalizado', mass: 1, area: 1, cd: 1.05, color: '#888', radius: 140, image: '/objetos/caixa (1).png' },
+  customA: { id: 'customA', name: 'Personalizado A', mass: 1, area: 1, cd: 1.05, color: '#888', radius: 140, image: '/objetos/caixa (1).png' },
+  customB: { id: 'customB', name: 'Personalizado B', mass: 1, area: 1, cd: 1.05, color: '#888', radius: 140, image: '/objetos/caixa (1).png' },
 };
 
 export const ENVIRONMENTS: Record<string, Environment> = {

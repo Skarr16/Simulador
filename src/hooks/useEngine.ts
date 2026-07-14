@@ -18,6 +18,8 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
 
   // Pre-compute the simulation trajectory
   const simulationData = useMemo(() => {
+    if (!objectA || !objectB || !env) return [];
+    
     let t = 0;
     const dt = 0.02; // 20ms step for physics integration
     let yA = config.height;
@@ -39,14 +41,40 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
 
       if (config.simulationMode === 'paraquedas') {
         const shouldDeploy = manualParachuteTime !== null && t >= manualParachuteTime;
+        
         if (shouldDeploy && objectA.id === 'skydiver') {
-          currentAreaA = objectA.parachuteArea !== undefined ? objectA.parachuteArea : objectA.area + 5;
-          currentCdA = objectA.parachuteCd !== undefined ? objectA.parachuteCd : 1.75;
+          const targetArea = objectA.parachuteArea !== undefined ? objectA.parachuteArea : objectA.area + 5;
+          const targetCd = objectA.parachuteCd !== undefined ? objectA.parachuteCd : 1.75;
+          const deployTimeElapsed = t - manualParachuteTime;
+          const deployDuration = 5.0; // 5 seconds to fully open
+          
+          if (deployTimeElapsed < deployDuration) {
+             const progress = deployTimeElapsed / deployDuration;
+             const easedProgress = Math.pow(progress, 3); // Ease-in curve for smoother deceleration
+             currentAreaA = objectA.area + (targetArea - objectA.area) * easedProgress;
+             currentCdA = objectA.cd + (targetCd - objectA.cd) * easedProgress;
+          } else {
+             currentAreaA = targetArea;
+             currentCdA = targetCd;
+          }
           parachuteDeployedA = true;
         }
+        
         if (shouldDeploy && objectB.id === 'skydiver') {
-          currentAreaB = objectB.parachuteArea !== undefined ? objectB.parachuteArea : objectB.area + 5;
-          currentCdB = objectB.parachuteCd !== undefined ? objectB.parachuteCd : 1.75;
+          const targetArea = objectB.parachuteArea !== undefined ? objectB.parachuteArea : objectB.area + 5;
+          const targetCd = objectB.parachuteCd !== undefined ? objectB.parachuteCd : 1.75;
+          const deployTimeElapsed = t - manualParachuteTime;
+          const deployDuration = 5.0; // 5 seconds to fully open
+          
+          if (deployTimeElapsed < deployDuration) {
+             const progress = deployTimeElapsed / deployDuration;
+             const easedProgress = Math.pow(progress, 3); // Ease-in curve for smoother deceleration
+             currentAreaB = objectB.area + (targetArea - objectB.area) * easedProgress;
+             currentCdB = objectB.cd + (targetCd - objectB.cd) * easedProgress;
+          } else {
+             currentAreaB = targetArea;
+             currentCdB = targetCd;
+          }
           parachuteDeployedB = true;
         }
       }

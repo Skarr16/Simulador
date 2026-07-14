@@ -8,8 +8,8 @@ interface SettingsDrawerProps {
   onClose: () => void;
   config: SimulationConfig;
   setConfig: (config: SimulationConfig) => void;
-  toggles: { vectors: boolean; graphs: boolean; table: boolean; devMode: boolean; showHeights: boolean; showGravity: boolean; };
-  setToggles: (toggles: { vectors: boolean; graphs: boolean; table: boolean; devMode: boolean; showHeights: boolean; showGravity: boolean; }) => void;
+  toggles: { vectors: boolean; graphs: boolean; table: boolean; devMode: boolean; showHeights: boolean; showGravity: boolean; crashAlert?: boolean; };
+  setToggles: (toggles: { vectors: boolean; graphs: boolean; table: boolean; devMode: boolean; showHeights: boolean; showGravity: boolean; crashAlert?: boolean; }) => void;
   disabled: boolean;
   customObjects: Record<string, PhysicsObject>;
   setCustomObjects: (objects: Record<string, PhysicsObject>) => void;
@@ -261,7 +261,7 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                   className="w-full bg-[#F4F1EB] border-2 border-slate-900 rounded-lg p-2 font-bold outline-none focus:ring-2 focus:ring-[#FF3366] disabled:opacity-50"
                 >
                   {Object.values(customObjects)
-                    .filter(obj => obj.id !== 'astronaut' || config.environmentId !== 'earth')
+                    .filter(obj => (obj.id !== 'astronaut' || config.environmentId !== 'earth') && obj.id !== 'customB')
                     .map(obj => (
                     <option key={obj.id} value={obj.id}>{obj.name} ({obj.mass}kg{`, ${obj.area}m²`})</option>
                   ))}
@@ -339,15 +339,15 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                    </div>
                 )}
 
-                {config.objectAId === 'custom' && customObjects.custom && (
+                {config.objectAId === 'customA' && customObjects.customA && (
                    <div className="mt-3 p-3 bg-slate-50 border-2 border-slate-200 rounded-lg space-y-3">
                       <div>
                         <label className="block text-[10px] font-bold text-slate-700 mb-1 uppercase">Massa</label>
                         <div className="flex items-center gap-2">
                           <input
                              type="number" step="0.1" min="0.1"
-                             value={customObjects.custom.mass || ''}
-                             onChange={(e) => setCustomObjects({ ...customObjects, custom: { ...customObjects.custom, mass: parseFloat(e.target.value) || 0 }})}
+                             value={customObjects.customA.mass || ''}
+                             onChange={(e) => setCustomObjects({ ...customObjects, customA: { ...customObjects.customA, mass: parseFloat(e.target.value) || 0 }})}
                              disabled={disabled}
                              className="w-full p-1.5 border-2 border-slate-300 rounded font-mono text-sm outline-none focus:border-[#FF3366] disabled:opacity-50"
                           />
@@ -359,8 +359,8 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                         <div className="flex items-center gap-2">
                           <input
                              type="number" step="0.01" min="0.01"
-                             value={customObjects.custom.area || ''}
-                             onChange={(e) => setCustomObjects({ ...customObjects, custom: { ...customObjects.custom, area: parseFloat(e.target.value) || 0 }})}
+                             value={customObjects.customA.area || ''}
+                             onChange={(e) => setCustomObjects({ ...customObjects, customA: { ...customObjects.customA, area: parseFloat(e.target.value) || 0 }})}
                              disabled={disabled}
                              className="w-full p-1.5 border-2 border-slate-300 rounded font-mono text-sm outline-none focus:border-[#FF3366] disabled:opacity-50"
                           />
@@ -371,8 +371,8 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                         <label className="block text-[10px] font-bold text-slate-700 mb-1 uppercase">Coef. Arrasto (Cd)</label>
                         <input
                            type="number" step="0.01" min="0.01"
-                           value={customObjects.custom.cd || ''}
-                           onChange={(e) => setCustomObjects({ ...customObjects, custom: { ...customObjects.custom, cd: parseFloat(e.target.value) || 0 }})}
+                           value={customObjects.customA.cd || ''}
+                           onChange={(e) => setCustomObjects({ ...customObjects, customA: { ...customObjects.customA, cd: parseFloat(e.target.value) || 0 }})}
                            disabled={disabled}
                            className="w-full p-1.5 border-2 border-slate-300 rounded font-mono text-sm outline-none focus:border-[#FF3366] disabled:opacity-50"
                         />
@@ -391,7 +391,7 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                     className="w-full bg-[#F4F1EB] border-2 border-slate-900 rounded-lg p-2 font-bold outline-none focus:ring-2 focus:ring-[#0055FF] disabled:opacity-50"
                   >
                     {Object.values(customObjects)
-                    .filter(obj => obj.id !== 'astronaut' || config.environmentId !== 'earth')
+                    .filter(obj => (obj.id !== 'astronaut' || config.environmentId !== 'earth') && obj.id !== 'customA')
                     .map(obj => (
                       <option key={obj.id} value={obj.id}>{obj.name} ({obj.mass}kg{`, ${obj.area}m²`})</option>
                     ))}
@@ -469,17 +469,18 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                      </div>
                   )}
 
-                  {config.objectBId === 'custom' && customObjects.custom && (
+                  
+                  {config.objectBId === 'customB' && customObjects.customB && (
                    <div className="mt-3 p-3 bg-slate-50 border-2 border-slate-200 rounded-lg space-y-3">
                       <div>
                         <label className="block text-[10px] font-bold text-slate-700 mb-1 uppercase">Massa</label>
                         <div className="flex items-center gap-2">
-                          <input
-                             type="number" step="0.1" min="0.1"
-                             value={customObjects.custom.mass || ''}
-                             onChange={(e) => setCustomObjects({ ...customObjects, custom: { ...customObjects.custom, mass: parseFloat(e.target.value) || 0 }})}
-                             disabled={disabled}
-                             className="w-full p-1.5 border-2 border-slate-300 rounded font-mono text-sm outline-none focus:border-[#0055FF] disabled:opacity-50"
+                          <input 
+                            type="number" step="0.1" min="0.1"
+                            value={customObjects.customB.mass || ''}
+                            onChange={(e) => setCustomObjects({ ...customObjects, customB: { ...customObjects.customB, mass: parseFloat(e.target.value) || 0 }})}
+                            disabled={disabled}
+                            className="w-full p-1.5 border-2 border-slate-300 rounded font-mono text-sm outline-none focus:border-[#0055FF] disabled:opacity-50"
                           />
                           <span className="text-xs font-black text-slate-500">kg</span>
                         </div>
@@ -487,24 +488,24 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                       <div>
                         <label className="block text-[10px] font-bold text-slate-700 mb-1 uppercase">Área</label>
                         <div className="flex items-center gap-2">
-                          <input
-                             type="number" step="0.01" min="0.01"
-                             value={customObjects.custom.area || ''}
-                             onChange={(e) => setCustomObjects({ ...customObjects, custom: { ...customObjects.custom, area: parseFloat(e.target.value) || 0 }})}
-                             disabled={disabled}
-                             className="w-full p-1.5 border-2 border-slate-300 rounded font-mono text-sm outline-none focus:border-[#0055FF] disabled:opacity-50"
+                          <input 
+                            type="number" step="0.01" min="0.01"
+                            value={customObjects.customB.area || ''}
+                            onChange={(e) => setCustomObjects({ ...customObjects, customB: { ...customObjects.customB, area: parseFloat(e.target.value) || 0 }})}
+                            disabled={disabled}
+                            className="w-full p-1.5 border-2 border-slate-300 rounded font-mono text-sm outline-none focus:border-[#0055FF] disabled:opacity-50"
                           />
                           <span className="text-xs font-black text-slate-500">m²</span>
                         </div>
                       </div>
                       <div>
                         <label className="block text-[10px] font-bold text-slate-700 mb-1 uppercase">Coef. Arrasto (Cd)</label>
-                        <input
-                           type="number" step="0.01" min="0.01"
-                           value={customObjects.custom.cd || ''}
-                           onChange={(e) => setCustomObjects({ ...customObjects, custom: { ...customObjects.custom, cd: parseFloat(e.target.value) || 0 }})}
-                           disabled={disabled}
-                           className="w-full p-1.5 border-2 border-slate-300 rounded font-mono text-sm outline-none focus:border-[#0055FF] disabled:opacity-50"
+                        <input 
+                          type="number" step="0.01" min="0.01"
+                          value={customObjects.customB.cd || ''}
+                          onChange={(e) => setCustomObjects({ ...customObjects, customB: { ...customObjects.customB, cd: parseFloat(e.target.value) || 0 }})}
+                          disabled={disabled}
+                          className="w-full p-1.5 border-2 border-slate-300 rounded font-mono text-sm outline-none focus:border-[#0055FF] disabled:opacity-50"
                         />
                       </div>
                    </div>
@@ -518,6 +519,18 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
           <section className="space-y-4">
             <h3 className="text-sm font-black text-slate-900 uppercase">Interface & Exibição</h3>
             <div className="bg-white p-4 rounded-xl border-[3px] border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] flex flex-col gap-3">
+
+              <button 
+                type="button"
+                onClick={() => setToggles({ ...toggles, crashAlert: toggles.crashAlert === false ? true : false })}
+                className="flex items-center justify-between w-full hover:bg-slate-50 p-2 rounded-lg transition-colors text-left"
+              >
+                <span className="text-sm font-black uppercase text-slate-700">Alerta de Paraquedista</span>
+                <div className={`w-12 h-6 flex items-center border-2 border-slate-900 rounded-full p-0.5 transition-colors ${toggles.crashAlert !== false ? 'bg-[#00C48C]' : 'bg-slate-200'}`}>
+                  <div className={`w-4 h-4 rounded-full shadow-sm transform transition-transform ${toggles.crashAlert !== false ? 'translate-x-6 bg-white' : 'translate-x-0 bg-slate-500'}`} />
+                </div>
+              </button>
+
               <button 
                 type="button"
                 onClick={() => setToggles({ ...toggles, vectors: !toggles.vectors })}
