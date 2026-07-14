@@ -333,9 +333,15 @@ export default function App() {
                   let nextObjectA = config.objectAId;
                   let nextObjectB = config.objectBId;
 
-                  if (nextEnvId !== 'moon') {
-                    if (nextObjectA === 'astronaut') nextObjectA = config.simulationMode === 'paraquedas' ? 'skydiver' : 'bowling';
-                    if (nextObjectB === 'astronaut') nextObjectB = config.simulationMode === 'paraquedas' ? 'skydiver' : 'bowling';
+                  if (nextEnvId === 'moon') {
+                    nextObjectA = 'astronaut';
+                    if (config.simulationMode === 'paraquedas') nextObjectB = 'astronaut';
+                  } else if (nextEnvId === 'custom') {
+                    nextObjectA = 'et';
+                    if (config.simulationMode === 'paraquedas') nextObjectB = 'et';
+                  } else if (nextEnvId === 'earth') {
+                    nextObjectA = config.simulationMode === 'paraquedas' ? 'skydiver' : 'bowling';
+                    if (config.simulationMode === 'paraquedas') nextObjectB = 'skydiver';
                   }
 
                   let nextEnableAirResistance = config.enableAirResistance;

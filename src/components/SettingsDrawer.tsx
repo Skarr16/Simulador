@@ -68,9 +68,15 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                   onChange={(e) => {
                     let nextObjectA = config.objectAId;
                     let nextObjectB = config.objectBId;
-                    if (e.target.value !== 'moon') {
-                      if (nextObjectA === 'astronaut') nextObjectA = config.simulationMode === 'paraquedas' ? 'skydiver' : 'bowling';
-                      if (nextObjectB === 'astronaut') nextObjectB = config.simulationMode === 'paraquedas' ? 'skydiver' : 'bowling';
+                    if (e.target.value === 'moon') {
+                      nextObjectA = 'astronaut';
+                      if (config.simulationMode === 'paraquedas') nextObjectB = 'astronaut';
+                    } else if (e.target.value === 'custom') {
+                      nextObjectA = 'et';
+                      if (config.simulationMode === 'paraquedas') nextObjectB = 'et';
+                    } else if (e.target.value === 'earth') {
+                      nextObjectA = config.simulationMode === 'paraquedas' ? 'skydiver' : 'bowling';
+                      if (config.simulationMode === 'paraquedas') nextObjectB = 'skydiver';
                     }
 
                     let nextEnableAirResistance = config.enableAirResistance;

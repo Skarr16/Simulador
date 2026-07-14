@@ -5,6 +5,8 @@ import { PhysicsObject, Environment } from '../types';
 interface SimulationCanvasProps {
   height: number;
   structureId?: string;
+  maxVA?: number;
+  maxVB?: number;
   resetCount: number;
   yA: number;
   yB: number;
@@ -300,19 +302,19 @@ export function SimulationCanvas({
         >
           
           {structureId === 'pisa' && (
-             <img src="/queda livre/torre de pisa.png" alt="Torre de Pisa" className="w-full h-full object-contain mix-blend-multiply" />
+             <img src="/estruturas/torre de pisa.png" alt="Torre de Pisa" className="w-full h-full object-contain mix-blend-multiply" />
           )}
           {structureId === 'eiffel' && (
-             <img src="/queda livre/torre effel.png" alt="Torre Eiffel" className="w-full h-full object-contain mix-blend-multiply" />
+             <img src="/estruturas/torre effel.png" alt="Torre Eiffel" className="w-full h-full object-contain mix-blend-multiply" />
           )}
           {structureId === 'cristo' && (
-             <img src="/queda livre/cristo redentor.png" alt="Cristo Redentor" className="w-full h-full object-contain mix-blend-multiply" />
+             <img src="/estruturas/cristo redentor.png" alt="Cristo Redentor" className="w-full h-full object-contain mix-blend-multiply" />
           )}
           {structureId === 'gize' && (
-             <img src="/queda livre/piramide de gize.png" alt="Pirâmide de Gizé" className="w-full h-full object-contain mix-blend-multiply" />
+             <img src="/estruturas/piramide de gize.png" alt="Pirâmide de Gizé" className="w-full h-full object-contain mix-blend-multiply" />
           )}
           {structureId === 'custom' && (
-             <img src="/queda livre/penhasco.png" alt="Penhasco" className="w-full h-full object-contain mix-blend-multiply" />
+             <img src="/estruturas/penhasco.png" alt="Penhasco" className="w-full h-full object-contain mix-blend-multiply" />
           )}
           <div className="bg-white/90 px-3 py-1 rounded-full border-2 border-slate-900 mt-2 font-black text-xs text-slate-900 shadow-[2px_2px_0px_0px_#0f172a] whitespace-nowrap">
             {getStructureName(structureId)}
@@ -344,25 +346,31 @@ export function SimulationCanvas({
                </div>
              );
           } else if (obj.id === 'skydiver') {
-             let imgSrc = "/paraquedas/boneco caindo (1).png";
-             let transformClass = "translate-y-0 scale-[1.0] md:scale-[0.9] lg:scale-[0.9] origin-bottom"; // Falling without parachute
-             if (currentY <= 0) {
-                imgSrc = "/paraquedas/boneco no chao.png";
-                transformClass = "translate-y-0 scale-[1.0] md:scale-[0.9] lg:scale-[0.9] origin-bottom"; // Standing on ground
-             } else if (parachuteDeployed) {
-                imgSrc = "/paraquedas/boneco caindo com paraquedas (1).png";
-                transformClass = "translate-y-0 scale-[1.0] md:scale-[0.9] lg:scale-[0.9] origin-bottom"; // Falling with parachute
-             }
+             let transformClass = "translate-y-0 scale-[1.0] md:scale-[0.9] lg:scale-[0.9] origin-bottom";
+             const isGround = currentY <= 0;
+             const isPara = parachuteDeployed && !isGround;
+             const isFallingState = !isGround && !isPara;
              content = (
                <div className={`w-full h-full relative flex items-center justify-center drop-shadow-md ${parachuteDeployed && isFalling ? 'animate-[float_2s_ease-in-out_infinite]' : ''} ${transformClass}`}>
-                  <img src={imgSrc} className="w-full h-full object-contain object-bottom" />
+                  <img src="/objetos/paraquedas/boneco no chao.png" className={`absolute inset-0 w-full h-full object-contain object-bottom transition-opacity duration-150 ${isGround ? 'opacity-100' : 'opacity-0'}`} />
+                  <img src="/objetos/paraquedas/boneco caindo com paraquedas (1).png" className={`absolute inset-0 w-full h-full object-contain object-bottom transition-opacity duration-150 ${isPara ? 'opacity-100' : 'opacity-0'}`} />
+                  <img src="/objetos/paraquedas/boneco caindo (1).png" className={`absolute inset-0 w-full h-full object-contain object-bottom transition-opacity duration-150 ${isFallingState ? 'opacity-100' : 'opacity-0'}`} />
                </div>
              );
           } else if (obj.id === 'astronaut') {
              let transformClass = "translate-y-0 scale-[1.3] md:scale-[1.15] lg:scale-[1.15] origin-bottom";
              content = (
                <div className={`w-full h-full relative flex items-center justify-center drop-shadow-md ${transformClass}`}>
-                  <img src={(currentY <= 0) ? "/astronalta/astronalta no chão.png" : "/astronalta/astronalta caindo.png"} className="w-full h-full object-contain object-bottom" />
+                  <img src="/objetos/astronauta/astronalta no chão.png" className={`absolute inset-0 w-full h-full object-contain object-bottom transition-opacity duration-150 ${currentY <= 0 ? 'opacity-100' : 'opacity-0'}`} />
+                  <img src="/objetos/astronauta/astronalta caindo.png" className={`absolute inset-0 w-full h-full object-contain object-bottom transition-opacity duration-150 ${currentY <= 0 ? 'opacity-0' : 'opacity-100'}`} />
+               </div>
+             );
+          } else if (obj.id === 'et') {
+             let transformClass = "translate-y-4 md:translate-y-5 lg:translate-y-6 scale-[1.3] md:scale-[1.15] lg:scale-[1.15] origin-bottom";
+             content = (
+               <div className={`w-full h-full relative flex items-center justify-center drop-shadow-md ${transformClass}`}>
+                  <img src="/objetos/et/et_no_chao.png" className={`absolute inset-0 w-full h-full object-contain object-bottom transition-opacity duration-150 ${currentY <= 0 ? 'opacity-100' : 'opacity-0'}`} />
+                  <img src="/objetos/et/et_caindo.png" className={`absolute inset-0 w-full h-full object-contain object-bottom transition-opacity duration-150 ${currentY <= 0 ? 'opacity-0' : 'opacity-100'}`} />
                </div>
              );
           } else {
@@ -406,7 +414,7 @@ export function SimulationCanvas({
                   yA <= 0 ? 'hidden' : 
                   'animate-[flyAway_3s_ease-in_forwards]'
                 } ${
-                  objectA.id === 'astronaut' 
+                  objectA.id === 'astronaut' || objectA.id === 'et'
                     ? 'w-[160px] h-[65px] md:w-[220px] md:h-[90px]' 
                     : 'w-[200px] h-[80px] md:w-[280px] md:h-[110px] lg:w-[350px] lg:h-[140px]'
                 }`}
@@ -414,8 +422,12 @@ export function SimulationCanvas({
               >
                 {objectA.id === 'astronaut' ? (
                   <>
-                    <img src="/astronalta/chama da nave.png" alt="Chama" className="absolute -left-12 md:-left-24 top-1/2 -translate-y-1/2 w-20 md:w-36 h-14 md:h-24 object-contain drop-shadow-xl z-0 animate-pulse" />
-                    <img src="/astronalta/nave.png" alt="Nave" className="w-full h-full object-contain drop-shadow-xl z-10" />
+                    <img src="/objetos/astronauta/chama da nave.png" alt="Chama" className="absolute -left-12 md:-left-24 top-1/2 -translate-y-1/2 w-20 md:w-36 h-14 md:h-24 object-contain drop-shadow-xl z-0 animate-pulse" />
+                    <img src="/objetos/astronauta/nave.png" alt="Nave" className="w-full h-full object-contain drop-shadow-xl z-10" />
+                  </>
+                ) : objectA.id === 'et' ? (
+                  <>
+                    <img src="/objetos/et/ovni.png" alt="OVNI" className="w-full h-full object-contain drop-shadow-xl z-10" />
                   </>
                 ) : (
                   <>
@@ -425,7 +437,7 @@ export function SimulationCanvas({
                        <div className="h-1 w-20 bg-white/80 rounded-full animate-pulse" style={{ animationDelay: '100ms' }}></div>
                        <div className="h-1 w-8 bg-white/80 rounded-full animate-pulse" style={{ animationDelay: '300ms' }}></div>
                     </div>
-                    <img src="/paraquedas/aviao(1).png" alt="Avião" className="w-full h-full object-contain drop-shadow-xl z-10" />
+                    <img src="/objetos/paraquedas/avião.png" alt="Avião" className="w-full h-full object-contain drop-shadow-xl z-10" />
                   </>
                 )}
               </div>

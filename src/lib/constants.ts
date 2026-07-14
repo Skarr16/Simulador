@@ -13,6 +13,7 @@ export const OBJECTS: Record<string, PhysicsObject> = {
   astronaut: { id: 'astronaut', name: 'Astronauta', mass: 100.0, area: 0.9, cd: 1.2, color: '#A855F7', radius: 150 },
   customA: { id: 'customA', name: 'Personalizado A', mass: 1, area: 1, cd: 1.05, color: '#888', radius: 140, image: '/objetos/caixa (1).png' },
   customB: { id: 'customB', name: 'Personalizado B', mass: 1, area: 1, cd: 1.05, color: '#888', radius: 140, image: '/objetos/caixa (1).png' },
+  et: { id: 'et', name: 'ET', mass: 45.0, area: 0.5, cd: 1.0, color: '#22c55e', radius: 150 },
 };
 
 export const ENVIRONMENTS: Record<string, Environment> = {
@@ -21,10 +22,10 @@ export const ENVIRONMENTS: Record<string, Environment> = {
   custom: { id: 'custom', name: 'Personalizado', g: 3.71, rho: 0.020 },
 };
 
-export const STRUCTURES: Record<string, { id: string; name: string; height: number }> = {
-  cristo: { id: 'cristo', name: 'Cristo Redentor', height: 38 },
-  pisa: { id: 'pisa', name: 'Torre de Pisa', height: 56 },
-  eiffel: { id: 'eiffel', name: 'Torre Eiffel', height: 93 },
-  gize: { id: 'gize', name: 'Pirâmide de Gizé', height: 138 },
+export const STRUCTURES: Record<string, { id: string; name: string; height: number; image?: string }> = {
+  cristo: { id: 'cristo', name: 'Cristo Redentor', height: 38, image: '/estruturas/cristo redentor.png' },
+  pisa: { id: 'pisa', name: 'Torre de Pisa', height: 56, image: '/estruturas/torre de pisa.png' },
+  eiffel: { id: 'eiffel', name: 'Torre Eiffel', height: 93, image: '/estruturas/torre effel.png' },
+  gize: { id: 'gize', name: 'Pirâmide de Gizé', height: 138, image: '/estruturas/piramide de gize.png' },
   custom: { id: 'custom', name: 'Personalizado', height: 50 }
 };
