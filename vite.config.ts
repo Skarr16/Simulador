@@ -5,6 +5,7 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
+    publicDir: 'Imagens',
     plugins: [react(), tailwindcss()],
     build: {
       outDir: 'dist',

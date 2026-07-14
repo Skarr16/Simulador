@@ -94,6 +94,12 @@ export default function App() {
     if (engine.isRunning) {
       if (!prevIsRunning.current) {
         soundEngine.startWind();
+        if (config.simulationMode === 'paraquedas' && config.objectAId === 'et') {
+          soundEngine.playOvni();
+        }
+        if (config.simulationMode === 'paraquedas' && config.objectAId === 'astronaut') {
+          soundEngine.playAstronautShip();
+        }
       }
       const maxV = Math.max(engine.currentState.vA, engine.currentState.vB);
       soundEngine.updateWind(maxV);
@@ -181,6 +187,12 @@ export default function App() {
        prevYB.current = engine.currentState.yB;
        prevVA.current = 0;
        prevVB.current = 0;
+       if (config.simulationMode === 'paraquedas' && config.objectAId === 'et' && toggles.sound) {
+         soundEngine.playOvni();
+       }
+       if (config.simulationMode === 'paraquedas' && config.objectAId === 'astronaut' && toggles.sound) {
+         soundEngine.playAstronautShip();
+       }
     }
   }, [engine.resetCount, engine.isRunning, engine.isFinished, engine.time, engine.currentState.yA, engine.currentState.yB]);
 

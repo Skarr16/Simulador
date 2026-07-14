@@ -22,11 +22,14 @@ class SoundEngine {
       
       // Load MP3
       try {
-        const response = await fetch('/whatsapp.mp3');
-        const arrayBuffer = await response.arrayBuffer();
-        this.whatsappBuffer = await this.ctx.decodeAudioData(arrayBuffer);
+        const response = await fetch('/sons/whatsapp.mp3');
+        if (response.ok) {
+          const arrayBuffer = await response.arrayBuffer();
+          this.whatsappBuffer = await this.ctx.decodeAudioData(arrayBuffer);
+        }
       } catch (e) {
-        console.error('Failed to load MP3', e);
+        // Suppress error to avoid cluttering logs if the user provided an invalid or empty MP3
+        // console.warn('MP3 decode failed, using synthetic fallback', e);
       }
     } catch (e) {
       console.error('AudioContext not supported');
@@ -127,18 +130,138 @@ class SoundEngine {
   }
 
   playWhatsapp() {
-    if (!this.isEnabled || !this.ctx || !this.masterGain || !this.whatsappBuffer) return;
+    if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+
+    if (this.whatsappBuffer) {
+      const source = this.ctx.createBufferSource();
+      source.buffer = this.whatsappBuffer;
+      const gain = this.ctx.createGain();
+      gain.gain.value = 1.0;
+      source.connect(gain);
+      gain.connect(this.masterGain);
+      source.start();
+    } else {
+      // Synthetic fallback
+      const osc1 = this.ctx.createOscillator();
+      const osc2 = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc1.type = 'sine';
+      osc2.type = 'sine';
+      
+      // WhatsApp-ish notification tone
+      osc1.frequency.setValueAtTime(600, this.ctx.currentTime);
+      osc1.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.1);
+      
+      osc2.frequency.setValueAtTime(800, this.ctx.currentTime + 0.15);
+      osc2.frequency.exponentialRampToValueAtTime(1200, this.ctx.currentTime + 0.25);
+
+      gain.gain.setValueAtTime(0, this.ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.5, this.ctx.currentTime + 0.02);
+      gain.gain.setValueAtTime(0.5, this.ctx.currentTime + 0.1);
+      gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.12);
+      
+      gain.gain.setValueAtTime(0, this.ctx.currentTime + 0.15);
+      gain.gain.linearRampToValueAtTime(0.5, this.ctx.currentTime + 0.17);
+      gain.gain.setValueAtTime(0.5, this.ctx.currentTime + 0.25);
+      gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.3);
+
+      osc1.connect(gain);
+      osc2.connect(gain);
+      gain.connect(this.masterGain);
+
+      osc1.start(this.ctx.currentTime);
+      osc1.stop(this.ctx.currentTime + 0.12);
+      
+      osc2.start(this.ctx.currentTime + 0.15);
+      osc2.stop(this.ctx.currentTime + 0.3);
+    }
+  }
+
+  playOvni() {
+    if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    const osc = this.ctx.createOscillator();
+    const lfo = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sine';
+    lfo.type = 'sine';
     
-    const source = this.ctx.createBufferSource();
-    source.buffer = this.whatsappBuffer;
+    // Base frequency
+    osc.frequency.value = 400;
+    
+    // LFO controls frequency to give that wobbly sci-fi sound
+    lfo.frequency.value = 8;
+    const lfoGain = this.ctx.createGain();
+    lfoGain.gain.value = 50;
+    
+    lfo.connect(lfoGain);
+    lfoGain.connect(osc.frequency);
+
+    // Envelope - lower volume and fades out over 3 seconds (when it leaves screen)
+    gain.gain.setValueAtTime(0, this.ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.1, this.ctx.currentTime + 0.2);
+    gain.gain.linearRampToValueAtTime(0.05, this.ctx.currentTime + 1.5);
+    gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 3);
+
+    osc.connect(gain);
+    gain.connect(this.masterGain);
+
+    osc.start(this.ctx.currentTime);
+    lfo.start(this.ctx.currentTime);
+    osc.stop(this.ctx.currentTime + 3);
+    lfo.stop(this.ctx.currentTime + 3);
+  }
+
+  playAstronautShip() {
+    if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    const osc1 = this.ctx.createOscillator();
+    const osc2 = this.ctx.createOscillator();
+    const noise = this.ctx.createBufferSource();
     
     const gain = this.ctx.createGain();
-    gain.gain.value = 1.0;
+
+    osc1.type = 'square';
+    osc2.type = 'sawtooth';
     
-    source.connect(gain);
+    osc1.frequency.setValueAtTime(150, this.ctx.currentTime);
+    osc1.frequency.exponentialRampToValueAtTime(50, this.ctx.currentTime + 2);
+    
+    osc2.frequency.setValueAtTime(155, this.ctx.currentTime);
+    osc2.frequency.exponentialRampToValueAtTime(55, this.ctx.currentTime + 2);
+
+    // Simple noise for thrust
+    const bufferSize = this.ctx.sampleRate * 3.0; // 3 seconds
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    noise.buffer = buffer;
+    
+    // Noise filter
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 1000;
+    noise.connect(filter);
+    filter.connect(gain);
+
+    // Envelope - fades out over 3 seconds
+    gain.gain.setValueAtTime(0, this.ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.1, this.ctx.currentTime + 0.2);
+    gain.gain.linearRampToValueAtTime(0.05, this.ctx.currentTime + 1.5);
+    gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 3);
+
+    osc1.connect(gain);
+    osc2.connect(gain);
     gain.connect(this.masterGain);
+
+    osc1.start(this.ctx.currentTime);
+    osc2.start(this.ctx.currentTime);
+    noise.start(this.ctx.currentTime);
     
-    source.start();
+    osc1.stop(this.ctx.currentTime + 3);
+    osc2.stop(this.ctx.currentTime + 3);
   }
 
   playImpact(velocity: number) {

@@ -68,15 +68,24 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                   onChange={(e) => {
                     let nextObjectA = config.objectAId;
                     let nextObjectB = config.objectBId;
-                    if (e.target.value === 'moon') {
-                      nextObjectA = 'astronaut';
-                      if (config.simulationMode === 'paraquedas') nextObjectB = 'astronaut';
-                    } else if (e.target.value === 'custom') {
-                      nextObjectA = 'et';
-                      if (config.simulationMode === 'paraquedas') nextObjectB = 'et';
-                    } else if (e.target.value === 'earth') {
-                      nextObjectA = config.simulationMode === 'paraquedas' ? 'skydiver' : 'bowling';
-                      if (config.simulationMode === 'paraquedas') nextObjectB = 'skydiver';
+                    if (config.simulationMode === 'paraquedas') {
+                      if (e.target.value === 'moon') {
+                        nextObjectA = 'astronaut';
+                        nextObjectB = 'astronaut';
+                      } else if (e.target.value === 'custom') {
+                        nextObjectA = 'et';
+                        nextObjectB = 'et';
+                      } else if (e.target.value === 'earth') {
+                        nextObjectA = 'skydiver';
+                        nextObjectB = 'skydiver';
+                      }
+                    } else {
+                       if (e.target.value === 'earth' && config.objectAId === 'astronaut') {
+                         nextObjectA = 'bowling';
+                       }
+                       if (e.target.value === 'earth' && config.objectBId === 'astronaut') {
+                         nextObjectB = 'soccer';
+                       }
                     }
 
                     let nextEnableAirResistance = config.enableAirResistance;
@@ -267,7 +276,7 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                   className="w-full bg-[#F4F1EB] border-2 border-slate-900 rounded-lg p-2 font-bold outline-none focus:ring-2 focus:ring-[#FF3366] disabled:opacity-50"
                 >
                   {Object.values(customObjects)
-                    .filter(obj => (obj.id !== 'astronaut' || config.environmentId !== 'earth') && obj.id !== 'customB')
+                    .filter(obj => obj.id !== 'customB')
                     .map(obj => (
                     <option key={obj.id} value={obj.id}>{obj.name} ({obj.mass}kg{`, ${obj.area}m²`})</option>
                   ))}
@@ -397,7 +406,7 @@ export function SettingsDrawer({ isOpen, onClose, config, setConfig, toggles, se
                     className="w-full bg-[#F4F1EB] border-2 border-slate-900 rounded-lg p-2 font-bold outline-none focus:ring-2 focus:ring-[#0055FF] disabled:opacity-50"
                   >
                     {Object.values(customObjects)
-                    .filter(obj => (obj.id !== 'astronaut' || config.environmentId !== 'earth') && obj.id !== 'customA')
+                    .filter(obj => obj.id !== 'customA')
                     .map(obj => (
                       <option key={obj.id} value={obj.id}>{obj.name} ({obj.mass}kg{`, ${obj.area}m²`})</option>
                     ))}

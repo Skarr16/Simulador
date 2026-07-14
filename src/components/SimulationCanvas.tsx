@@ -427,7 +427,10 @@ export function SimulationCanvas({
                   </>
                 ) : objectA.id === 'et' ? (
                   <>
-                    <img src="/objetos/et/ovni.png" alt="OVNI" className="w-full h-full object-contain drop-shadow-xl z-10" />
+                    <div className="absolute top-1/2 -translate-y-1/2 -left-12 md:-left-20 h-2 w-20 md:w-32 bg-green-400 rounded-full blur-[2px] opacity-80 animate-pulse shadow-[0_0_15px_#4ade80]"></div>
+                    <div className="absolute top-1/2 -translate-y-1/2 -left-8 md:-left-12 h-3 w-12 md:w-16 bg-emerald-300 rounded-full blur-[1px] opacity-90 animate-pulse shadow-[0_0_20px_#6ee7b7]" style={{ animationDelay: '150ms' }}></div>
+                    <div className="absolute top-1/2 -translate-y-1/2 -left-16 md:-left-28 h-1 w-24 md:w-40 bg-teal-500 rounded-full blur-[4px] opacity-60 animate-pulse shadow-[0_0_10px_#14b8a6]" style={{ animationDelay: '300ms' }}></div>
+                    <img src="/objetos/et/ovni.png" alt="OVNI" className="w-full h-full object-contain drop-shadow-xl z-10 relative" />
                   </>
                 ) : (
                   <>
