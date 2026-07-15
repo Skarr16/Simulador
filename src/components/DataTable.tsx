@@ -123,7 +123,7 @@ export function DataTable({ dataPoints, initialHeight, objectA, objectB, simulat
 
   return (
     <div className="bg-white p-5 rounded-2xl shadow-[6px_6px_0px_0px_#0f172a] border-[3px] border-slate-900 font-mono text-xs flex flex-col h-full min-h-[350px]">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+      <div className="flex flex-row flex-wrap items-center justify-between gap-2 mb-4">
         <h3 className="font-sans font-black text-slate-900 uppercase tracking-widest flex items-center gap-2 text-sm">
           <Table className="w-4 h-4 text-[#0055FF]" /> Tabela de Dados
         </h3>

@@ -45,7 +45,7 @@ export function ChartsArea({ data, simulationMode }: ChartsAreaProps) {
 
   return (
     <div className="w-full h-80 bg-white border-[3px] border-slate-900 p-4 rounded-2xl shadow-[6px_6px_0px_0px_#0f172a] flex flex-col">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-2">
+      <div className="flex flex-row flex-wrap items-center justify-between mb-4 gap-2">
         <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">
           {activeTab === 'position' ? 'Posição (m) vs Tempo (s)' : 'Velocidade (m/s) vs Tempo (s)'}
         </h3>

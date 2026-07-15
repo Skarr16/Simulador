@@ -40,7 +40,8 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
       let parachuteDeployedB = false;
 
       if (config.simulationMode === 'paraquedas') {
-        const shouldDeploy = manualParachuteTime !== null && t >= manualParachuteTime;
+        let autoDeploy = config.simulationMode === 'paraquedas' && (config.structureId !== 'custom' || config.height < 700);
+        const shouldDeploy = autoDeploy || (manualParachuteTime !== null && t >= manualParachuteTime);
         
         if (shouldDeploy && objectA.id === 'skydiver') {
           const targetArea = objectA.parachuteArea !== undefined ? objectA.parachuteArea : objectA.area + 5;
@@ -136,7 +137,10 @@ export function useEngine(config: SimulationConfig, customObjects?: Record<strin
   const startTimeRef = useRef<number | null>(null);
 
   const animate = useCallback((timestamp: number) => {
-    let timeScale = config.simulationMode === 'paraquedas' ? 10 : 1;
+    let timeScale = 1;
+    if (config.height > 1000) {
+      timeScale = 1 + (config.height - 1000) * (9 / 3000);
+    }
     timeScale *= speedMultiplier;
     if (!startTimeRef.current) startTimeRef.current = timestamp - ((time * 1000) / timeScale);
     const elapsed = ((timestamp - startTimeRef.current) / 1000) * timeScale;

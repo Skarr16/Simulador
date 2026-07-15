@@ -248,10 +248,10 @@ class SoundEngine {
     osc1.connect(gain);
 
     // Envelope - fades out over 3 seconds as the ship flies away
-    gain.gain.setValueAtTime(0.5, this.ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.3, this.ctx.currentTime + 0.5); // fly in
-    gain.gain.linearRampToValueAtTime(0.1, this.ctx.currentTime + 2.0); // fly away
-    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 2.9);
+    gain.gain.setValueAtTime(4.0, this.ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(3.0, this.ctx.currentTime + 0.5); // fly in
+    gain.gain.linearRampToValueAtTime(1.0, this.ctx.currentTime + 2.0); // fly away
+    gain.gain.linearRampToValueAtTime(0.1, this.ctx.currentTime + 2.9);
     gain.gain.setValueAtTime(0, this.ctx.currentTime + 3.0); // gone
 
     gain.connect(this.masterGain);
