@@ -208,19 +208,7 @@ export function SimulationCanvas({
 
       {/* Imaginary X-axis at y=0 */}
 
-      {/* Gravity Indicator */}
-      {showGravity && (
-        <div className="absolute top-4 left-4 sm:left-6 sm:top-6 md:top-16 md:left-[60px] z-[60] bg-white border-[3px] border-slate-900 rounded-xl px-2 py-1 sm:px-3 sm:py-1.5 shadow-[4px_4px_0px_0px_#0f172a] flex flex-col items-center justify-center leading-none">
-          <span className="text-[10px] sm:text-xs font-black uppercase text-slate-500">Gravidade</span>
-          <span className="text-sm sm:text-lg font-black text-slate-900 tabular-nums leading-none">
-            {env.g.toFixed(2)} <span className="text-xs sm:text-sm font-bold ml-0.5 text-slate-700">m/s²</span>
-          </span>
-        </div>
-      )}
-
-      {/* Height Indicator */}
-      <div className={`absolute left-0 top-0 bottom-0 w-24 z-40 ${env.id === 'moon' ? 'text-white' : env.id === 'custom' ? 'text-[#451004]' : 'text-slate-900'}`}>
-        <div className={`absolute left-4 sm:left-6 top-[10%] bottom-[10%] border-l-[3px] ${env.id === 'moon' ? 'border-white' : env.id === 'custom' ? 'border-[#451004]' : 'border-slate-900'}`}></div>
+      <div className="absolute top-0 bottom-[10%] left-0 right-0 pointer-events-none z-10">
         {Array.from({ length: 11 }).map((_, i) => {
           const percent = i * 10;
           const val = (height * percent / 100).toFixed(1);

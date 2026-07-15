@@ -57,6 +57,7 @@ export default function App() {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isQrCodeOpen, setIsQrCodeOpen] = useState(false);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   
   const [customObjects, setCustomObjects] = useState(OBJECTS);
   const [customEnvs, setCustomEnvs] = useState(ENVIRONMENTS);
@@ -232,46 +233,14 @@ export default function App() {
     };
   }, [tooltipTimer]);
 
-  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
-  const touchStartY = useRef<number | null>(null);
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartY.current = e.touches[0].clientY;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (touchStartY.current === null) return;
-    const currentY = e.touches[0].clientY;
-    const diff = touchStartY.current - currentY;
-    
-    // threshold
-    if (diff > 30) {
-      // Swiped up (scrolled down) - hide UI
-      setIsHeaderVisible(false);
-      touchStartY.current = currentY; // reset to avoid continuous triggers
-    } else if (diff < -30) {
-      // Swiped down (scrolled up) - show UI
-      setIsHeaderVisible(true);
-      touchStartY.current = currentY;
-    }
-  };
-  
-  const handleWheel = (e: React.WheelEvent) => {
-    if (e.deltaY > 20) {
-      setIsHeaderVisible(false);
-    } else if (e.deltaY < -20) {
-      setIsHeaderVisible(true);
-    }
-  };
-
-  const maxVA = engine.dataPoints.length > 0 ? Math.max(0, ...engine.dataPoints.map(dp => Math.abs(dp.vA))) : 0;
+    const maxVA = engine.dataPoints.length > 0 ? Math.max(0, ...engine.dataPoints.map(dp => Math.abs(dp.vA))) : 0;
   const maxVB = engine.dataPoints.length > 0 ? Math.max(0, ...engine.dataPoints.map(dp => Math.abs(dp.vB))) : 0;
 
   return (
-    <div className="h-screen flex flex-col bg-[#F4F1EB] text-slate-900 font-sans selection:bg-blue-200 relative overflow-hidden">
+    <div className="h-[100dvh] flex flex-col bg-[#F4F1EB] text-slate-900 font-sans selection:bg-blue-200 relative overflow-hidden">
       
       {/* Header */}
-      <header className={`bg-white border-b-[3px] border-slate-900 shadow-sm z-[100] flex-shrink-0 overflow-visible transition-transform duration-300 absolute top-0 left-0 right-0 md:relative ${isHeaderVisible ? 'translate-y-0' : '-translate-y-full md:translate-y-0'}`}>
+      <header className={`bg-white shadow-sm z-[100] shrink-0 overflow-hidden relative transition-all duration-300 ease-in-out ${isHeaderVisible ? "border-b-[3px] border-slate-900 max-h-[500px] opacity-100" : "max-h-0 opacity-0 border-b-0 md:max-h-[500px] md:opacity-100 md:border-b-[3px]"}`}>
         <div className="px-4 py-2.5 flex items-center justify-center min-h-16 h-auto overflow-visible">
           <div className="grid grid-cols-3 sm:flex sm:flex-wrap items-center justify-center gap-2 sm:gap-4 w-full">
             
@@ -343,17 +312,27 @@ export default function App() {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col md:flex-row relative z-10 overflow-y-auto overflow-x-hidden md:overflow-hidden" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onWheel={handleWheel}>
+      <main className="flex-1 flex flex-col md:flex-row relative z-10 overflow-y-auto overflow-x-hidden md:overflow-hidden">
         
         {/* Canvas Area (Takes max space) */}
-        <div className="w-full flex-1 min-h-[500px] md:min-h-0 flex flex-col relative md:shrink md:p-0">
+        <div className="w-full flex-1 shrink-0 md:shrink md:p-0 flex flex-col relative min-h-full md:min-h-0">
           <div className="flex-1 flex flex-col pointer-events-none md:p-4">
             {/* We make SimulationCanvas accept full width/height of this wrapper */}
-            <div className="w-full flex-1 pointer-events-auto flex relative md:rounded-2xl md:shadow-[6px_6px_0px_0px_#0f172a] border-b-[4px] border-slate-900 md:border-[3px] overflow-hidden bg-white">
+            <div className="w-full flex-1 pointer-events-auto flex relative md:rounded-2xl md:shadow-[6px_6px_0px_0px_#0f172a] border-b-[4px] border-slate-900 md:border-[3px] overflow-hidden bg-white" onClick={(e) => { if (window.innerWidth < 768 && (e.target as HTMLElement).tagName !== "BUTTON") setIsHeaderVisible(!isHeaderVisible); }}>
               
               {/* Mode Indicator */}
-              <div className={`absolute left-1/2 -translate-x-1/2 md:left-4 md:translate-x-0 bg-white/95 px-4 py-1.5 rounded-full border-2 border-slate-900 font-black text-sm text-slate-800 shadow-[2px_2px_0px_0px_#0f172a] z-20 whitespace-nowrap pointer-events-none top-4`}>
-                {simulationMode === 'paraquedas' ? 'MODO: QUEDA LIVRE' : 'MODO: QUEDA SIMULTÂNEA'}
+              <div className="absolute left-3 top-3 md:left-4 md:top-4 z-20 flex flex-col items-start gap-2 pointer-events-none">
+                <div className="bg-white/95 px-3 py-1.5 md:px-4 md:py-1.5 rounded-full border-[2px] border-slate-900 font-black text-[11px] sm:text-xs md:text-sm text-slate-800 shadow-[2px_2px_0px_0px_#0f172a] whitespace-nowrap">
+                  {simulationMode === 'paraquedas' ? 'MODO: QUEDA LIVRE' : 'MODO: QUEDA SIMULTÂNEA'}
+                </div>
+                {toggles.showGravity && (
+                  <div className="bg-white border-[2px] md:border-[3px] border-slate-900 rounded-xl px-2 py-1 sm:px-3 sm:py-1.5 shadow-[2px_2px_0px_0px_#0f172a] md:shadow-[4px_4px_0px_0px_#0f172a] flex flex-col items-center justify-center leading-none self-start">
+                    <span className="text-[10px] sm:text-xs font-black uppercase text-slate-500">Gravidade</span>
+                    <span className="text-sm sm:text-lg font-black text-slate-900 tabular-nums leading-none">
+                      {engine.env.g.toFixed(2)} <span className="text-xs sm:text-sm font-bold ml-0.5 text-slate-700">m/s²</span>
+                    </span>
+                  </div>
+                )}
               </div>
               <SimulationCanvas 
                 height={config.height} 
@@ -418,7 +397,7 @@ export default function App() {
             </div>
 
             {/* Playback Controls (Floating) */}
-            <div className={`mt-2 mb-4 mx-2 sm:mx-4 z-50 md:m-0 md:static md:mt-4 pointer-events-auto bg-white p-2 sm:p-3 rounded-2xl shadow-[4px_4px_0px_0px_#0f172a] md:shadow-[6px_6px_0px_0px_#0f172a] border-[3px] border-slate-900 grid grid-cols-2 sm:flex sm:flex-row items-center justify-center gap-2 sm:gap-4 shrink-0`}>
+            <div className="mt-2 mb-4 mx-2 sm:mx-4 z-50 md:m-0 md:static md:mt-4 pointer-events-auto bg-white p-2 sm:p-3 rounded-2xl shadow-[4px_4px_0px_0px_#0f172a] md:shadow-[6px_6px_0px_0px_#0f172a] border-[3px] border-slate-900 grid grid-cols-2 sm:flex sm:flex-row items-center justify-center gap-2 sm:gap-4 shrink-0">
               <button type="button" 
                 onClick={engine.start}
                 disabled={engine.isRunning}
@@ -458,7 +437,7 @@ export default function App() {
 
         {/* Dynamic Data Panels (Optional Sidebar) */}
         {(toggles.graphs || toggles.table) && (
-          <div className="w-full md:w-[350px] lg:w-[450px] p-4 flex flex-col gap-6 overflow-visible md:overflow-y-auto shrink-0 border-t-[3px] md:border-t-0 md:border-l-[3px] border-slate-900 bg-[#F4F1EB] z-20">
+          <div className="w-full md:w-[350px] lg:w-[450px] shrink-0 md:flex-none p-4 flex flex-col gap-6 overflow-visible md:overflow-y-auto border-t-[3px] md:border-t-0 md:border-l-[3px] border-slate-900 bg-[#F4F1EB] z-20">
                         {toggles.graphs && (
               <div className="animate-in fade-in slide-in-from-right-4 duration-300 flex-1 min-h-[300px]">
                 <ChartsArea data={engine.dataPoints} simulationMode={simulationMode} />
