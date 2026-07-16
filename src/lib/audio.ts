@@ -14,34 +14,41 @@ class SoundEngine {
   private alertBuffer: AudioBuffer | null = null;
 
   async init() {
-    if (this.ctx) return;
-    try {
-      this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      this.masterGain = this.ctx.createGain();
-      this.masterGain.connect(this.ctx.destination);
-      this.masterGain.gain.value = 0.5;
-      
-      // Load MP3
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
+    if (!this.ctx) {
+      try {
+        this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+        this.masterGain = this.ctx.createGain();
+        this.masterGain.connect(this.ctx.destination);
+        this.masterGain.gain.value = 0.5;
+      } catch (e) {
+        console.error('AudioContext not supported');
+        return;
+      }
+    }
+    
+    // Load MP3
+    if (!this.whatsappBuffer) {
       try {
         const response = await fetch('/sons/whatsapp.mp3?v=' + Date.now());
         if (response.ok) {
           const arrayBuffer = await response.arrayBuffer();
           this.whatsappBuffer = await this.ctx.decodeAudioData(arrayBuffer);
         }
-      } catch (e) {
-        // Suppress error to avoid cluttering logs if the user provided an invalid or empty MP3
-        // console.warn('MP3 decode failed, using synthetic fallback', e);
-      }
+      } catch (e) { console.error("Audio load error:", e); }
+    }
+    if (!this.alertBuffer) {
       try {
         const responseAlert = await fetch('/sons/alerta.mp3?v=' + Date.now());
         if (responseAlert.ok) {
           const arrayBufferAlert = await responseAlert.arrayBuffer();
           this.alertBuffer = await this.ctx.decodeAudioData(arrayBufferAlert);
         }
-      } catch (e) {}
-    } catch (e) {
-      console.error('AudioContext not supported');
+      } catch (e) { console.error("Audio load error:", e); }
     }
+
   }
 
   toggle(enabled: boolean) {
@@ -60,6 +67,9 @@ class SoundEngine {
   
   playClick() {
     if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     
@@ -79,6 +89,9 @@ class SoundEngine {
 
   playSoftImpact(velocity: number) {
     if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
     
     const bufferSize = this.ctx.sampleRate * 0.4;
     const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
@@ -109,6 +122,9 @@ class SoundEngine {
 
   playMetallicImpact(velocity: number) {
     if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
     
     // Mix two oscillators for a metallic clang
     const osc1 = this.ctx.createOscillator();
@@ -139,6 +155,9 @@ class SoundEngine {
 
   playWhatsapp() {
     if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
 
     if (this.whatsappBuffer) {
       const source = this.ctx.createBufferSource();
@@ -186,6 +205,9 @@ class SoundEngine {
   }
   playOvni() {
     if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
     const osc = this.ctx.createOscillator();
     const lfo = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
@@ -221,6 +243,9 @@ class SoundEngine {
 
   playAstronautShip() {
     if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
 
     // A deeper rumble for spaceship
     const osc1 = this.ctx.createOscillator();
@@ -271,6 +296,9 @@ class SoundEngine {
 
   playAirplane() {
     if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
 
     // Airplane jet/propeller sound
     const osc = this.ctx.createOscillator();
@@ -324,6 +352,9 @@ class SoundEngine {
 
   playImpact(velocity: number) {
     if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
     
     // Create noise buffer for a "puhhff" thud sound
     const bufferSize = this.ctx.sampleRate * 0.3; // 0.3 seconds
@@ -357,6 +388,9 @@ class SoundEngine {
 
   playParachute() {
     if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
     
     const bufferSize = this.ctx.sampleRate * 0.5; // 0.5 seconds
     const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
@@ -386,6 +420,9 @@ class SoundEngine {
 
   startWind() {
     if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
     if (this.windNode) return; // Already playing
 
     // --- Wind Noise Setup ---
