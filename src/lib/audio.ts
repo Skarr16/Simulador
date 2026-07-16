@@ -1,3 +1,5 @@
+import whatsappUrl from '../../sons/whatsapp.mp3';
+import alertaUrl from '../../sons/alerta.mp3';
 class SoundEngine {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
@@ -23,7 +25,7 @@ class SoundEngine {
       
       // Load MP3
       try {
-        const response = await fetch('/sons/whatsapp.mp3?v=' + Date.now());
+        const response = await fetch(whatsappUrl);
         if (response.ok) {
           const arrayBuffer = await response.arrayBuffer();
           this.whatsappBuffer = await this.ctx.decodeAudioData(arrayBuffer);
@@ -33,7 +35,7 @@ class SoundEngine {
         // console.warn('MP3 decode failed, using synthetic fallback', e);
       }
       try {
-        const responseAlert = await fetch('/sons/alexis_gaming_cam-alerte-346112.mp3?v=' + Date.now());
+        const responseAlert = await fetch(alertaUrl);
         if (responseAlert.ok) {
           const arrayBufferAlert = await responseAlert.arrayBuffer();
           this.alertBuffer = await this.ctx.decodeAudioData(arrayBufferAlert);
