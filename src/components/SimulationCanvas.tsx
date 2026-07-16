@@ -52,27 +52,27 @@ export function SimulationCanvas({
   const [devOffsets, setDevOffsets] = useState<Record<string, {left: number, bottom: number, width: number, height: number}>>({});
   
   const mobileOffsets: Record<string, {left: number, bottom: number, width: number, height: number}> = {
-    pisa: { left: -29, bottom: -25, width: 106, height: 110 },
-    eiffel: { left: -24, bottom: -23, width: 91, height: 108 },
-    cristo: { left: -33, bottom: -18, width: 119, height: 98 },
+    pisa: { left: -29, bottom: -21, width: 106, height: 110 },
+    eiffel: { left: -24, bottom: -21, width: 91, height: 108 },
+    cristo: { left: -33, bottom: -19, width: 119, height: 98 },
     gize: { left: -50, bottom: -35, width: 172, height: 122 },
-    custom: { left: -41, bottom: -25, width: 100, height: 120 }
+    custom: { left: -28, bottom: -18, width: 84, height: 106 }
   };
 
   const tabletOffsets: Record<string, {left: number, bottom: number, width: number, height: number}> = {
-    pisa: { left: -25, bottom: -20, width: 95, height: 110 },
-    eiffel: { left: -10, bottom: -20, width: 60, height: 105 },
-    cristo: { left: -10, bottom: -20, width: 60, height: 105 },
-    gize: { left: -30, bottom: -26, width: 100, height: 115 },
-    custom: { left: -24, bottom: 2, width: 60, height: 65 }
+    pisa: { left: -15, bottom: -22, width: 79, height: 110 },
+    eiffel: { left: -10, bottom: -20, width: 65, height: 105 },
+    cristo: { left: -10, bottom: -20, width: 85, height: 105 },
+    gize: { left: -36, bottom: -27, width: 112, height: 115 },
+    custom: { left: -24, bottom: 3, width: 70, height: 65 }
   };
 
   const desktopOffsets: Record<string, {left: number, bottom: number, width: number, height: number}> = {
-    pisa: { left: -32, bottom: -18, width: 88, height: 107 },
-    eiffel: { left: -6, bottom: -20, width: 40, height: 100 },
-    cristo: { left: -2, bottom: -22, width: 40, height: 107 },
-    gize: { left: -1, bottom: -28, width: 46, height: 108 },
-    custom: { left: -24, bottom: 3, width: 60, height: 65 }
+    pisa: { left: -30, bottom: -20, width: 88, height: 107 },
+    eiffel: { left: -6, bottom: -19, width: 41, height: 102 },
+    cristo: { left: -4, bottom: -20, width: 40, height: 107 },
+    gize: { left: -1, bottom: -23, width: 35, height: 108 },
+    custom: { left: -23, bottom: 2, width: 60, height: 65 }
   };
 
   const groundOffset = 10; 
@@ -208,7 +208,7 @@ export function SimulationCanvas({
 
       {/* Imaginary X-axis at y=0 */}
 
-      <div className="absolute inset-0 pointer-events-none z-40">
+      <div className="absolute inset-0 pointer-events-none z-[60]">
         {/* Ruler Vertical Spine */}
         <div className={`absolute top-[35%] bottom-[10%] left-[20px] sm:left-[28px] w-[3px] ${env.id === 'moon' ? 'bg-white' : env.id === 'custom' ? 'bg-[#451004]' : 'bg-slate-900'} z-0`}></div>
         {Array.from({ length: 11 }).map((_, i) => {
@@ -230,7 +230,7 @@ export function SimulationCanvas({
       </div>
 
       {/* Ground */}
-      <div className={`absolute bottom-0 left-0 right-0 h-[10%] border-t-[3px] border-b-[4px] sm:border-b-0 border-slate-900 z-30 flex items-center justify-center ${env.id === 'moon' ? 'bg-[#64748b]' : env.id === 'custom' ? 'bg-[#95290f]' : 'bg-[#00C48C]'}`}>
+      <div className={`absolute bottom-0 left-0 right-0 h-[10%] border-t-[3px] border-b-[4px] sm:border-b-0 border-slate-900 z-[20] flex items-center justify-center ${env.id === 'moon' ? 'bg-[#64748b]' : env.id === 'custom' ? 'bg-[#95290f]' : 'bg-[#00C48C]'}`}>
         <button 
           onClick={onToggleEnv}
           className="text-slate-900 font-black text-sm uppercase tracking-widest bg-white/80 px-4 py-1 rounded-full border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a] hover:bg-white active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_#0f172a] transition-all z-10"

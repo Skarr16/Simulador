@@ -11,6 +11,7 @@ class SoundEngine {
   private fallOscGain: GainNode | null = null;
 
   private whatsappBuffer: AudioBuffer | null = null;
+  private alertBuffer: AudioBuffer | null = null;
 
   async init() {
     if (this.ctx) return;
@@ -22,7 +23,7 @@ class SoundEngine {
       
       // Load MP3
       try {
-        const response = await fetch('/sons/whatsapp.mp3');
+        const response = await fetch('/sons/whatsapp.mp3?v=' + Date.now());
         if (response.ok) {
           const arrayBuffer = await response.arrayBuffer();
           this.whatsappBuffer = await this.ctx.decodeAudioData(arrayBuffer);
@@ -31,6 +32,13 @@ class SoundEngine {
         // Suppress error to avoid cluttering logs if the user provided an invalid or empty MP3
         // console.warn('MP3 decode failed, using synthetic fallback', e);
       }
+      try {
+        const responseAlert = await fetch('/sons/alerta.mp3?v=' + Date.now());
+        if (responseAlert.ok) {
+          const arrayBufferAlert = await responseAlert.arrayBuffer();
+          this.alertBuffer = await this.ctx.decodeAudioData(arrayBufferAlert);
+        }
+      } catch (e) {}
     } catch (e) {
       console.error('AudioContext not supported');
     }
@@ -141,40 +149,20 @@ class SoundEngine {
       gain.connect(this.masterGain);
       source.start();
     } else {
-      // Synthetic fallback
-      const osc1 = this.ctx.createOscillator();
-      const osc2 = this.ctx.createOscillator();
+      console.warn("Audio buffer not loaded yet");
+    }
+  }
+
+  playAlert() {
+    if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    if (this.alertBuffer) {
+      const source = this.ctx.createBufferSource();
+      source.buffer = this.alertBuffer;
       const gain = this.ctx.createGain();
-
-      osc1.type = 'sine';
-      osc2.type = 'sine';
-      
-      // WhatsApp-ish notification tone
-      osc1.frequency.setValueAtTime(600, this.ctx.currentTime);
-      osc1.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.1);
-      
-      osc2.frequency.setValueAtTime(800, this.ctx.currentTime + 0.15);
-      osc2.frequency.exponentialRampToValueAtTime(1200, this.ctx.currentTime + 0.25);
-
-      gain.gain.setValueAtTime(0, this.ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.5, this.ctx.currentTime + 0.02);
-      gain.gain.setValueAtTime(0.5, this.ctx.currentTime + 0.1);
-      gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.12);
-      
-      gain.gain.setValueAtTime(0, this.ctx.currentTime + 0.15);
-      gain.gain.linearRampToValueAtTime(0.5, this.ctx.currentTime + 0.17);
-      gain.gain.setValueAtTime(0.5, this.ctx.currentTime + 0.25);
-      gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.3);
-
-      osc1.connect(gain);
-      osc2.connect(gain);
+      gain.gain.value = 1.0;
+      source.connect(gain);
       gain.connect(this.masterGain);
-
-      osc1.start(this.ctx.currentTime);
-      osc1.stop(this.ctx.currentTime + 0.12);
-      
-      osc2.start(this.ctx.currentTime + 0.15);
-      osc2.stop(this.ctx.currentTime + 0.3);
+      source.start();
     }
   }
 
