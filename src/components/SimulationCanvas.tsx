@@ -208,7 +208,9 @@ export function SimulationCanvas({
 
       {/* Imaginary X-axis at y=0 */}
 
-      <div className="absolute top-0 bottom-[10%] left-0 right-0 pointer-events-none z-10">
+      <div className="absolute inset-0 pointer-events-none z-40">
+        {/* Ruler Vertical Spine */}
+        <div className={`absolute top-[35%] bottom-[10%] left-[20px] sm:left-[28px] w-[3px] ${env.id === 'moon' ? 'bg-white' : env.id === 'custom' ? 'bg-[#451004]' : 'bg-slate-900'} z-0`}></div>
         {Array.from({ length: 11 }).map((_, i) => {
           const percent = i * 10;
           const val = (height * percent / 100).toFixed(1);

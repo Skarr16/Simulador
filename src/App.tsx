@@ -78,6 +78,25 @@ export default function App() {
   const prevDeployedBForCrash = useRef(false);
 
   useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (e.ctrlKey) {
+        e.preventDefault();
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && (e.key === '=' || e.key === '-' || e.key === '+' || e.key === '_' || e.key === '0')) {
+        e.preventDefault();
+      }
+    };
+    document.addEventListener('wheel', handleWheel, { passive: false });
+    document.addEventListener('keydown', handleKeyDown, { passive: false });
+    return () => {
+      document.removeEventListener('wheel', handleWheel);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  useEffect(() => {
     const handleGlobalClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (target.closest('button')) {
@@ -397,7 +416,7 @@ export default function App() {
             </div>
 
             {/* Playback Controls (Floating) */}
-            <div className="mt-2 mb-4 mx-2 sm:mx-4 z-50 sm:m-0 sm:static sm:mt-4 pointer-events-auto bg-white p-2 sm:p-3 rounded-2xl shadow-[4px_4px_0px_0px_#0f172a] sm:shadow-[6px_6px_0px_0px_#0f172a] border-[3px] border-slate-900 flex flex-wrap items-center justify-center gap-2 sm:gap-4 w-full shrink-0">
+            <div className="mt-2 sm:mt-4 mb-4 sm:mb-0 w-full z-50 pointer-events-auto bg-white p-2 sm:p-3 rounded-none sm:rounded-2xl shadow-[0px_-4px_0px_0px_#0f172a] sm:shadow-[6px_6px_0px_0px_#0f172a] border-y-[4px] sm:border-[3px] border-slate-900 flex flex-wrap items-center justify-center gap-2 sm:gap-4 shrink-0">
               <button type="button" 
                 onClick={engine.start}
                 disabled={engine.isRunning}
