@@ -1,7 +1,7 @@
 class SoundEngine {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
-  public isEnabled: boolean = false;
+  public isEnabled: boolean = true;
 
   private windNode: AudioBufferSourceNode | null = null;
   private windGain: GainNode | null = null;
@@ -103,8 +103,8 @@ class SoundEngine {
     noise.connect(filter);
     filter.connect(gain);
     gain.connect(this.masterGain);
-    
-    noise.start();
+    noise.start(this.ctx.currentTime);
+    noise.stop(this.ctx.currentTime + 0.3);
   }
 
   playMetallicImpact(velocity: number) {
@@ -177,10 +177,10 @@ class SoundEngine {
       
       gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.6);
-      
       osc.connect(gain);
       gain.connect(this.masterGain);
-      osc.start();
+      osc.start(this.ctx.currentTime);
+      osc.stop(this.ctx.currentTime + 0.6);
       osc.stop(this.ctx.currentTime + 0.6);
   }
   }
@@ -351,8 +351,8 @@ class SoundEngine {
     noise.connect(filter);
     filter.connect(gain);
     gain.connect(this.masterGain);
-    
-    noise.start();
+    noise.start(this.ctx.currentTime);
+    noise.stop(this.ctx.currentTime + 0.5);
   }
 
   playParachute() {
