@@ -460,7 +460,7 @@ export function SimulationCanvas({
                       {/* Top Vectors (Drag) */}
                       {FdA > 0 && (
                         <div className="absolute bottom-[100%] left-1/2 -translate-x-1/2 mb-1 flex flex-col items-center pointer-events-none z-30">
-                           <span className="text-[10px] font-black bg-white/80 px-1 rounded mb-1 shadow-sm border border-slate-200 text-center whitespace-nowrap">Fa: {FdA.toFixed(1)} N</span>
+                           <span className="text-[10px] font-black bg-white/80 px-1 rounded mb-1 shadow-sm border border-slate-200 text-center whitespace-nowrap">Fa: {FdA.toFixed(3)} N</span>
                            <div className="w-1 sm:w-1.5 bg-[#FF3366] relative" style={{ height: 15 + Math.min(FdA, 50) }}>
                              <div className="absolute -top-[7px] sm:-top-2 left-1/2 -translate-x-1/2 border-l-[5px] sm:border-l-[8px] border-r-[5px] sm:border-r-[8px] border-b-[7px] sm:border-b-[10px] border-x-transparent border-b-[#FF3366]"></div>
                            </div>
@@ -507,7 +507,7 @@ export function SimulationCanvas({
                   {/* Top Vectors (Drag) */}
                   {FdB > 0 && (
                     <div className="absolute bottom-[100%] left-1/2 -translate-x-1/2 mb-1 flex flex-col items-center pointer-events-none z-30">
-                       <span className="text-[10px] font-black bg-white/80 px-1 rounded mb-1 shadow-sm border border-slate-200 text-center whitespace-nowrap">Fa: {FdB.toFixed(1)} N</span>
+                       <span className="text-[10px] font-black bg-white/80 px-1 rounded mb-1 shadow-sm border border-slate-200 text-center whitespace-nowrap">Fa: {FdB.toFixed(3)} N</span>
                        <div className="w-1 sm:w-1.5 bg-[#FF3366] relative" style={{ height: 15 + Math.min(FdB, 50) }}>
                          <div className="absolute -top-[7px] sm:-top-2 left-1/2 -translate-x-1/2 border-l-[5px] sm:border-l-[8px] border-r-[5px] sm:border-r-[8px] border-b-[7px] sm:border-b-[10px] border-x-transparent border-b-[#FF3366]"></div>
                        </div>
@@ -559,7 +559,7 @@ export function SimulationCanvas({
              </div>
              <div className="bg-slate-100 p-2 sm:p-3 rounded-lg border border-slate-200 shadow-inner flex flex-col justify-center items-center sm:items-start text-center sm:text-left">
                <div className="text-[10px] sm:text-xs uppercase font-bold text-slate-500 mb-0.5 sm:mb-1">Arrasto (Fa)</div>
-               <div className="font-black text-sm sm:text-2xl text-[#FF3366] tabular-nums tracking-tighter">{FdA.toFixed(1)} <span className="text-[10px] sm:text-base">N</span></div>
+               <div className="font-black text-sm sm:text-2xl text-[#FF3366] tabular-nums tracking-tighter">{FdA.toFixed(3)} <span className="text-[10px] sm:text-base">N</span></div>
              </div>
              <div className="bg-slate-100 p-2 sm:p-3 rounded-lg border border-slate-200 shadow-inner flex flex-col justify-center items-center sm:items-start text-center sm:text-left">
                <div className="text-[10px] sm:text-xs uppercase font-bold text-slate-500 mb-0.5 sm:mb-1">Peso (P)</div>

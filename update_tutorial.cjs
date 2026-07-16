@@ -1,46 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { X, Play, LineChart as ChartIcon, Activity, ChevronRight, ChevronLeft, RotateCcw, Square, Settings2, Wind, ArrowDownToLine, Zap, ChevronDown } from 'lucide-react';
-import HTMLFlipBook from 'react-pageflip';
+const fs = require('fs');
+let code = fs.readFileSync('src/components/TutorialModal.tsx', 'utf8');
 
-interface TutorialModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  simulationMode?: 'livre' | 'paraquedas';
-}
-
-export function TutorialModal({ isOpen, onClose, simulationMode }: TutorialModalProps) {
-  const [page, setPage] = useState(0);
-  const bookRef = useRef<any>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-
-  useEffect(() => {
-    if (!isOpen || !containerRef.current) return;
-    const observer = new ResizeObserver((entries) => {
-      for (let entry of entries) {
-        setDimensions({
-          width: entry.contentRect.width,
-          height: entry.contentRect.height,
-        });
-      }
-    });
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, [isOpen]);
-
-  if (!isOpen) return null;
-
-  const paginate = (dir: number) => {
-    if (bookRef.current) {
-      if (dir === 1) {
-        bookRef.current.pageFlip().flipNext();
-      } else {
-        bookRef.current.pageFlip().flipPrev();
-      }
-    }
-  };
-
-  
+const newPages = `
   const pages = [
     // Page 0: Welcome
     (
@@ -281,86 +242,9 @@ export function TutorialModal({ isOpen, onClose, simulationMode }: TutorialModal
       </div>
     )
   ];
+`;
 
+code = code.replace(/const pages = \[\s*\/\/ Page 0: Welcome[\s\S]*?(?=return \()/g, newPages + '\n\n  ');
 
-  return (
-    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
-      {/* Book Container */}
-      <div className="bg-[#F4F1EB] border-4 border-slate-900 shadow-[8px_8px_0px_0px_#0f172a] rounded-2xl w-full max-w-lg aspect-[3/4] max-h-[85vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200 relative">
-        
-        {/* Binder accent (visual only) */}
-        <div className="absolute left-0 top-0 bottom-0 w-8 sm:w-10 bg-slate-800/5 border-r-2 border-slate-900/10 z-0"></div>
-        
-        {/* Header/Close */}
-        <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-20">
-          <button 
-            onClick={onClose}
-            className="w-10 h-10 bg-white hover:bg-slate-100 rounded-xl border-2 border-slate-900 flex items-center justify-center transition-colors shadow-[2px_2px_0px_0px_#0f172a]"
-          >
-            <X className="w-5 h-5 text-slate-900" />
-          </button>
-        </div>
-
-        {/* Page Number */}
-        <div className="absolute top-5 left-10 sm:left-14 z-20 font-mono text-xs font-bold text-slate-400">
-          Pág. {page + 1}/{pages.length}
-        </div>
-
-        {/* Page Content */}
-        <div ref={containerRef} className="flex-1 pl-12 pr-6 sm:pl-16 sm:pr-8 pt-16 sm:pt-20 pb-20 relative z-10 overflow-hidden w-full h-full">
-          {dimensions.width > 0 && (
-            <div key={`${dimensions.width}-${dimensions.height}`} style={{ width: dimensions.width, height: dimensions.height }}>
-              <HTMLFlipBook
-                width={dimensions.width}
-                height={dimensions.height}
-                size="fixed"
-                maxShadowOpacity={0.5}
-                showCover={false}
-                mobileScrollSupport={true}
-                usePortrait={true}
-                className="tutorial-book"
-                ref={bookRef}
-                onFlip={(e: any) => setPage(e.data)}
-                style={{ margin: '0 auto' }}
-                startPage={page}
-                drawShadow={true}
-                flippingTime={1000}
-                useMouseEvents={false}
-              >
-                {pages.map((p, i) => (
-                  <div key={i} className="page bg-[#F4F1EB] h-full overflow-hidden flex flex-col">
-                    {p}
-                  </div>
-                ))}
-              </HTMLFlipBook>
-            </div>
-          )}
-        </div>
-
-        {/* Navigation Footer */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 flex justify-between bg-[#F4F1EB] border-t-2 border-slate-900/10 z-20 pl-12 sm:pl-16">
-          <button
-            onClick={() => paginate(-1)}
-            disabled={page === 0}
-            className="flex items-center gap-1 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 bg-white disabled:bg-slate-200 disabled:text-slate-400 text-slate-900 font-black rounded-xl border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_#0f172a] disabled:shadow-none disabled:translate-y-[2px] transition-all text-[10px] sm:text-xs uppercase"
-          >
-            <ChevronLeft className="w-4 h-4" /> <span className="hidden sm:inline">Anterior</span>
-          </button>
-          
-          <button
-            onClick={() => {
-              if (page === pages.length - 1) {
-                onClose();
-              } else {
-                paginate(1);
-              }
-            }}
-            className="flex items-center gap-1 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 bg-[#00C48C] text-slate-900 font-black rounded-xl border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_#0f172a] transition-all text-[10px] sm:text-xs uppercase"
-          >
-            {page === pages.length - 1 ? 'Concluir' : <span className="hidden sm:inline">Próxima</span>} <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
+fs.writeFileSync('src/components/TutorialModal.tsx', code);
+console.log("Updated TutorialModal");
