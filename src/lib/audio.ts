@@ -33,7 +33,7 @@ class SoundEngine {
         // console.warn('MP3 decode failed, using synthetic fallback', e);
       }
       try {
-        const responseAlert = await fetch('/sons/alerta.mp3?v=' + Date.now());
+        const responseAlert = await fetch('/sons/alexis_gaming_cam-alerte-346112.mp3?v=' + Date.now());
         if (responseAlert.ok) {
           const arrayBufferAlert = await responseAlert.arrayBuffer();
           this.alertBuffer = await this.ctx.decodeAudioData(arrayBufferAlert);
