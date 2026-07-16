@@ -124,9 +124,8 @@ export default function App() {
           soundEngine.playAirplane();
         }
       }
-      const maxV = Math.max(engine.currentState.vA, engine.currentState.vB);
-      const yPct = Math.max(engine.currentState.yA, engine.currentState.yB) / Math.max(config.height, 1);
-      soundEngine.updateWind(maxV, yPct);
+      const maxV = config.simulationMode === 'paraquedas' ? engine.currentState.vA : Math.max(engine.currentState.vA, engine.currentState.vB);
+      soundEngine.updateWind(maxV);
     } else if (prevIsRunning.current) {
       soundEngine.stopWind();
     }
@@ -136,7 +135,7 @@ export default function App() {
     if (engine.currentState.parachuteDeployedA && !prevDeployedA.current) {
       soundEngine.playParachute();
     }
-    if (engine.currentState.parachuteDeployedB && !prevDeployedB.current) {
+    if (config.simulationMode !== 'paraquedas' && engine.currentState.parachuteDeployedB && !prevDeployedB.current) {
       soundEngine.playParachute();
     }
     prevDeployedA.current = engine.currentState.parachuteDeployedA || false;
@@ -181,15 +180,10 @@ export default function App() {
     if (config.simulationMode === 'paraquedas' && engine.isRunning) {
       const currentState = engine.currentState;
       const isSkydiverA = config.objectAId === 'skydiver';
-      const isSkydiverB = config.objectBId === 'skydiver';
-      
       let failed = false;
       
       // Check altitude < 600m without parachute
       if (isSkydiverA && currentState.yA > 0 && currentState.yA < 600 && !currentState.parachuteDeployedA) {
-        failed = true;
-      }
-      if (isSkydiverB && currentState.yB > 0 && currentState.yB < 600 && !currentState.parachuteDeployedB) {
         failed = true;
       }
       

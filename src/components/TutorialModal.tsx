@@ -112,12 +112,25 @@ export function TutorialModal({ isOpen, onClose, simulationMode }: TutorialModal
           </p>
           <div className="flex justify-around mb-4">
             <div className="text-center">
-              <img src="https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?auto=format&fit=crop&q=80&w=150" className="w-12 h-12 rounded-full border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a] mx-auto mb-1" />
+              <div className="w-12 h-12 rounded-full border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a] mx-auto mb-1 overflow-hidden relative bg-[#87CEEB]">
+                <div className="absolute bottom-0 w-full h-[30%] bg-[#00C48C] border-t-2 border-slate-900"></div>
+                <div className="absolute top-2 right-2 w-3 h-3 bg-[#FFD700] rounded-full"></div>
+              </div>
               <span className="text-[10px] font-black uppercase">Terra (Ar)</span>
             </div>
             <div className="text-center">
-              <img src="https://images.unsplash.com/photo-1522030299830-16b8d3d049fe?auto=format&fit=crop&q=80&w=150" className="w-12 h-12 rounded-full border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a] mx-auto mb-1" />
+              <div className="w-12 h-12 rounded-full border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a] mx-auto mb-1 overflow-hidden relative bg-[#1a1a2e]">
+                <div className="absolute bottom-0 w-full h-[30%] bg-[#64748b] border-t-2 border-slate-900"></div>
+                <div className="absolute top-2 left-2 w-2 h-2 bg-white rounded-full opacity-80"></div>
+              </div>
               <span className="text-[10px] font-black uppercase">Lua (Vácuo)</span>
+            </div>
+            <div className="text-center">
+              <div className="w-12 h-12 rounded-full border-2 border-slate-900 shadow-[2px_2px_0px_0px_#0f172a] mx-auto mb-1 overflow-hidden relative bg-[#fad47c]">
+                <div className="absolute bottom-0 w-full h-[30%] bg-[#95290f] border-t-2 border-slate-900"></div>
+                <div className="absolute top-4 right-3 w-4 h-1 bg-[#bd4821] rounded-full"></div>
+              </div>
+              <span className="text-[10px] font-black uppercase">Person.</span>
             </div>
           </div>
           <div className="bg-slate-100 p-3 rounded-xl border-2 border-slate-200">

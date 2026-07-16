@@ -7,8 +7,8 @@ class SoundEngine {
   private windGain: GainNode | null = null;
   private windFilter: BiquadFilterNode | null = null;
 
-  private fallOsc: OscillatorNode | null = null;
-  private fallOscGain: GainNode | null = null;
+  
+  
 
   private whatsappBuffer: AudioBuffer | null = null;
   private alertBuffer: AudioBuffer | null = null;
@@ -155,6 +155,9 @@ class SoundEngine {
 
   playAlert() {
     if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
     if (this.alertBuffer) {
       const source = this.ctx.createBufferSource();
       source.buffer = this.alertBuffer;
@@ -163,9 +166,24 @@ class SoundEngine {
       source.connect(gain);
       gain.connect(this.masterGain);
       source.start();
-    }
+    } else {
+      // Synthetic fallback
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(400, this.ctx.currentTime);
+      osc.frequency.setValueAtTime(600, this.ctx.currentTime + 0.2);
+      osc.frequency.setValueAtTime(400, this.ctx.currentTime + 0.4);
+      
+      gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.6);
+      
+      osc.connect(gain);
+      gain.connect(this.masterGain);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.6);
   }
-
+  }
   playOvni() {
     if (!this.isEnabled || !this.ctx || !this.masterGain) return;
     const osc = this.ctx.createOscillator();
@@ -396,18 +414,7 @@ class SoundEngine {
     
     this.windNode.start();
 
-    // --- Falling Tone Setup ---
-    this.fallOsc = this.ctx.createOscillator();
-    this.fallOsc.type = 'triangle';
-    this.fallOsc.frequency.value = 800;
     
-    this.fallOscGain = this.ctx.createGain();
-    this.fallOscGain.gain.value = 0;
-    
-    this.fallOsc.connect(this.fallOscGain);
-    this.fallOscGain.connect(this.masterGain);
-    
-    this.fallOsc.start();
   }
 
   updateWind(velocity: number, yPct: number = 1) {
@@ -420,15 +427,7 @@ class SoundEngine {
     const windFreq = 200 + (velocity * 20);
     this.windFilter.frequency.setTargetAtTime(Math.min(windFreq, 3000), this.ctx.currentTime, 0.1);
 
-    if (this.fallOsc && this.fallOscGain) {
-      // Cartoon falling effect: pitch goes down as velocity increases
-      const pitch = 100 + (700 * yPct);
-      this.fallOsc.frequency.setTargetAtTime(pitch, this.ctx.currentTime, 0.1);
-
-      // Fade in the falling tone as velocity increases
-      const oscVol = Math.min(1.0, velocity / 100) * 0.15;
-      this.fallOscGain.gain.setTargetAtTime(oscVol, this.ctx.currentTime, 0.1);
-    }
+    
   }
 
   stopWind() {
@@ -437,9 +436,7 @@ class SoundEngine {
     if (this.windGain) {
       this.windGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.1);
     }
-    if (this.fallOscGain) {
-      this.fallOscGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.1);
-    }
+    
     
     // Stop and clear after fade
     setTimeout(() => {
@@ -449,11 +446,7 @@ class SoundEngine {
         this.windGain = null;
         this.windFilter = null;
       }
-      if (this.fallOsc) {
-        try { this.fallOsc.stop(); } catch(e) {}
-        this.fallOsc = null;
-        this.fallOscGain = null;
-      }
+      
     }, 200);
   }
 }
