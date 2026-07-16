@@ -125,7 +125,8 @@ export default function App() {
         }
       }
       const maxV = Math.max(engine.currentState.vA, engine.currentState.vB);
-      soundEngine.updateWind(maxV);
+      const yPct = Math.max(engine.currentState.yA, engine.currentState.yB) / Math.max(config.height, 1);
+      soundEngine.updateWind(maxV, yPct);
     } else if (prevIsRunning.current) {
       soundEngine.stopWind();
     }
@@ -282,7 +283,7 @@ export default function App() {
               className="flex shrink-0 items-center justify-center gap-1.5 sm:gap-2 px-1 sm:px-4 py-1.5 sm:py-2 bg-[#3b82f6] text-white rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
             >
               <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
-              <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Tutorial</span>
+              <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Guia</span>
             </button>
 
             {/* Button 6: QR Code */}

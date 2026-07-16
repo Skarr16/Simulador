@@ -1,4 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+const fs = require('fs');
+
+const guiaCode = `import React, { useState, useRef, useEffect } from 'react';
 import { X, Play, LineChart as ChartIcon, Activity, ChevronRight, ChevronLeft, RotateCcw, Square, Settings2, Wind, ArrowDownToLine, Zap } from 'lucide-react';
 import HTMLFlipBook from 'react-pageflip';
 
@@ -287,7 +289,7 @@ export function TutorialModal({ isOpen, onClose, simulationMode }: TutorialModal
         {/* Page Content */}
         <div ref={containerRef} className="flex-1 pl-12 pr-6 sm:pl-16 sm:pr-8 pt-16 sm:pt-20 pb-20 relative z-10 overflow-hidden w-full h-full">
           {dimensions.width > 0 && (
-            <div key={`${dimensions.width}-${dimensions.height}`} style={{ width: dimensions.width, height: dimensions.height }}>
+            <div key={\`\${dimensions.width}-\${dimensions.height}\`} style={{ width: dimensions.width, height: dimensions.height }}>
               <HTMLFlipBook
                 width={dimensions.width}
                 height={dimensions.height}
@@ -342,3 +344,7 @@ export function TutorialModal({ isOpen, onClose, simulationMode }: TutorialModal
     </div>
   );
 }
+`;
+
+fs.writeFileSync('src/components/TutorialModal.tsx', guiaCode);
+console.log("Updated TutorialModal");

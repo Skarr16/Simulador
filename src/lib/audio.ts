@@ -410,7 +410,7 @@ class SoundEngine {
     this.fallOsc.start();
   }
 
-  updateWind(velocity: number) {
+  updateWind(velocity: number, yPct: number = 1) {
     if (!this.isEnabled || !this.windGain || !this.ctx || !this.windFilter) return;
     
     // Max wind sound around 80 m/s
@@ -422,7 +422,7 @@ class SoundEngine {
 
     if (this.fallOsc && this.fallOscGain) {
       // Cartoon falling effect: pitch goes down as velocity increases
-      const pitch = Math.max(100, 800 - (velocity * 5));
+      const pitch = 100 + (700 * yPct);
       this.fallOsc.frequency.setTargetAtTime(pitch, this.ctx.currentTime, 0.1);
 
       // Fade in the falling tone as velocity increases
