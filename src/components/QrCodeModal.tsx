@@ -28,10 +28,10 @@ export function QrCodeModal({ isOpen, onClose }: QrCodeModalProps) {
       <div className="bg-[#F4F1EB] w-full max-w-md rounded-2xl border-4 border-slate-900 shadow-[8px_8px_0px_0px_#0f172a] flex flex-col overflow-hidden">
         
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b-4 border-slate-900 bg-[#0055FF]">
+        <div className="flex items-center justify-between p-4 border-b-4 border-slate-900 bg-[#7C3AED]">
           <div className="flex items-center gap-2">
             <QrCode className="w-6 h-6 text-white" />
-            <h2 className="text-lg font-black text-white uppercase tracking-tight">Compartilhar Simulador</h2>
+            <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">Compartilhar Simulador</h2>
           </div>
           <button onClick={onClose} className="p-1 hover:bg-white/20 rounded-lg transition-colors">
             <X className="w-6 h-6 text-white" />
@@ -54,7 +54,7 @@ export function QrCodeModal({ isOpen, onClose }: QrCodeModalProps) {
             />
             
             {/* Soft decorative visual indicator */}
-            <div className="absolute inset-0 bg-[#0055FF]/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            <div className="absolute inset-0 bg-[#7C3AED]/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
           </div>
 
           {/* Link display & copy section */}

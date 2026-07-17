@@ -267,7 +267,7 @@ export default function App() {
                 setToggles(prev => ({ ...prev, sound: nextState }));
                 soundEngine.toggle(nextState);
               }}
-              className={`flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 ${toggles.sound ? 'bg-[#FF3366] text-white' : 'bg-white text-slate-900'} rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
+              className={`flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 ${toggles.sound ? 'bg-[#FF3366] text-slate-900' : 'bg-white text-slate-900'} rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
             >
               {toggles.sound ? <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <VolumeX className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
               <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider hidden sm:inline">Som</span>
@@ -276,7 +276,7 @@ export default function App() {
             {/* Button Tutorial */}
             <button type="button" 
               onClick={() => setIsTutorialOpen(true)}
-              className="flex shrink-0 items-center justify-center gap-1.5 sm:gap-2 px-1 sm:px-4 py-1.5 sm:py-2 bg-[#3b82f6] text-white rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
+              className="flex shrink-0 items-center justify-center gap-1.5 sm:gap-2 px-1 sm:px-4 py-1.5 sm:py-2 bg-[#3b82f6] text-slate-900 rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
             >
               <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
               <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Guia</span>
@@ -285,7 +285,7 @@ export default function App() {
             {/* Button 6: QR Code */}
             <button type="button" 
               onClick={() => setIsQrCodeOpen(true)}
-              className="flex shrink-0 items-center justify-center gap-1 sm:gap-2 px-1 sm:px-4 py-1.5 sm:py-2 bg-[#A855F7] text-white rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
+              className="flex shrink-0 items-center justify-center gap-1 sm:gap-2 px-1 sm:px-4 py-1.5 sm:py-2 bg-[#A855F7] text-slate-900 rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
             >
               <QrCode className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
               <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">QR Code</span>
@@ -297,7 +297,7 @@ export default function App() {
                 engineLivre.pause();
                 setSimulationMode('paraquedas');
               }}
-              className={`flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 ${simulationMode === 'paraquedas' ? 'bg-[#00C48C] text-white' : 'bg-white text-slate-900'} rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
+              className={`flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 ${simulationMode === 'paraquedas' ? 'bg-[#00C48C] text-slate-900' : 'bg-white text-slate-900'} rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
             >
               <Wind className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
               <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Queda Livre</span>
@@ -309,7 +309,7 @@ export default function App() {
                 engineParaquedas.pause();
                 setSimulationMode('livre');
               }}
-              className={`flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 ${simulationMode === 'livre' ? 'bg-[#00C48C] text-white' : 'bg-white text-slate-900'} rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
+              className={`flex shrink-0 items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 ${simulationMode === 'livre' ? 'bg-[#00C48C] text-slate-900' : 'bg-white text-slate-900'} rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all`}
             >
               <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
               <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Queda Simultânea</span>
@@ -436,7 +436,7 @@ export default function App() {
                 <button type="button" 
                   onClick={engine.deployParachute}
                   disabled={!engine.isRunning || engine.currentState.parachuteDeployedA || engine.isFinished}
-                  className={`flex items-center justify-center gap-1 sm:gap-2 px-1.5 py-1.5 sm:px-2 md:px-4 sm:py-2 hover:bg-[#e62e5c] disabled:bg-slate-200 disabled:text-slate-400 text-white font-black rounded-xl border-[2px] sm:border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] sm:shadow-[4px_4px_0px_0px_#0f172a] hover:translate-y-1 hover:shadow-[0px_0px_0px_0px_#0f172a] disabled:hover:translate-y-0 disabled:hover:shadow-[3px_3px_0px_0px_#0f172a] sm:disabled:hover:shadow-[4px_4px_0px_0px_#0f172a] disabled:cursor-not-allowed transition-all text-[10px] sm:text-sm md:text-base ${(engine.currentState.yA <= config.height * 0.5 && engine.currentState.yA > config.height * 0.15 && !engine.currentState.parachuteDeployedA && engine.isRunning) ? 'bg-red-600 animate-alert-blink' : 'bg-[#FF3366]'}`}
+                  className={`flex items-center justify-center gap-1 sm:gap-2 px-1.5 py-1.5 sm:px-2 md:px-4 sm:py-2 hover:bg-[#e62e5c] disabled:bg-slate-200 disabled:text-slate-400 text-slate-900 font-black rounded-xl border-[2px] sm:border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] sm:shadow-[4px_4px_0px_0px_#0f172a] hover:translate-y-1 hover:shadow-[0px_0px_0px_0px_#0f172a] disabled:hover:translate-y-0 disabled:hover:shadow-[3px_3px_0px_0px_#0f172a] sm:disabled:hover:shadow-[4px_4px_0px_0px_#0f172a] disabled:cursor-not-allowed transition-all text-[10px] sm:text-sm md:text-base ${(engine.currentState.yA <= config.height * 0.5 && engine.currentState.yA > config.height * 0.15 && !engine.currentState.parachuteDeployedA && engine.isRunning) ? 'bg-red-600 animate-alert-blink' : 'bg-[#FF3366]'}`}
                 >
                   <Wind className="w-3 h-3 sm:w-4 sm:h-4" /> <span>ABRIR</span>
                 </button>

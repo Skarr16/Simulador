@@ -3,7 +3,7 @@ import { PhysicsObject, Environment } from '../types';
 export const OBJECTS: Record<string, PhysicsObject> = {
   bowling: { id: 'bowling', name: 'Bola de Boliche', diameterInfo: 'Ø 21.7cm', mass: 7.26, area: 0.037, cd: 0.47, color: '#1e293b', radius: 120, image: '/objetos/bola de boliche.png' },
   soccer: { id: 'soccer', name: 'Bola de Futebol', diameterInfo: 'Ø 21.7cm', mass: 0.43, area: 0.037, cd: 0.46, color: '#f8fafc', radius: 120, image: '/objetos/bola de futebol.png' },
-  golf: { id: 'golf', name: 'Bola de Golfe', diameterInfo: 'Ø 4.2cm', mass: 0.046, area: 0.0014, cd: 0.3, color: '#e2e8f0', radius: 70, image: '/objetos/bola de golf.png' },
+  golf: { id: 'golf', name: 'Bola de Golfe', diameterInfo: 'Ø 4.2cm', mass: 0.046, area: 0.0014, cd: 0.39, color: '#e2e8f0', radius: 70, image: '/objetos/bola de golf.png' },
   pingpong: { id: 'pingpong', name: 'Bola de Ping-Pong', diameterInfo: 'Ø 4.2cm', mass: 0.0027, area: 0.0014, cd: 0.4, color: '#f97316', radius: 70, image: '/objetos/bola de ping-pong.png' },
   paper_crumpled: { id: 'paper_crumpled', name: 'Papel Amassado', mass: 0.005, area: 0.0028, cd: 0.8, color: '#cbd5e1', radius: 90, image: '/objetos/papel amassado.png' },
   paper_flat: { id: 'paper_flat', name: 'Folha de Papel', mass: 0.005, area: 0.06, cd: 1.28, color: '#ffffff', radius: 120, image: '/objetos/papel.png' },
