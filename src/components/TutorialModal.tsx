@@ -615,7 +615,7 @@ export function TutorialModal({ isOpen, onClose, simulationMode }: TutorialModal
         <div className="max-w-sm flex flex-col items-center -mt-12 sm:-mt-20">
           <img src="/ufs_logo.png" className="w-56 h-auto mb-10 object-contain drop-shadow-md" alt="Logo UFS" />
           <p className="text-white text-[14px] sm:text-sm font-sans font-medium text-center leading-relaxed drop-shadow-sm">
-            projeto desenvolvido durante a diciplina de <span className="font-black tracking-wide">TÓPICOS ESPECIAIS EM FERRAMENTAS COMPUTACIONAIS PARA O ENSINO DE FÍSICA - T01</span> do periodo 2026.1 da universidade Federal de Sergipe
+            Projeto desenvolvido durante a diciplina de <span className="font-black tracking-wide">TÓPICOS ESPECIAIS EM FERRAMENTAS COMPUTACIONAIS PARA O ENSINO DE FÍSICA - T01</span> do periodo <strong>2026.1</strong> da <strong>Universidade Federal de Sergipe</strong>
           </p>
         </div>
       </div>
