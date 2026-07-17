@@ -1,3 +1,5 @@
+import whatsappSnd from '../../public/sons/whatsapp.mp3';
+import alertaSnd from '../../public/sons/alerta.mp3';
 class SoundEngine {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
@@ -32,7 +34,7 @@ class SoundEngine {
     // Load MP3
     if (!this.whatsappBuffer) {
       try {
-        const response = await fetch('/sons/whatsapp.mp3?v=' + Date.now());
+        const response = await fetch(whatsappSnd);
         if (response.ok) {
           const arrayBuffer = await response.arrayBuffer();
           this.whatsappBuffer = await this.ctx.decodeAudioData(arrayBuffer);
@@ -41,7 +43,7 @@ class SoundEngine {
     }
     if (!this.alertBuffer) {
       try {
-        const responseAlert = await fetch('/sons/alerta.mp3?v=' + Date.now());
+        const responseAlert = await fetch(alertaSnd);
         if (responseAlert.ok) {
           const arrayBufferAlert = await responseAlert.arrayBuffer();
           this.alertBuffer = await this.ctx.decodeAudioData(arrayBufferAlert);
@@ -154,200 +156,21 @@ class SoundEngine {
   }
 
   playWhatsapp() {
-    if (!this.isEnabled || !this.ctx || !this.masterGain) return;
-    if (this.ctx.state === 'suspended') {
-      this.ctx.resume().catch(() => {});
-    }
-
-    if (this.whatsappBuffer) {
-      const source = this.ctx.createBufferSource();
-      source.buffer = this.whatsappBuffer;
-      const gain = this.ctx.createGain();
-      gain.gain.value = 1.0;
-      source.connect(gain);
-      gain.connect(this.masterGain);
-      source.start();
-    } else {
-      console.warn("Audio buffer not loaded yet");
-    }
+    if (!this.isEnabled) return;
+    try {
+      const audio = new Audio(whatsappSnd);
+      audio.volume = 1.0;
+      audio.play().catch(e => console.error(e));
+    } catch (e) { console.error(e); }
   }
 
   playAlert() {
-    if (!this.isEnabled || !this.ctx || !this.masterGain) return;
-    if (this.ctx.state === 'suspended') {
-      this.ctx.resume().catch(() => {});
-    }
-    if (this.alertBuffer) {
-      const source = this.ctx.createBufferSource();
-      source.buffer = this.alertBuffer;
-      const gain = this.ctx.createGain();
-      gain.gain.value = 1.0;
-      source.connect(gain);
-      gain.connect(this.masterGain);
-      source.start();
-    } else {
-      // Synthetic fallback
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(400, this.ctx.currentTime);
-      osc.frequency.setValueAtTime(600, this.ctx.currentTime + 0.2);
-      osc.frequency.setValueAtTime(400, this.ctx.currentTime + 0.4);
-      
-      gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.6);
-      osc.connect(gain);
-      gain.connect(this.masterGain);
-      osc.start(this.ctx.currentTime);
-      osc.stop(this.ctx.currentTime + 0.6);
-      osc.stop(this.ctx.currentTime + 0.6);
-  }
-  }
-  playOvni() {
-    if (!this.isEnabled || !this.ctx || !this.masterGain) return;
-    if (this.ctx.state === 'suspended') {
-      this.ctx.resume().catch(() => {});
-    }
-    const osc = this.ctx.createOscillator();
-    const lfo = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-
-    osc.type = 'sine';
-    lfo.type = 'sine';
-    
-    // Base frequency
-    osc.frequency.value = 400;
-    
-    // LFO controls frequency to give that wobbly sci-fi sound
-    lfo.frequency.value = 8;
-    const lfoGain = this.ctx.createGain();
-    lfoGain.gain.value = 50;
-    
-    lfo.connect(lfoGain);
-    lfoGain.connect(osc.frequency);
-
-    // Envelope - lower volume and fades out over 3 seconds (when it leaves screen)
-    gain.gain.setValueAtTime(0, this.ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.1, this.ctx.currentTime + 0.2);
-    gain.gain.linearRampToValueAtTime(0.05, this.ctx.currentTime + 1.5);
-    gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 3);
-
-    osc.connect(gain);
-    gain.connect(this.masterGain);
-
-    osc.start(this.ctx.currentTime);
-    lfo.start(this.ctx.currentTime);
-    osc.stop(this.ctx.currentTime + 3);
-    lfo.stop(this.ctx.currentTime + 3);
-  }
-
-  playAstronautShip() {
-    if (!this.isEnabled || !this.ctx || !this.masterGain) return;
-    if (this.ctx.state === 'suspended') {
-      this.ctx.resume().catch(() => {});
-    }
-
-    // A deeper rumble for spaceship
-    const osc1 = this.ctx.createOscillator();
-    const noise = this.ctx.createBufferSource();
-    const gain = this.ctx.createGain();
-
-    osc1.type = 'triangle'; // triangle is less strident than sawtooth
-    
-    // Very low pitch rumble
-    osc1.frequency.setValueAtTime(50, this.ctx.currentTime);
-    osc1.frequency.linearRampToValueAtTime(30, this.ctx.currentTime + 3);
-
-    // Noise for thrust
-    const bufferSize = this.ctx.sampleRate * 3.0; // 3 seconds
-    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      // Reduce noise harshness
-      data[i] = (Math.random() * 2 - 1) * 0.5;
-    }
-    noise.buffer = buffer;
-    
-    // Noise filter - much lower pass for a muffled deep roar
-    const filter = this.ctx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(150, this.ctx.currentTime);
-    filter.frequency.linearRampToValueAtTime(50, this.ctx.currentTime + 3);
-    
-    noise.connect(filter);
-    filter.connect(gain);
-    osc1.connect(gain);
-
-    // Envelope - fades out over 3 seconds as the ship flies away
-    gain.gain.setValueAtTime(4.0, this.ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(3.0, this.ctx.currentTime + 0.5); // fly in
-    gain.gain.linearRampToValueAtTime(1.0, this.ctx.currentTime + 2.0); // fly away
-    gain.gain.linearRampToValueAtTime(0.1, this.ctx.currentTime + 2.9);
-    gain.gain.setValueAtTime(0, this.ctx.currentTime + 3.0); // gone
-
-    gain.connect(this.masterGain);
-
-    osc1.start(this.ctx.currentTime);
-    noise.start(this.ctx.currentTime);
-    
-    osc1.stop(this.ctx.currentTime + 3.0);
-    noise.stop(this.ctx.currentTime + 3.0);
-  }
-
-  playAirplane() {
-    if (!this.isEnabled || !this.ctx || !this.masterGain) return;
-    if (this.ctx.state === 'suspended') {
-      this.ctx.resume().catch(() => {});
-    }
-
-    // Airplane jet/propeller sound
-    const osc = this.ctx.createOscillator();
-    const noise = this.ctx.createBufferSource();
-    const gain = this.ctx.createGain();
-
-    // Whine for jet
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(250, this.ctx.currentTime);
-    osc.frequency.linearRampToValueAtTime(150, this.ctx.currentTime + 3); // Doppler effect
-
-    // Noise for air
-    const bufferSize = this.ctx.sampleRate * 3.0; 
-    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = Math.random() * 2 - 1;
-    }
-    noise.buffer = buffer;
-    
-    // Noise filter - bandpass for airplane
-    const filter = this.ctx.createBiquadFilter();
-    filter.type = 'bandpass';
-    filter.frequency.setValueAtTime(800, this.ctx.currentTime);
-    filter.frequency.linearRampToValueAtTime(400, this.ctx.currentTime + 3);
-    
-    noise.connect(filter);
-    filter.connect(gain);
-    
-    // Balance whine vs noise
-    const oscGain = this.ctx.createGain();
-    oscGain.gain.value = 0.2;
-    osc.connect(oscGain);
-    oscGain.connect(gain);
-
-    // Envelope - fades out over 3 seconds
-    gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.3, this.ctx.currentTime + 0.3); // approach
-    gain.gain.linearRampToValueAtTime(0.1, this.ctx.currentTime + 2.0); // fly away
-    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 2.9);
-    gain.gain.setValueAtTime(0, this.ctx.currentTime + 3.0); // gone
-
-    gain.connect(this.masterGain);
-
-    osc.start(this.ctx.currentTime);
-    noise.start(this.ctx.currentTime);
-    
-    osc.stop(this.ctx.currentTime + 3.0);
-    noise.stop(this.ctx.currentTime + 3.0);
+    if (!this.isEnabled) return;
+    try {
+      const audio = new Audio(alertaSnd);
+      audio.volume = 1.0;
+      audio.play().catch(e => console.error(e));
+    } catch (e) { console.error(e); }
   }
 
   playImpact(velocity: number) {
@@ -465,6 +288,129 @@ class SoundEngine {
     this.windFilter.frequency.setTargetAtTime(Math.min(windFreq, 3000), this.ctx.currentTime, 0.1);
 
     
+  }
+
+  
+  playOvni() {
+    if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
+    const osc = this.ctx.createOscillator();
+    const lfo = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    lfo.type = 'sine';
+    
+    osc.frequency.value = 400;
+    
+    lfo.frequency.value = 8;
+    const lfoGain = this.ctx.createGain();
+    lfoGain.gain.value = 50;
+    
+    lfo.connect(lfoGain);
+    lfoGain.connect(osc.frequency);
+    
+    gain.gain.setValueAtTime(0, this.ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.1, this.ctx.currentTime + 0.2);
+    gain.gain.linearRampToValueAtTime(0.1, this.ctx.currentTime + 2.5);
+    gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 3);
+    
+    osc.connect(gain);
+    gain.connect(this.masterGain);
+    
+    osc.start(this.ctx.currentTime);
+    lfo.start(this.ctx.currentTime);
+    osc.stop(this.ctx.currentTime + 3);
+    lfo.stop(this.ctx.currentTime + 3);
+  }
+
+  playAstronautShip() {
+    if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
+    
+    const osc1 = this.ctx.createOscillator();
+    const noise = this.ctx.createBufferSource();
+    const gain = this.ctx.createGain();
+    osc1.type = 'triangle'; 
+    
+    osc1.frequency.setValueAtTime(50, this.ctx.currentTime);
+    osc1.frequency.linearRampToValueAtTime(30, this.ctx.currentTime + 3);
+    
+    const bufferSize = this.ctx.sampleRate * 3.0; 
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * 0.5;
+    }
+    noise.buffer = buffer;
+    
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(150, this.ctx.currentTime);
+    filter.frequency.linearRampToValueAtTime(50, this.ctx.currentTime + 3);
+    
+    noise.connect(filter);
+    filter.connect(gain);
+    osc1.connect(gain);
+    
+    gain.gain.setValueAtTime(4.0, this.ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(3.0, this.ctx.currentTime + 0.5);
+    gain.gain.linearRampToValueAtTime(1.0, this.ctx.currentTime + 2.0);
+    gain.gain.linearRampToValueAtTime(0.1, this.ctx.currentTime + 2.9);
+    gain.gain.setValueAtTime(0, this.ctx.currentTime + 3.0);
+    
+    gain.connect(this.masterGain);
+    osc1.start(this.ctx.currentTime);
+    noise.start(this.ctx.currentTime);
+    
+    osc1.stop(this.ctx.currentTime + 3.0);
+    noise.stop(this.ctx.currentTime + 3.0);
+  }
+
+  playAirplane() {
+    if (!this.isEnabled || !this.ctx || !this.masterGain) return;
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
+    
+    const osc = this.ctx.createOscillator();
+    const noise = this.ctx.createBufferSource();
+    const gain = this.ctx.createGain();
+    
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(250, this.ctx.currentTime);
+    osc.frequency.linearRampToValueAtTime(150, this.ctx.currentTime + 3);
+    
+    const bufferSize = this.ctx.sampleRate * 3.0; 
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    noise.buffer = buffer;
+    
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(800, this.ctx.currentTime);
+    filter.frequency.linearRampToValueAtTime(400, this.ctx.currentTime + 3);
+    
+    noise.connect(filter);
+    filter.connect(gain);
+    osc.connect(gain);
+    
+    gain.gain.setValueAtTime(0, this.ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.3, this.ctx.currentTime + 1.0); 
+    gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 3.0); 
+    
+    gain.connect(this.masterGain);
+    osc.start(this.ctx.currentTime);
+    noise.start(this.ctx.currentTime);
+    
+    osc.stop(this.ctx.currentTime + 3.0);
+    noise.stop(this.ctx.currentTime + 3.0);
   }
 
   stopWind() {

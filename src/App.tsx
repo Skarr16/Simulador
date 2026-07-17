@@ -100,8 +100,7 @@ export default function App() {
     const handleGlobalClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (target.closest('button')) {
-        soundEngine.init();
-        soundEngine.playClick();
+        soundEngine.init().then(() => soundEngine.playClick());
       }
     };
     document.addEventListener('click', handleGlobalClick);
