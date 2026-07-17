@@ -385,7 +385,12 @@ export function SimulationCanvas({
                  <div className="font-black border-b border-slate-700 pb-1 mb-1">{obj.name}</div>
                  <div>Massa: {obj.mass.toFixed(3)} kg</div>
                  <div>Velocidade: {currentV.toFixed(1)} m/s</div>
-                 {(currentY <= 0 && currentV === 0) && <div>Velocidade Máx: {(letter === 'A' ? maxVA : maxVB).toFixed(1)} m/s</div>}
+                 {(currentY <= 0 && currentV === 0) && (
+                   <>
+                     <div>Velocidade Máx: {(letter === 'A' ? maxVA : maxVB).toFixed(1)} m/s</div>
+                     <div>F. Arrasto Máx: {(0.5 * env.rho * Math.pow(letter === 'A' ? maxVA : maxVB, 2) * (parachuteDeployed && obj.id === 'skydiver' ? 1.75 : obj.cd) * (parachuteDeployed && obj.id === 'skydiver' ? obj.area + 5 : obj.area)).toFixed(3)} N</div>
+                   </>
+                 )}
                  <div>Área: {parachuteDeployed && obj.id === 'skydiver' ? (obj.area + 5).toFixed(2) : obj.area} m²</div>
                  <div>Cd: {parachuteDeployed && obj.id === 'skydiver' ? '1.75' : obj.cd}</div>
                </div>
@@ -460,7 +465,7 @@ export function SimulationCanvas({
                       {/* Top Vectors (Drag) */}
                       {FdA > 0 && (
                         <div className="absolute bottom-[100%] left-1/2 -translate-x-1/2 mb-1 flex flex-col items-center pointer-events-none z-30">
-                           <span className="text-[10px] font-black bg-white/80 px-1 rounded mb-3 shadow-sm border border-slate-200 text-center whitespace-nowrap">Fa: {FdA.toFixed(3)} N</span>
+                           <span className="text-[10px] font-black bg-white/80 px-1 rounded mb-4 shadow-sm border border-slate-200 text-center whitespace-nowrap">Fa: {FdA.toFixed(3)} N</span>
                            <div className="w-1 sm:w-1.5 bg-[#FF3366] relative" style={{ height: 15 + Math.min(FdA, 50) }}>
                              <div className="absolute -top-[7px] sm:-top-2 left-1/2 -translate-x-1/2 border-l-[5px] sm:border-l-[8px] border-r-[5px] sm:border-r-[8px] border-b-[7px] sm:border-b-[10px] border-x-transparent border-b-[#FF3366]"></div>
                            </div>
@@ -507,7 +512,7 @@ export function SimulationCanvas({
                   {/* Top Vectors (Drag) */}
                   {FdB > 0 && (
                     <div className="absolute bottom-[100%] left-1/2 -translate-x-1/2 mb-1 flex flex-col items-center pointer-events-none z-30">
-                       <span className="text-[10px] font-black bg-white/80 px-1 rounded mb-3 shadow-sm border border-slate-200 text-center whitespace-nowrap">Fa: {FdB.toFixed(3)} N</span>
+                       <span className="text-[10px] font-black bg-white/80 px-1 rounded mb-4 shadow-sm border border-slate-200 text-center whitespace-nowrap">Fa: {FdB.toFixed(3)} N</span>
                        <div className="w-1 sm:w-1.5 bg-[#FF3366] relative" style={{ height: 15 + Math.min(FdB, 50) }}>
                          <div className="absolute -top-[7px] sm:-top-2 left-1/2 -translate-x-1/2 border-l-[5px] sm:border-l-[8px] border-r-[5px] sm:border-r-[8px] border-b-[7px] sm:border-b-[10px] border-x-transparent border-b-[#FF3366]"></div>
                        </div>
