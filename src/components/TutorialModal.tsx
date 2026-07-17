@@ -45,18 +45,15 @@ export function TutorialModal({ isOpen, onClose, simulationMode }: TutorialModal
     // Page 0: Welcome
     (
       <div className="flex flex-col h-full">
-        <h2 className="text-2xl sm:text-3xl font-black uppercase text-slate-900 mb-2 mt-4 text-center tracking-tight leading-none">
+        <h2 className="text-2xl sm:text-3xl font-black uppercase text-slate-900 mb-2 mt-4 text-center tracking-tight leading-none shrink-0">
           GUIA DO<br/>
           <span className="text-[#0055FF]">SIMULADOR</span>
         </h2>
-        <div className="flex-1 flex flex-col justify-center items-center px-4">
-          <div className="w-24 h-24 bg-white rounded-2xl border-4 border-slate-900 shadow-[4px_4px_0px_0px_#0f172a] flex items-center justify-center mb-6">
-            <Settings2 className="w-12 h-12 text-[#0055FF]" />
-          </div>
-          <p className="text-sm font-bold text-slate-600 text-center leading-relaxed">
+        <div className="flex-1 overflow-y-auto flex flex-col justify-center items-center px-2 sm:px-4 pb-8 scrollbar-thin">
+          <p className="text-sm sm:text-base font-bold text-slate-600 text-center leading-relaxed">
             Bem-vindo ao Guia Completo! Este simulador permite analisar a física da queda livre e o comportamento de saltos de paraquedas.
           </p>
-          <p className="text-sm font-bold text-slate-600 text-center mt-4">
+          <p className="text-sm sm:text-base font-bold text-slate-600 text-center mt-3 sm:mt-4">
             Dependendo do modo (<strong>Queda Simultânea</strong> ou <strong>Queda Livre</strong>), as funções e objetos mudam.
           </p>
         </div>
