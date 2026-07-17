@@ -381,18 +381,32 @@ export function SimulationCanvas({
              >
                {content}
                {/* Tooltip */}
-               <div className={`absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-44 bg-slate-900 text-white text-xs p-2.5 rounded-lg opacity-0 group-hover:opacity-100 group-focus:opacity-100 active:opacity-100 transition-opacity pointer-events-none z-[9999] shadow-lg border border-slate-700`}>
+               <div className={`absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 ${obj.id === 'skydiver' ? 'w-56' : 'w-44'} bg-slate-900 text-white text-xs p-2.5 rounded-lg opacity-0 group-hover:opacity-100 group-focus:opacity-100 active:opacity-100 transition-opacity pointer-events-none z-[9999] shadow-lg border border-slate-700`}>
                  <div className="font-black border-b border-slate-700 pb-1 mb-1">{obj.name}</div>
                  <div>Massa: {obj.mass.toFixed(3)} kg</div>
-                 <div>Velocidade: {currentV.toFixed(1)} m/s</div>
+                 {!(currentY <= 0 && currentV === 0) && (
+                   <div>Velocidade: {currentV.toFixed(2).replace('.', ',')} m/s</div>
+                 )}
                  {(currentY <= 0 && currentV === 0) && (
                    <>
-                     <div>Velocidade Máx: {(letter === 'A' ? maxVA : maxVB).toFixed(1)} m/s</div>
-                     <div>F. Arrasto Máx: {(0.5 * env.rho * Math.pow(letter === 'A' ? maxVA : maxVB, 2) * (parachuteDeployed && obj.id === 'skydiver' ? 1.75 : obj.cd) * (parachuteDeployed && obj.id === 'skydiver' ? obj.area + 5 : obj.area)).toFixed(3)} N</div>
+                     {obj.id === 'skydiver' ? (
+                       <>
+                         <div>Velocidade Máx (sem paraquedas): {(letter === 'A' ? maxVA : maxVB).toFixed(1)} m/s</div>
+                         <div>Velocidade Máx (com paraquedas): {(() => {
+                           const cdPara = obj.parachuteCd !== undefined ? obj.parachuteCd : 1.75;
+                           const areaPara = obj.parachuteArea !== undefined ? obj.parachuteArea : obj.area + 5;
+                           const vMaxCom = env.rho > 0 ? Math.sqrt((2 * obj.mass * env.g) / (env.rho * cdPara * areaPara)) : 0;
+                           return env.rho > 0 ? `${vMaxCom.toFixed(1)} m/s` : 'N/A';
+                         })()}</div>
+                       </>
+                     ) : (
+                       <div>Velocidade Máx: {(letter === 'A' ? maxVA : maxVB).toFixed(1)} m/s</div>
+                     )}
+                     <div>F. Arrasto Máx: {(obj.id === 'skydiver' ? (obj.mass * env.g) : (0.5 * env.rho * Math.pow(letter === 'A' ? maxVA : maxVB, 2) * (parachuteDeployed && obj.id === 'skydiver' ? (obj.parachuteCd !== undefined ? obj.parachuteCd : 1.75) : obj.cd) * (parachuteDeployed && obj.id === 'skydiver' ? (obj.parachuteArea !== undefined ? obj.parachuteArea : obj.area + 5) : obj.area))).toFixed(3)} N</div>
                    </>
                  )}
-                 <div>Área: {parachuteDeployed && obj.id === 'skydiver' ? (obj.area + 5).toFixed(2) : obj.area} m²</div>
-                 <div>Cd: {parachuteDeployed && obj.id === 'skydiver' ? '1.75' : obj.cd}</div>
+                 <div>Área: {parachuteDeployed && obj.id === 'skydiver' ? (obj.parachuteArea !== undefined ? obj.parachuteArea : obj.area + 5).toFixed(2) : obj.area} m²</div>
+                 <div>Cd: {parachuteDeployed && obj.id === 'skydiver' ? (obj.parachuteCd !== undefined ? obj.parachuteCd : 1.75) : obj.cd}</div>
                </div>
              </div>
           );
@@ -478,7 +492,7 @@ export function SimulationCanvas({
                                 <div className="w-1 sm:w-1.5 bg-[#0055FF] relative" style={{ height: 15 + getVelScale(vA) }}>
                                     <div className="absolute -bottom-[7px] sm:-bottom-2 left-1/2 -translate-x-1/2 border-l-[5px] sm:border-l-[8px] border-r-[5px] sm:border-r-[8px] border-t-[7px] sm:border-t-[10px] border-x-transparent border-t-[#0055FF]"></div>
                                 </div>
-                                <span className="text-[10px] font-black bg-white/80 px-1 rounded mt-3 shadow-sm border border-slate-200 text-center whitespace-nowrap">v: {vA.toFixed(1)} m/s</span>
+                                <span className="text-[10px] font-black bg-white/80 px-1 rounded mt-3 shadow-sm border border-slate-200 text-center whitespace-nowrap">v: {vA.toFixed(2).replace('.', ',')} m/s</span>
                             </div>
                         )}
                         <div className={`flex flex-col items-center ${env.id === 'moon' ? 'text-white' : 'text-slate-900'}`}>
@@ -525,7 +539,7 @@ export function SimulationCanvas({
                             <div className="w-1 sm:w-1.5 bg-[#0055FF] relative" style={{ height: 15 + getVelScale(vB) }}>
                                 <div className="absolute -bottom-[7px] sm:-bottom-2 left-1/2 -translate-x-1/2 border-l-[5px] sm:border-l-[8px] border-r-[5px] sm:border-r-[8px] border-t-[7px] sm:border-t-[10px] border-x-transparent border-t-[#0055FF]"></div>
                             </div>
-                            <span className="text-[10px] font-black bg-white/80 px-1 rounded mt-3 shadow-sm border border-slate-200 text-center whitespace-nowrap">v: {vB.toFixed(1)} m/s</span>
+                            <span className="text-[10px] font-black bg-white/80 px-1 rounded mt-3 shadow-sm border border-slate-200 text-center whitespace-nowrap">v: {vB.toFixed(2).replace('.', ',')} m/s</span>
                         </div>
                     )}
                     <div className={`flex flex-col items-center ${env.id === 'moon' ? 'text-white' : 'text-slate-900'}`}>
@@ -578,13 +592,14 @@ export function SimulationCanvas({
 
           <div className="border-t-2 border-slate-100 pt-4">
              <h4 className="font-bold text-sm uppercase mb-3 text-slate-700">Parâmetros</h4>
-             <div className="font-sans text-sm sm:text-2xl font-black tracking-wider mb-4 bg-slate-900 text-green-400 p-3 sm:p-4 rounded-xl whitespace-nowrap overflow-x-auto text-center shadow-inner border border-slate-700">
+             <div className="font-sans text-sm sm:text-2xl font-black tracking-wider mb-2 bg-slate-900 text-green-400 p-3 sm:p-4 rounded-xl whitespace-nowrap overflow-x-auto text-center shadow-inner border border-slate-700">
                F<sub>a</sub> = &frac12; &middot; &rho; &middot; v&sup2; &middot; C<sub>d</sub> &middot; A
              </div>
              <ul className="text-xs space-y-2 text-slate-700 font-medium">
                <li className="flex justify-between items-center border-b border-slate-100 pb-1"><span><strong className="text-slate-900 text-sm">&rho;</strong> (Densidade do ar)</span> <span>{env.rho} kg/m&sup3;</span></li>
-               <li className="flex justify-between items-center border-b border-slate-100 pb-1"><span><strong className="text-slate-900 text-sm">C<sub>d</sub></strong> (Coef. de arrasto)</span> <span>{parachuteDeployedA ? '1.75' : objectA.cd}</span></li>
-               <li className="flex justify-between items-center border-b border-slate-100 pb-1"><span><strong className="text-slate-900 text-sm">A</strong> (Área de seção)</span> <span>{parachuteDeployedA ? (objectA.area + 5).toFixed(2) : objectA.area} m&sup2;</span></li>
+               <li className="flex justify-between items-center border-b border-slate-100 pb-1"><span><strong className="text-slate-900 text-sm font-serif">v</strong> (velocidade)</span> <span>{vA.toFixed(2).replace('.', ',')} m/s²</span></li>
+               <li className="flex justify-between items-center border-b border-slate-100 pb-1"><span><strong className="text-slate-900 text-sm">C<sub>d</sub></strong> (Coef. de arrasto)</span> <span>{parachuteDeployedA ? (objectA.parachuteCd !== undefined ? objectA.parachuteCd : 1.75) : objectA.cd}</span></li>
+               <li className="flex justify-between items-center border-b border-slate-100 pb-1"><span><strong className="text-slate-900 text-sm">A</strong> (Área de seção)</span> <span>{parachuteDeployedA ? (objectA.parachuteArea !== undefined ? objectA.parachuteArea : objectA.area + 5).toFixed(2) : objectA.area} m&sup2;</span></li>
                <li className="flex justify-between items-center"><span><strong className="text-slate-900 text-sm">m</strong> (Massa)</span> <span>{objectA.mass} kg</span></li>
              </ul>
           </div>

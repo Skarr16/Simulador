@@ -8,8 +8,9 @@ import { SettingsDrawer } from './components/SettingsDrawer';
 import { AdminModal } from './components/AdminModal';
 import { QrCodeModal } from './components/QrCodeModal';
 import { TutorialModal } from './components/TutorialModal';
+import { AboutModal } from './components/AboutModal';
 import { FailModal } from './components/FailModal';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, Info } from 'lucide-react';
 import { useEngine } from './hooks/useEngine';
 import { soundEngine } from './lib/audio';
 import { SimulationConfig } from './types';
@@ -57,6 +58,7 @@ export default function App() {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isQrCodeOpen, setIsQrCodeOpen] = useState(false);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   
   const [customObjects, setCustomObjects] = useState(OBJECTS);
@@ -282,6 +284,15 @@ export default function App() {
               <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider">Guia</span>
             </button>
 
+            {/* Button Sobre */}
+            <button type="button" 
+              onClick={() => setIsAboutOpen(true)}
+              className="flex shrink-0 items-center justify-center gap-1.5 sm:gap-2 px-1 sm:px-4 py-1.5 sm:py-2 bg-[#7C3AED] text-slate-900 rounded-xl border-[3px] border-slate-900 shadow-[3px_3px_0px_0px_#0f172a] hover:translate-y-0.5 hover:translate-x-0.5 hover:shadow-[1.5px_1.5px_0px_0px_#0f172a] active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0px_0px_#0f172a] transition-all"
+            >
+              <Info className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-900" /> 
+              <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wider text-slate-900">Sobre</span>
+            </button>
+
             {/* Button 6: QR Code */}
             <button type="button" 
               onClick={() => setIsQrCodeOpen(true)}
@@ -480,6 +491,7 @@ export default function App() {
       </main>
 
       <TutorialModal isOpen={isTutorialOpen} onClose={() => setIsTutorialOpen(false)} simulationMode={simulationMode} />
+      <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
       <SettingsDrawer 
         isOpen={isSettingsOpen} 
         onClose={() => setIsSettingsOpen(false)} 

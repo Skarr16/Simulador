@@ -586,7 +586,12 @@ export function TutorialModal({ isOpen, onClose, simulationMode }: TutorialModal
             <div className="flex flex-col gap-3">
                <div className="flex justify-between items-center border-b border-slate-200 pb-2">
                   <span className="text-[11px] font-bold text-slate-600"><strong className="text-slate-900 text-[12px]">ρ</strong> (Densidade do ar)</span>
-                  <span className="text-[11px] font-medium text-slate-800">1.225 kg/m³</span>
+                  <span className="text-[11px] font-medium text-slate-800">0.02 kg/m³</span>
+               </div>
+               
+               <div className="flex justify-between items-center border-b border-slate-200 pb-2">
+                  <span className="text-[11px] font-bold text-slate-600"><strong className="text-slate-900 text-[12px]">v</strong> (velocidade)</span>
+                  <span className="text-[11px] font-medium text-slate-800">0,00 m/s²</span>
                </div>
                
                <div className="flex justify-between items-center border-b border-slate-200 pb-2">
@@ -596,27 +601,15 @@ export function TutorialModal({ isOpen, onClose, simulationMode }: TutorialModal
                
                <div className="flex justify-between items-center border-b border-slate-200 pb-2">
                   <span className="text-[11px] font-bold text-slate-600"><strong className="text-slate-900 text-[12px]">A</strong> (Área de seção)</span>
-                  <span className="text-[11px] font-medium text-slate-800">0.35 m²</span>
+                  <span className="text-[11px] font-medium text-slate-800">0.5 m²</span>
                </div>
                
                <div className="flex justify-between items-center">
                   <span className="text-[11px] font-bold text-slate-600"><strong className="text-slate-900 text-[12px]">m</strong> (Massa)</span>
-                  <span className="text-[11px] font-medium text-slate-800">75 kg</span>
+                  <span className="text-[11px] font-medium text-slate-800">45 kg</span>
                </div>
             </div>
           </div>
-        </div>
-      </div>
-    ),
-    
-    // Page 8: Créditos
-    (
-      <div className="absolute inset-0 bg-[#7C3AED] flex flex-col items-center justify-center p-8 z-50">
-        <div className="max-w-sm flex flex-col items-center -mt-12 sm:-mt-20">
-          <img src="/ufs_logo.png" className="w-56 h-auto mb-10 object-contain drop-shadow-md" alt="Logo UFS" />
-          <p className="text-white text-[14px] sm:text-sm font-sans font-medium text-center leading-relaxed drop-shadow-sm">
-            Projeto desenvolvido durante a diciplina de <span className="font-black tracking-wide">TÓPICOS ESPECIAIS EM FERRAMENTAS COMPUTACIONAIS PARA O ENSINO DE FÍSICA - T01</span> do periodo <strong>2026.1</strong> da <strong>Universidade Federal de Sergipe</strong>
-          </p>
         </div>
       </div>
     )
