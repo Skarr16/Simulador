@@ -488,9 +488,9 @@ export function SimulationCanvas({
                       {/* Bottom Vectors (Velocity & Weight) */}
                       <div className="absolute top-[100%] left-1/2 -translate-x-1/2 mt-1 flex flex-row gap-8 sm:gap-12 pointer-events-none z-30">
                         {vA > 0 && (
-                            <div className="flex flex-col items-center text-[#0055FF]">
-                                <div className="w-1 sm:w-1.5 bg-[#0055FF] relative" style={{ height: 15 + getVelScale(vA) }}>
-                                    <div className="absolute -bottom-[7px] sm:-bottom-2 left-1/2 -translate-x-1/2 border-l-[5px] sm:border-l-[8px] border-r-[5px] sm:border-r-[8px] border-t-[7px] sm:border-t-[10px] border-x-transparent border-t-[#0055FF]"></div>
+                            <div className="flex flex-col items-center text-[#00C48C]">
+                                <div className="w-1 sm:w-1.5 bg-[#00C48C] relative" style={{ height: 15 + getVelScale(vA) }}>
+                                    <div className="absolute -bottom-[7px] sm:-bottom-2 left-1/2 -translate-x-1/2 border-l-[5px] sm:border-l-[8px] border-r-[5px] sm:border-r-[8px] border-t-[7px] sm:border-t-[10px] border-x-transparent border-t-[#00C48C]"></div>
                                 </div>
                                 <span className="text-[10px] font-black bg-white/80 px-1 rounded mt-3 shadow-sm border border-slate-200 text-center whitespace-nowrap">v: {vA.toFixed(2).replace('.', ',')} m/s</span>
                             </div>
@@ -535,9 +535,9 @@ export function SimulationCanvas({
                   {/* Bottom Vectors (Velocity & Weight) */}
                   <div className="absolute top-[100%] left-1/2 -translate-x-1/2 mt-1 flex flex-row gap-8 sm:gap-12 pointer-events-none z-30">
                     {vB > 0 && (
-                        <div className="flex flex-col items-center text-[#0055FF]">
-                            <div className="w-1 sm:w-1.5 bg-[#0055FF] relative" style={{ height: 15 + getVelScale(vB) }}>
-                                <div className="absolute -bottom-[7px] sm:-bottom-2 left-1/2 -translate-x-1/2 border-l-[5px] sm:border-l-[8px] border-r-[5px] sm:border-r-[8px] border-t-[7px] sm:border-t-[10px] border-x-transparent border-t-[#0055FF]"></div>
+                        <div className="flex flex-col items-center text-[#8B5CF6]">
+                            <div className="w-1 sm:w-1.5 bg-[#8B5CF6] relative" style={{ height: 15 + getVelScale(vB) }}>
+                                <div className="absolute -bottom-[7px] sm:-bottom-2 left-1/2 -translate-x-1/2 border-l-[5px] sm:border-l-[8px] border-r-[5px] sm:border-r-[8px] border-t-[7px] sm:border-t-[10px] border-x-transparent border-t-[#8B5CF6]"></div>
                             </div>
                             <span className="text-[10px] font-black bg-white/80 px-1 rounded mt-3 shadow-sm border border-slate-200 text-center whitespace-nowrap">v: {vB.toFixed(2).replace('.', ',')} m/s</span>
                         </div>
@@ -574,7 +574,7 @@ export function SimulationCanvas({
           <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-4 sm:mb-5">
              <div className="bg-slate-100 p-2 sm:p-3 rounded-lg border border-slate-200 shadow-inner flex flex-col justify-center items-center sm:items-start text-center sm:text-left">
                <div className="text-[10px] sm:text-xs uppercase font-bold text-slate-500 mb-0.5 sm:mb-1">Velocidade (v)</div>
-               <div className="font-black text-sm sm:text-2xl text-[#0055FF] tabular-nums tracking-tighter">{vA.toFixed(1)} <span className="text-[10px] sm:text-base">m/s</span></div>
+               <div className="font-black text-sm sm:text-2xl text-[#00C48C] tabular-nums tracking-tighter">{vA.toFixed(1)} <span className="text-[10px] sm:text-base">m/s</span></div>
              </div>
              <div className="bg-slate-100 p-2 sm:p-3 rounded-lg border border-slate-200 shadow-inner flex flex-col justify-center items-center sm:items-start text-center sm:text-left">
                <div className="text-[10px] sm:text-xs uppercase font-bold text-slate-500 mb-0.5 sm:mb-1">Arrasto (Fa)</div>

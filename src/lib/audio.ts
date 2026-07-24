@@ -1,4 +1,3 @@
-import whatsappSnd from '../../public/sons/whatsapp.mp3';
 import alertaSnd from '../../public/sons/alerta.mp3';
 class SoundEngine {
   private ctx: AudioContext | null = null;
@@ -12,7 +11,6 @@ class SoundEngine {
   
   
 
-  private whatsappBuffer: AudioBuffer | null = null;
   private alertBuffer: AudioBuffer | null = null;
 
   async init() {
@@ -31,16 +29,7 @@ class SoundEngine {
       }
     }
     
-    // Load MP3
-    if (!this.whatsappBuffer) {
-      try {
-        const response = await fetch(whatsappSnd);
-        if (response.ok) {
-          const arrayBuffer = await response.arrayBuffer();
-          this.whatsappBuffer = await this.ctx.decodeAudioData(arrayBuffer);
-        }
-      } catch (e) { console.error("Audio load error:", e); }
-    }
+    
     if (!this.alertBuffer) {
       try {
         const responseAlert = await fetch(alertaSnd);
@@ -155,14 +144,7 @@ class SoundEngine {
     osc2.stop(this.ctx.currentTime + 0.25);
   }
 
-  playWhatsapp() {
-    if (!this.isEnabled) return;
-    try {
-      const audio = new Audio(whatsappSnd);
-      audio.volume = 1.0;
-      audio.play().catch(e => console.error(e));
-    } catch (e) { console.error(e); }
-  }
+  
 
   playAlert() {
     if (!this.isEnabled) return;

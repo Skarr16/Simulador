@@ -37,7 +37,7 @@ export function ChartsArea({ data, simulationMode }: ChartsAreaProps) {
 
   const legendPayload = simulationMode === 'paraquedas' 
     ? [
-        { value: activeTab === 'position' ? 'Posição' : 'Velocidade', type: 'line', id: 'data', color: '#FF3366' },
+        { value: activeTab === 'position' ? 'Posição' : 'Velocidade', type: 'line', id: 'data', color: activeTab === 'position' ? '#FF3366' : '#00C48C' },
         ...(deployPoint ? [{ value: 'Paraquedas Aberto', type: 'circle', id: 'deploy', color: '#8b5cf6' }] : [])
       ]
     : undefined;
@@ -109,8 +109,8 @@ export function ChartsArea({ data, simulationMode }: ChartsAreaProps) {
               </>
             ) : (
               <>
-                <Line type="monotone" dataKey="vA" name={simulationMode === 'paraquedas' ? "Velocidade" : "Objeto A"} stroke="#FF3366" strokeWidth={4} dot={false} isAnimationActive={false} />
-                {simulationMode === 'livre' && <Line type="monotone" dataKey="vB" name="Objeto B" stroke="#0055FF" strokeWidth={4} dot={false} isAnimationActive={false} />}
+                <Line type="monotone" dataKey="vA" name={simulationMode === 'paraquedas' ? "Velocidade" : "Objeto A"} stroke="#00C48C" strokeWidth={4} dot={false} isAnimationActive={false} />
+                {simulationMode === 'livre' && <Line type="monotone" dataKey="vB" name="Objeto B" stroke="#8B5CF6" strokeWidth={4} dot={false} isAnimationActive={false} />}
                 {simulationMode === 'paraquedas' && deployPoint && (
                    <ReferenceDot x={deployPoint.t} y={deployPoint.vA} r={6} fill="#8b5cf6" stroke="white" strokeWidth={2} />
                 )}

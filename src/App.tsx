@@ -146,8 +146,7 @@ export default function App() {
     // Impact
     if (engine.currentState.yA <= 0 && prevYA.current > 0) {
       if (engine.objectA.id === 'skydiver') {
-        soundEngine.playSoftImpact(Math.max(prevVA.current, 10));
-        soundEngine.playWhatsapp();
+        soundEngine.playMetallicImpact(Math.max(prevVA.current, 10));
       } else if (['customA', 'customB', 'book', 'soccer'].includes(engine.objectA.id)) {
         soundEngine.playImpact(Math.max(prevVA.current, 10));
       } else if (['paper_crumpled', 'paper_flat', 'feather'].includes(engine.objectA.id)) {
@@ -158,8 +157,7 @@ export default function App() {
     }
     if (engine.currentState.yB <= 0 && prevYB.current > 0 && config.simulationMode !== 'paraquedas') {
       if (engine.objectB.id === 'skydiver') {
-        soundEngine.playSoftImpact(Math.max(prevVB.current, 10));
-        soundEngine.playWhatsapp();
+        soundEngine.playMetallicImpact(Math.max(prevVB.current, 10));
       } else if (['customA', 'customB', 'book', 'soccer'].includes(engine.objectB.id)) {
         soundEngine.playImpact(Math.max(prevVB.current, 10));
       } else if (['paper_crumpled', 'paper_flat', 'feather'].includes(engine.objectB.id)) {
