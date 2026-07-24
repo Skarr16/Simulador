@@ -32,6 +32,13 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
             Projeto desenvolvido durante a diciplina de <span className="font-black tracking-wide">TÓPICOS ESPECIAIS EM FERRAMENTAS COMPUTACIONAIS PARA O ENSINO DE FÍSICA - T01</span> do periodo <strong>2026.1</strong> da <strong>Universidade Federal de Sergipe</strong>
           </p>
           
+          <div className="flex flex-col items-center w-full mb-6">
+            <h3 className="text-white font-black tracking-wider text-sm mb-2 uppercase drop-shadow-sm">Professor Responsável</h3>
+            <p className="text-white text-xs sm:text-[13px] font-medium text-center opacity-90 drop-shadow-sm">
+              HELI LUCAS SANTOS PINTO
+            </p>
+          </div>
+
           <div className="flex flex-col items-center w-full">
             <h3 className="text-white font-black tracking-wider text-sm mb-4 uppercase drop-shadow-sm">Desenvolvedores</h3>
             <ul className="text-white text-xs sm:text-[13px] font-medium text-center space-y-2 opacity-90 drop-shadow-sm">
